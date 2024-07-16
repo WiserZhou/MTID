@@ -24,17 +24,56 @@ def zero_module(module):
 
 
 class SinusoidalPosEmb(nn.Module):
+    """
+    SinusoidalPosEmb is a module that generates sinusoidal positional embeddings.
+    These embeddings are commonly used in sequence models like Transformers to 
+    provide the model with information about the positions of elements in the sequence.
+    """
+
     def __init__(self, dim):
+        """
+        Initialize the SinusoidalPosEmb module.
+
+        Parameters:
+        - dim (int): The dimension of the positional embeddings.
+        """
         super().__init__()
         self.dim = dim
 
     def forward(self, x):
+        """
+        Forward pass to generate the positional embeddings.
+
+        Parameters:
+        - x (Tensor): A tensor containing the positions for which to generate embeddings.
+
+        Returns:
+        - Tensor: A tensor containing the sinusoidal positional embeddings.
+        """
+        # Get the device of the input tensor (CPU or GPU)
         device = x.device
+
+        # Calculate half the dimension, as we will create embeddings for both sine and cosine
         half_dim = self.dim // 2
+
+        # Calculate the scaling factor for the embedding
+        # We use log(10000) to spread out the positional embeddings in a range
         emb = math.log(10000) / (half_dim - 1)
+
+        # Create a tensor of size (half_dim) with values exponentially scaled by the factor calculated above
         emb = torch.exp(torch.arange(half_dim, device=device) * -emb)
+
+        # Expand the dimensions of x and emb for broadcasting
+        # x[:, None] changes shape from (batch_size) to (batch_size, 1)
+        # emb[None, :] changes shape from (half_dim) to (1, half_dim)
+        # This allows element-wise multiplication to create a (batch_size, half_dim) tensor
         emb = x[:, None] * emb[None, :]
+
+        # Calculate the sine and cosine of the embedding values
+        # Concatenate these values along the last dimension to create the final embeddings
+        # Resulting shape will be (batch_size, dim)
         emb = torch.cat((emb.sin(), emb.cos()), dim=-1)
+
         return emb
 
 
@@ -58,23 +97,29 @@ class Upsample1d(nn.Module):
 
 class Conv1dBlock(nn.Module):
     """
-        Conv1d --> GroupNorm --> Mish
+    A block consisting of Conv1d, GroupNorm, and Mish activation.
+    Optionally includes Dropout and can use zero-initialized weights.
     """
 
     def __init__(self, inp_channels, out_channels, kernel_size, n_groups=32, drop_out=0.0, if_zero=False):
         super().__init__()
+
+        # Define the block with dropout, if specified
         if drop_out > 0.0:
             self.block = nn.Sequential(
-                zero_module(
+                zero_module(  # Use zero-initialized weights if specified
                     nn.Conv1d(inp_channels, out_channels,
                               kernel_size, padding=1),
                 ),
+                # Rearrange the dimensions to fit GroupNorm's expected input shape
                 Rearrange('batch channels horizon -> batch channels 1 horizon'),
                 nn.GroupNorm(n_groups, out_channels),
                 Rearrange('batch channels 1 horizon -> batch channels horizon'),
-                nn.Mish(),
+                nn.Mish(),  # Apply Mish activation function
+                # Apply Dropout with specified probability
                 nn.Dropout(p=drop_out),
             )
+        # Define the block with zero-initialized weights, if specified
         elif if_zero:
             self.block = nn.Sequential(
                 zero_module(
@@ -85,8 +130,8 @@ class Conv1dBlock(nn.Module):
                 nn.GroupNorm(n_groups, out_channels),
                 Rearrange('batch channels 1 horizon -> batch channels horizon'),
                 nn.Mish(),
-
             )
+        # Define the standard block without Dropout and without zero-initialized weights
         else:
             self.block = nn.Sequential(
                 nn.Conv1d(inp_channels, out_channels, kernel_size, padding=1),
@@ -97,6 +142,7 @@ class Conv1dBlock(nn.Module):
             )
 
     def forward(self, x):
+        # Forward pass through the block
         return self.block(x)
 
 

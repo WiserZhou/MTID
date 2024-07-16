@@ -165,5 +165,7 @@ def get_args(description='whl'):
                         help='note the specific log and checkpoint')
     parser.add_argument('--loss_kind', default='Weighted_MSE', type=str,
                         help='Weighted_MSE: only 10 on both side ; Weighted_Gradient_MSE: gradient change')
+    parser.add_argument('--ckpt_path', default='', type=str,
+                        help='checkpoint path for max')
     args = parser.parse_args()
     return args
