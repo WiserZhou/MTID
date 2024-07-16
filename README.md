@@ -95,8 +95,10 @@ CUDA_VISIBLE_DEVICES=0 python temp.py --multiprocessing-distributed --num_thread
 2. Train PDPP: Modify the 'json_path_val' in `args.py` as the output file of `temp.py` and run:
 
 ```
-python main_distributed.py --multiprocessing-distributed --num_thread_reader=8 --cudnn_benchmark=1 --pin_memory --checkpoint_dir=whl --resume --batch_size=256 --batch_size_val=256 --evaluate
+python main_distributed.py --loss_kind=Weighted_Gradient_MSE --dist_port=21712
 ```
+dist_port:21712 is default number
+
 
 ​	  Training settings for different datasets are listed below:
 
@@ -126,7 +128,7 @@ python main_distributed.py --multiprocessing-distributed --num_thread_reader=8 -
 ​	  Modify the checkpoint path(L244) as the evaluated model in `inference.py` and run:
 
 ```
-python inference.py --multiprocessing-distributed --num_thread_reader=8 --cudnn_benchmark=1 --pin_memory --checkpoint_dir=whl --resume --batch_size=256 --batch_size_val=256 --evaluate > output.txt
+python inference.py --resume > output.txt
 ```
 
 ​	  **Results** of given checkpoints:

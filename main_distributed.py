@@ -66,7 +66,7 @@ def main_worker(gpu, ngpus_per_node, args):
             args.rank = args.rank * ngpus_per_node + gpu
         dist.init_process_group(
             backend=args.dist_backend,
-            init_method=args.dist_url,
+            init_method=f'tcp://localhost:{args.dist_port}',
             world_size=args.world_size,
             rank=args.rank,
         )
@@ -198,7 +198,7 @@ def main_worker(gpu, ngpus_per_node, args):
         # model.model.load_state_dict(checkpoint["model"], strict=False)
         # model.ema_model.load_state_dict(checkpoint["ema"], strict=False)
         time_pre = time.strftime("%Y%m%d%H%M%S", time.localtime())
-        logname = args.log_root + '_' + time_pre + '_' + args.dataset
+        logname = args.log_root + '_' + args.name + '_' + time_pre + '_' + args.dataset
         tb_logdir = os.path.join(args.log_root, logname)
         if args.rank == 0:
             # creat logger
@@ -222,16 +222,20 @@ def main_worker(gpu, ngpus_per_node, args):
     old_max_epoch = 0
     save_max = os.path.join(os.path.dirname(__file__), 'save_max')
 
+    # Main training loop across epochs
     for epoch in tqdm(range(args.start_epoch, args.epochs), desc='total train'):
 
+        # If distributed training is enabled, set the epoch for the sampler
         if args.distributed:
             train_sampler.set_epoch(epoch)
 
-        # train for one epoch
+        # Perform training for one epoch, and calculate additional metrics every 10 epochs
         if (epoch + 1) % 10 == 0:  # calculate on training set
             losses, acc_top1, acc_top5, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
                 acc_a0, acc_aT = model.train(
                     args.n_train_steps, True, args, scheduler)
+
+            # Reduce tensors for distributed training
             losses_reduced = reduce_tensor(losses.cuda()).item()
             acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
             acc_top5_reduced = reduce_tensor(acc_top5.cuda()).item()
@@ -242,6 +246,7 @@ def main_worker(gpu, ngpus_per_node, args):
             acc_a0_reduced = reduce_tensor(acc_a0.cuda()).item()
             acc_aT_reduced = reduce_tensor(acc_aT.cuda()).item()
 
+            # If the current process is the main process (rank 0), log the metrics
             if args.rank == 0:
                 logs = OrderedDict()
                 logs['Train/EpochLoss'] = losses_reduced
@@ -257,6 +262,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
                 tb_logger.flush()
         else:
+            # Train the model without calculating additional metrics
             losses = model.train(args.n_train_steps, False,
                                  args, scheduler).cuda()
             losses_reduced = reduce_tensor(losses).item()
@@ -273,7 +279,8 @@ def main_worker(gpu, ngpus_per_node, args):
 
                 tb_logger.flush()
 
-        if ((epoch + 1) % 5 == 0) and args.evaluate:  # or epoch > 18
+        # Evaluate the model every 2 epochs if evaluation is enabled
+        if ((epoch + 1) % 2 == 0) and args.evaluate:
             losses, acc_top1, acc_top5, \
                 trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
                 acc_a0, acc_aT = validate(test_loader, model.ema_model, args)
@@ -288,6 +295,7 @@ def main_worker(gpu, ngpus_per_node, args):
             acc_a0_reduced = reduce_tensor(acc_a0.cuda()).item()
             acc_aT_reduced = reduce_tensor(acc_aT.cuda()).item()
 
+            # If the current process is the main process (rank 0), log the validation metrics
             if args.rank == 0:
                 logs = OrderedDict()
                 logs['Val/EpochLoss'] = losses_reduced
@@ -303,36 +311,39 @@ def main_worker(gpu, ngpus_per_node, args):
 
                 tb_logger.flush()
                 print(trajectory_success_rate_meter_reduced, max_eva)
+
+            # Save checkpoint if the new trajectory success rate is better
             if trajectory_success_rate_meter_reduced >= max_eva:
                 if not (trajectory_success_rate_meter_reduced == max_eva and acc_top1_reduced < max_acc):
-                    save_checkpoint2(
-                        {
-                            "epoch": epoch + 1,
-                            "model": model.model.state_dict(),
-                            "ema": model.ema_model.state_dict(),
-                            "optimizer": model.optimizer.state_dict(),
-                            "step": model.step,
-                            "tb_logdir": tb_logdir,
-                            "scheduler": scheduler.state_dict(),
-                        }, save_max, old_max_epoch, epoch + 1, args.rank
-                    )
+                    save_checkpoint2(args.name,
+                                     {
+                                         "epoch": epoch + 1,
+                                         "model": model.model.state_dict(),
+                                         "ema": model.ema_model.state_dict(),
+                                         "optimizer": model.optimizer.state_dict(),
+                                         "step": model.step,
+                                         "tb_logdir": tb_logdir,
+                                         "scheduler": scheduler.state_dict(),
+                                     }, save_max, old_max_epoch, epoch + 1, args.rank
+                                     )
                     max_eva = trajectory_success_rate_meter_reduced
                     max_acc = acc_top1_reduced
                     old_max_epoch = epoch + 1
 
+        # Save checkpoint periodically based on the save frequency
         if (epoch + 1) % args.save_freq == 0:
             if args.rank == 0:
-                save_checkpoint(
-                    {
-                        "epoch": epoch + 1,
-                        "model": model.model.state_dict(),
-                        "ema": model.ema_model.state_dict(),
-                        "optimizer": model.optimizer.state_dict(),
-                        "step": model.step,
-                        "tb_logdir": tb_logdir,
-                        "scheduler": scheduler.state_dict(),
-                    }, checkpoint_dir, epoch + 1
-                )
+                save_checkpoint(args.name,
+                                {
+                                    "epoch": epoch + 1,
+                                    "model": model.model.state_dict(),
+                                    "ema": model.ema_model.state_dict(),
+                                    "optimizer": model.optimizer.state_dict(),
+                                    "step": model.step,
+                                    "tb_logdir": tb_logdir,
+                                    "scheduler": scheduler.state_dict(),
+                                }, checkpoint_dir, epoch + 1
+                                )
 
 
 def log(output, args):
@@ -340,22 +351,22 @@ def log(output, args):
         f.write(output + '\n')
 
 
-def save_checkpoint(state, checkpoint_dir, epoch, n_ckpt=3):
+def save_checkpoint(name, state, checkpoint_dir, epoch, n_ckpt=3):
     torch.save(state, os.path.join(checkpoint_dir,
-               "epoch{:0>4d}.pth.tar".format(epoch)))
+               "epoch_{}_{:0>4d}.pth.tar".format(name, epoch)))
     if epoch - n_ckpt >= 0:
         oldest_ckpt = os.path.join(
-            checkpoint_dir, "epoch{:0>4d}.pth.tar".format(epoch - n_ckpt))
+            checkpoint_dir, "epoch_{}_{:0>4d}.pth.tar".format(name, epoch - n_ckpt))
         if os.path.isfile(oldest_ckpt):
             os.remove(oldest_ckpt)
 
 
-def save_checkpoint2(state, checkpoint_dir, old_epoch, epoch, rank):
+def save_checkpoint2(name, state, checkpoint_dir, old_epoch, epoch, rank):
     torch.save(state, os.path.join(checkpoint_dir,
-               "epoch{:0>4d}_{}.pth.tar".format(epoch, rank)))
+               "epoch_{}_{:0>4d}_{}.pth.tar".format(name, epoch, rank)))
     if old_epoch > 0:
         oldest_ckpt = os.path.join(
-            checkpoint_dir, "epoch{:0>4d}_{}.pth.tar".format(old_epoch, rank))
+            checkpoint_dir, "epoch_{}_{:0>4d}_{}.pth.tar".format(name, old_epoch, rank))
         if os.path.isfile(oldest_ckpt):
             os.remove(oldest_ckpt)
 
