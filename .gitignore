@@ -1,0 +1,6 @@
+dataset/
+save_max/
+save_max_mlp/
+checkpoint/
+checkpoint_mlp/
+__pycache__
