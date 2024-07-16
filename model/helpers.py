@@ -190,7 +190,7 @@ class Weighted_Gradient_MSE(nn.Module):
             weights = torch.cat([
                 torch.linspace(10, 1, half_time_steps+1, device=pred.device),
                 torch.linspace(1, 10, half_time_steps+1,
-                               device=pred.device).flip(0)[1:]
+                               device=pred.device)[1:]
             ])
 
         # Apply weights to the action part of the loss
