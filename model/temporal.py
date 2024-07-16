@@ -10,29 +10,40 @@ from .helpers import (
     Conv1dBlock,
 )
 
+# Define a residual block used in the Temporal Unet
+
 
 class ResidualTemporalBlock(nn.Module):
 
     def __init__(self, inp_channels, out_channels, embed_dim, kernel_size=3):
         super().__init__()
 
+        # Define a sequence of convolutional blocks
         self.blocks = nn.ModuleList([
             Conv1dBlock(inp_channels, out_channels, kernel_size),
             Conv1dBlock(out_channels, out_channels, kernel_size, if_zero=True)
         ])
+
+        # Time embedding block
         self.time_mlp = nn.Sequential(    # should be removed for Noise and Deterministic Baselines
             nn.Mish(),
             nn.Linear(embed_dim, out_channels),
             Rearrange('batch t -> batch t 1'),
         )
+
+        # Residual connection
         self.residual_conv = nn.Conv1d(inp_channels, out_channels, 1) \
             if inp_channels != out_channels else nn.Identity()
 
     def forward(self, x, t):
+        # Forward pass with time embedding (for diffusion models)
         out = self.blocks[0](x) + self.time_mlp(t)   # for diffusion
-        # out = self.blocks[0](x)    # for Noise and Deterministic Baselines
+        # Uncomment the following line for Noise and Deterministic Baselines
+        # out = self.blocks[0](x)
         out = self.blocks[1](out)
         return out + self.residual_conv(x)
+
+# Define the Temporal Unet model
 
 
 class TemporalUnet(nn.Module):
@@ -44,10 +55,13 @@ class TemporalUnet(nn.Module):
     ):
         super().__init__()
 
+        # Determine the dimensions at each stage
         dims = [transition_dim, *map(lambda m: dim * m, dim_mults)]
         in_out = list(zip(dims[:-1], dims[1:]))
 
         time_dim = dim
+
+        # Define the time embedding module (for diffusion models)
         self.time_mlp = nn.Sequential(    # should be removed for Noise and Deterministic Baselines
             SinusoidalPosEmb(dim),
             nn.Linear(dim, dim * 4),
@@ -59,7 +73,7 @@ class TemporalUnet(nn.Module):
         self.ups = nn.ModuleList([])
         num_resolutions = len(in_out)
 
-        # print(in_out)
+        # Create downsampling blocks
         for ind, (dim_in, dim_out) in enumerate(in_out):
             is_last = ind >= (num_resolutions - 1)
 
@@ -70,9 +84,14 @@ class TemporalUnet(nn.Module):
             ]))
 
         mid_dim = dims[-1]
-        self.mid_block1 = ResidualTemporalBlock(mid_dim, mid_dim, embed_dim=time_dim)
-        self.mid_block2 = ResidualTemporalBlock(mid_dim, mid_dim, embed_dim=time_dim)
 
+        # Define the middle blocks
+        self.mid_block1 = ResidualTemporalBlock(
+            mid_dim, mid_dim, embed_dim=time_dim)
+        self.mid_block2 = ResidualTemporalBlock(
+            mid_dim, mid_dim, embed_dim=time_dim)
+
+        # Create upsampling blocks
         for ind, (dim_in, dim_out) in enumerate(reversed(in_out[1:])):
             is_last = ind >= (num_resolutions - 1)
 
@@ -82,33 +101,41 @@ class TemporalUnet(nn.Module):
                 Upsample1d(dim_in) if not is_last else nn.Identity()
             ]))
 
+        # Final convolutional block
         self.final_conv = nn.Sequential(
             Conv1dBlock(dim, dim, kernel_size=3, if_zero=True),
             nn.Conv1d(dim, transition_dim, 1),
         )
 
     def forward(self, x, time):
+        # Rearrange input tensor dimensions
         x = einops.rearrange(x, 'b h t -> b t h')
 
-        # t = None    # for Noise and Deterministic Baselines
+        # Get the time embedding (for diffusion models)
+        # Uncomment the following line for Noise and Deterministic Baselines
+        # t = None
         t = self.time_mlp(time)   # for diffusion
         h = []
 
+        # Forward pass through downsampling blocks
         for resnet, resnet2, downsample in self.downs:
             x = resnet(x, t)
             x = resnet2(x, t)
             h.append(x)
             x = downsample(x)
 
+        # Forward pass through middle blocks
         x = self.mid_block1(x, t)
         x = self.mid_block2(x, t)
 
+        # Forward pass through upsampling blocks
         for resnet, resnet2, upsample in self.ups:
             x = torch.cat((x, h.pop()), dim=1)
             x = resnet(x, t)
             x = resnet2(x, t)
             x = upsample(x)
 
+        # Final convolution and rearrange dimensions back
         x = self.final_conv(x)
         x = einops.rearrange(x, 'b t h -> b h t')
         return x

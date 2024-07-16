@@ -132,7 +132,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     diffusion_model = diffusion.GaussianDiffusion(
         temporal_model, args.horizon, args.observation_dim, args.action_dim, args.class_dim, args.n_diffusion_steps,
-        loss_type='Weighted_MSE', clip_denoised=True, )
+        loss_type=args.loss_kind, clip_denoised=True, )
 
     model = utils.Trainer(diffusion_model, train_loader, args.ema_decay, args.lr, args.gradient_accumulate_every,
                           args.step_start_ema, args.update_ema_every, args.log_freq)
@@ -192,21 +192,21 @@ def main_worker(gpu, ngpus_per_node, args):
                 tb_logger = Logger(tb_logdir)
                 log("=> loaded checkpoint '{}' (epoch {}){}".format(
                     checkpoint_path, checkpoint["epoch"], args.gpu), args)
-        else:
-            # log("=> loading checkpoint '{}' to initialize".format(checkpoint_path), args)
-            # checkpoint = torch.load(checkpoint_path, map_location='cuda:{}'.format(args.rank))
-            # model.model.load_state_dict(checkpoint["model"], strict=False)
-            # model.ema_model.load_state_dict(checkpoint["ema"], strict=False)
-            time_pre = time.strftime("%Y%m%d%H%M%S", time.localtime())
-            logname = args.log_root + '_' + time_pre + '_' + args.dataset
-            tb_logdir = os.path.join(args.log_root, logname)
-            if args.rank == 0:
-                # creat logger
-                if not (os.path.exists(tb_logdir)):
-                    os.makedirs(tb_logdir)
-                tb_logger = Logger(tb_logdir)
-                tb_logger.log_info(args)
-            log("=> no checkpoint found at '{}'".format(args.resume), args)
+    else:
+        # log("=> loading checkpoint '{}' to initialize".format(checkpoint_path), args)
+        # checkpoint = torch.load(checkpoint_path, map_location='cuda:{}'.format(args.rank))
+        # model.model.load_state_dict(checkpoint["model"], strict=False)
+        # model.ema_model.load_state_dict(checkpoint["ema"], strict=False)
+        time_pre = time.strftime("%Y%m%d%H%M%S", time.localtime())
+        logname = args.log_root + '_' + time_pre + '_' + args.dataset
+        tb_logdir = os.path.join(args.log_root, logname)
+        if args.rank == 0:
+            # creat logger
+            if not (os.path.exists(tb_logdir)):
+                os.makedirs(tb_logdir)
+            tb_logger = Logger(tb_logdir)
+            tb_logger.log_info(args)
+        log("=> no checkpoint found at '{}'".format(args.resume), args)
 
     if args.cudnn_benchmark:
         cudnn.benchmark = True

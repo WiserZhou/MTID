@@ -13,7 +13,7 @@ def get_args(description='whl'):
                         help='log dir root')
     parser.add_argument('--checkpoint_dir',
                         type=str,
-                        default='',
+                        default='whl',
                         help='checkpoint model folder')
     parser.add_argument('--optimizer',
                         type=str,
@@ -21,7 +21,7 @@ def get_args(description='whl'):
                         help='opt algorithm')
     parser.add_argument('--num_thread_reader',
                         type=int,
-                        default=40,
+                        default=8,
                         help='')
     parser.add_argument('--batch_size',
                         type=int,
@@ -29,7 +29,7 @@ def get_args(description='whl'):
                         help='batch size')
     parser.add_argument('--batch_size_val',
                         type=int,
-                        default=1024,
+                        default=256,
                         help='batch size eval')
     parser.add_argument('--pretrain_cnn_path',
                         type=str,
@@ -85,7 +85,7 @@ def get_args(description='whl'):
                         help='')
     parser.add_argument('--cudnn_benchmark',
                         type=int,
-                        default=0,
+                        default=1,
                         help='')
     parser.add_argument('--horizon',
                         type=int,
@@ -136,11 +136,11 @@ def get_args(description='whl'):
                         metavar='LR', help='initial learning rate', dest='lr')
     parser.add_argument('--resume', dest='resume', action='store_true',
                         help='resume training from last checkpoint')
-    parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
+    parser.add_argument('-e', '--evaluate', default=True, dest='evaluate', action='store_true',
                         help='evaluate model on validation set')
     parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                         help='use pre-trained model')
-    parser.add_argument('--pin_memory', dest='pin_memory', action='store_true',
+    parser.add_argument('--pin_memory', default=True, dest='pin_memory', action='store_true',
                         help='use pin_memory')
     parser.add_argument('--world-size', default=1, type=int,
                         help='number of nodes for distributed training')
@@ -156,7 +156,7 @@ def get_args(description='whl'):
                         help='seed for initializing training. ')
     parser.add_argument('--gpu', default=None, type=int,
                         help='GPU id to use.')
-    parser.add_argument('--multiprocessing-distributed', action='store_true',
+    parser.add_argument('--multiprocessing-distributed', default=True, action='store_true',
                         help='Use multi-processing distributed training to launch '
                              'N processes per node, which has N GPUs. This is the '
                              'fastest way to use PyTorch for either single node or '

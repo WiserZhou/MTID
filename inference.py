@@ -39,8 +39,10 @@ def accuracy2(output, target, topk=(1,), max_traj_len=0):
         correct_1 = correct[:1]
 
         # Success Rate
-        trajectory_success = torch.all(correct_1.view(correct_1.shape[1] // max_traj_len, -1), dim=1)
-        trajectory_success_rate = trajectory_success.sum() * 100.0 / trajectory_success.shape[0]
+        trajectory_success = torch.all(correct_1.view(
+            correct_1.shape[1] // max_traj_len, -1), dim=1)
+        trajectory_success_rate = trajectory_success.sum() * 100.0 / \
+            trajectory_success.shape[0]
 
         # MIoU
         _, pred_token = output.topk(1, 1, True, True)
@@ -51,7 +53,8 @@ def accuracy2(output, target, topk=(1,), max_traj_len=0):
         for i in range(pred_inst.shape[0]):
             pred_inst_set.add(tuple(pred_inst[i].tolist()))
             target_inst_set.add(tuple(target_inst[i].tolist()))
-        MIoU1 = 100.0 * len(pred_inst_set.intersection(target_inst_set)) / len(pred_inst_set.union(target_inst_set))
+        MIoU1 = 100.0 * len(pred_inst_set.intersection(target_inst_set)
+                            ) / len(pred_inst_set.union(target_inst_set))
 
         batch_size = batch_size // max_traj_len
         pred_inst = pred_token.view(batch_size, -1)  # [bs, T]
@@ -108,23 +111,26 @@ def test(val_loader, model, args):
             output = model(cond, if_jump=True)
 
             actions_pred = output.contiguous()
-            actions_pred = actions_pred[:, :, args.class_dim:args.class_dim + args.action_dim].contiguous()
+            actions_pred = actions_pred[:, :,
+                                        args.class_dim:args.class_dim + args.action_dim].contiguous()
             actions_pred = actions_pred.view(-1, args.action_dim)
 
             acc1, trajectory_success_rate, MIoU1, MIoU2, a0_acc, aT_acc = \
-                accuracy2(actions_pred.cpu(), video_label_reshaped.cpu(), topk=(1,), max_traj_len=args.horizon)
+                accuracy2(actions_pred.cpu(), video_label_reshaped.cpu(),
+                          topk=(1,), max_traj_len=args.horizon)
 
         acc_top1.update(acc1.item(), batch_size_current)
-        trajectory_success_rate_meter.update(trajectory_success_rate.item(), batch_size_current)
+        trajectory_success_rate_meter.update(
+            trajectory_success_rate.item(), batch_size_current)
         MIoU1_meter.update(MIoU1, batch_size_current)
         MIoU2_meter.update(MIoU2, batch_size_current)
         A0_acc.update(a0_acc, batch_size_current)
         AT_acc.update(aT_acc, batch_size_current)
 
     return torch.tensor(acc_top1.avg), \
-           torch.tensor(trajectory_success_rate_meter.avg), \
-           torch.tensor(MIoU1_meter.avg), torch.tensor(MIoU2_meter.avg), \
-           torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+        torch.tensor(trajectory_success_rate_meter.avg), \
+        torch.tensor(MIoU1_meter.avg), torch.tensor(MIoU2_meter.avg), \
+        torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
 
 
 def reduce_tensor(tensor):
@@ -153,7 +159,8 @@ def main():
 
     if args.multiprocessing_distributed:
         args.world_size = ngpus_per_node * args.world_size
-        mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
+        mp.spawn(main_worker, nprocs=ngpus_per_node,
+                 args=(ngpus_per_node, args))
     else:
         main_worker(args.gpu, ngpus_per_node, args)
 
@@ -175,7 +182,8 @@ def main_worker(gpu, ngpus_per_node, args):
             torch.cuda.set_device(args.gpu)
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.batch_size_val = int(args.batch_size_val / ngpus_per_node)
-            args.num_thread_reader = int(args.num_thread_reader / ngpus_per_node)
+            args.num_thread_reader = int(
+                args.num_thread_reader / ngpus_per_node)
     elif args.gpu is not None:
         torch.cuda.set_device(args.gpu)
 
@@ -187,7 +195,8 @@ def main_worker(gpu, ngpus_per_node, args):
         model=None,
     )
     if args.distributed:
-        test_sampler = torch.utils.data.distributed.DistributedSampler(test_dataset)
+        test_sampler = torch.utils.data.distributed.DistributedSampler(
+            test_dataset)
         test_sampler.shuffle = False
     else:
         test_sampler = None
@@ -229,7 +238,8 @@ def main_worker(gpu, ngpus_per_node, args):
         else:
             model.model.cuda()
             model.ema_model.cuda()
-            model.model = torch.nn.parallel.DistributedDataParallel(model.model, find_unused_parameters=True)
+            model.model = torch.nn.parallel.DistributedDataParallel(
+                model.model, find_unused_parameters=True)
             model.ema_model = torch.nn.parallel.DistributedDataParallel(model.ema_model,
                                                                         find_unused_parameters=True)
 
@@ -244,7 +254,8 @@ def main_worker(gpu, ngpus_per_node, args):
         checkpoint_path = "/home/zhouyufan/Projects/PDPP/save_max/epoch0185_0.pth.tar"
         if checkpoint_path:
             print("=> loading checkpoint '{}'".format(checkpoint_path), args)
-            checkpoint = torch.load(checkpoint_path, map_location='cuda:{}'.format(args.rank))
+            checkpoint = torch.load(
+                checkpoint_path, map_location='cuda:{}'.format(args.rank))
             args.start_epoch = checkpoint["epoch"]
             model.model.load_state_dict(checkpoint["model"], strict=True)
             model.ema_model.load_state_dict(checkpoint["ema"], strict=True)
@@ -271,17 +282,20 @@ def main_worker(gpu, ngpus_per_node, args):
         torch.manual_seed(tmp)
         torch.cuda.manual_seed_all(tmp)
 
-        acc_top1, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, acc_a0, acc_aT = test(test_loader, model.ema_model, args)
+        acc_top1, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, acc_a0, acc_aT = test(
+            test_loader, model.ema_model, args)
 
         acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
-        trajectory_success_rate_meter_reduced = reduce_tensor(trajectory_success_rate_meter.cuda()).item()
+        trajectory_success_rate_meter_reduced = reduce_tensor(
+            trajectory_success_rate_meter.cuda()).item()
         MIoU1_meter_reduced = reduce_tensor(MIoU1_meter.cuda()).item()
         MIoU2_meter_reduced = reduce_tensor(MIoU2_meter.cuda()).item()
         acc_a0_reduced = reduce_tensor(acc_a0.cuda()).item()
         acc_aT_reduced = reduce_tensor(acc_aT.cuda()).item()
 
         acc_top1_reduced_sum.append(acc_top1_reduced)
-        trajectory_success_rate_meter_reduced_sum.append(trajectory_success_rate_meter_reduced)
+        trajectory_success_rate_meter_reduced_sum.append(
+            trajectory_success_rate_meter_reduced)
         MIoU1_meter_reduced_sum.append(MIoU1_meter_reduced)
         MIoU2_meter_reduced_sum.append(MIoU2_meter_reduced)
         acc_a0_reduced_sum.append(acc_a0_reduced)
@@ -291,12 +305,18 @@ def main_worker(gpu, ngpus_per_node, args):
         time_end = time.time()
         print('time: ', time_end - time_start)
         print('-----------------Mean&Var-----------------------')
-        print('Val/EpochAcc@1', sum(acc_top1_reduced_sum) / test_times, np.var(acc_top1_reduced_sum))
-        print('Val/Traj_Success_Rate', sum(trajectory_success_rate_meter_reduced_sum) / test_times, np.var(trajectory_success_rate_meter_reduced_sum))
-        print('Val/MIoU1', sum(MIoU1_meter_reduced_sum) / test_times, np.var(MIoU1_meter_reduced_sum))
-        print('Val/MIoU2', sum(MIoU2_meter_reduced_sum) / test_times, np.var(MIoU2_meter_reduced_sum))
-        print('Val/acc_a0', sum(acc_a0_reduced_sum) / test_times, np.var(acc_a0_reduced_sum))
-        print('Val/acc_aT', sum(acc_aT_reduced_sum) / test_times, np.var(acc_aT_reduced_sum))
+        print('Val/EpochAcc@1', sum(acc_top1_reduced_sum) /
+              test_times, np.var(acc_top1_reduced_sum))
+        print('Val/Traj_Success_Rate', sum(trajectory_success_rate_meter_reduced_sum) /
+              test_times, np.var(trajectory_success_rate_meter_reduced_sum))
+        print('Val/MIoU1', sum(MIoU1_meter_reduced_sum) /
+              test_times, np.var(MIoU1_meter_reduced_sum))
+        print('Val/MIoU2', sum(MIoU2_meter_reduced_sum) /
+              test_times, np.var(MIoU2_meter_reduced_sum))
+        print('Val/acc_a0', sum(acc_a0_reduced_sum) /
+              test_times, np.var(acc_a0_reduced_sum))
+        print('Val/acc_aT', sum(acc_aT_reduced_sum) /
+              test_times, np.var(acc_aT_reduced_sum))
 
 
 if __name__ == "__main__":
