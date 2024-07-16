@@ -25,3 +25,26 @@ logging outputs to  /home/zhouyufan/Projects/PDPP/log/log_20240716161825_crossta
 total train:   2%|▏         | 3/200 [01:43<1:51:51, 34.07s/it]total train:   2%|▏         | 3/200 [01:43<1:51:51, 34.07s/it]total train:   2%|▏         | 3/200 [01:43<1:51:51, 34.07s/it]total train:   2%|▏         | 3/200 [01:43<1:51:51, 34.07s/it]total train:   2%|▏         | 3/200 [01:43<1:51:51, 34.07s/it]total train:   2%|▏         | 3/200 [01:43<1:51:51, 34.07s/it]total train:   2%|▏         | 3/200 [01:43<1:51:51, 34.07s/it]total train:   2%|▏         | 3/200 [01:45<1:53:16, 34.50s/it]lrs:
 4.4999999999999996e-05
 ---------------------------------
+total train:   2%|▏         | 4/200 [02:19<1:53:18, 34.68s/it]total train:   2%|▏         | 4/200 [02:19<1:53:18, 34.68s/it]total train:   2%|▏         | 4/200 [02:19<1:53:18, 34.68s/it]total train:   2%|▏         | 4/200 [02:19<1:53:18, 34.68s/it]total train:   2%|▏         | 4/200 [02:19<1:53:18, 34.68s/it]total train:   2%|▏         | 4/200 [02:19<1:53:18, 34.68s/it]total train:   2%|▏         | 4/200 [02:19<1:53:18, 34.68s/it]total train:   2%|▏         | 4/200 [02:20<1:54:12, 34.96s/it]lrs:
+6e-05
+---------------------------------
+lrs:
+7.5e-05
+---------------------------------
+/home/zhouyufan/Projects/PDPP/utils/eval.py:72: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+/home/zhouyufan/Projects/PDPP/utils/eval.py:72: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+/home/zhouyufan/Projects/PDPP/utils/eval.py:72: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+/home/zhouyufan/Projects/PDPP/utils/eval.py:72: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+/home/zhouyufan/Projects/PDPP/utils/eval.py:72: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+/home/zhouyufan/Projects/PDPP/utils/eval.py:72: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+/home/zhouyufan/Projects/PDPP/utils/eval.py:72: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+/home/zhouyufan/Projects/PDPP/utils/eval.py:72: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+total train:   2%|▎         | 5/200 [03:13<2:16:04, 41.87s/it]total train:   2%|▎         | 5/200 [03:13<2:16:06, 41.88s/it]total train:   2%|▎         | 5/200 [03:13<2:16:07, 41.88s/it]total train:   2%|▎         | 5/200 [03:13<2:16:08, 41.89s/it]total train:   2%|▎         | 5/200 [03:13<2:16:08, 41.89s/it]total train:   2%|▎         | 5/200 [03:14<2:16:17, 41.94s/it]total train:   2%|▎         | 5/200 [03:14<2:16:17, 41.94s/it]total train:   2%|▎         | 5/200 [03:15<2:16:14, 41.92s/it]5.170156955718994 0
