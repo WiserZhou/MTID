@@ -46,3 +46,52 @@ Starting training loop for rank: 6, total batch size: 256
 Starting training loop for rank: 1, total batch size: 256
 => no checkpoint found at 'True'
 Starting training loop for rank: 0, total batch size: 256
+=> loading checkpoint '/home/zhouyufan/Projects/PDPP/checkpoint/whl/epoch0140.pth.tar'
+=> loading checkpoint '/home/zhouyufan/Projects/PDPP/checkpoint/whl/epoch0140.pth.tar'
+=> loading checkpoint '/home/zhouyufan/Projects/PDPP/checkpoint/whl/epoch0140.pth.tar'
+=> loading checkpoint '/home/zhouyufan/Projects/PDPP/checkpoint/whl/epoch0140.pth.tar'
+=> loading checkpoint '/home/zhouyufan/Projects/PDPP/checkpoint/whl/epoch0140.pth.tar'
+=> loading checkpoint '/home/zhouyufan/Projects/PDPP/checkpoint/whl/epoch0140.pth.tar'
+=> loading checkpoint '/home/zhouyufan/Projects/PDPP/checkpoint/whl/epoch0140.pth.tar'
+=> loading checkpoint '/home/zhouyufan/Projects/PDPP/checkpoint/whl/epoch0140.pth.tar'
+Starting training loop for rank: 6, total batch size: 256
+Starting training loop for rank: 7, total batch size: 256
+Starting training loop for rank: 2, total batch size: 256
+Starting training loop for rank: 1, total batch size: 256
+Starting training loop for rank: 3, total batch size: 256
+Starting training loop for rank: 5, total batch size: 256
+Starting training loop for rank: 4, total batch size: 256
+=> loaded checkpoint '/home/zhouyufan/Projects/PDPP/checkpoint/whl/epoch0140.pth.tar' (epoch 140)0
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'True'
+=> no checkpoint found at 'True'
+Starting training loop for rank: 6, total batch size: 256
+Starting training loop for rank: 5, total batch size: 256
+=> no checkpoint found at 'True'
+=> no checkpoint found at 'True'
+Starting training loop for rank: 3, total batch size: 256
+=> no checkpoint found at 'True'
+Starting training loop for rank: 7, total batch size: 256
+Starting training loop for rank: 4, total batch size: 256
+=> no checkpoint found at 'True'
+Starting training loop for rank: 1, total batch size: 256
+=> no checkpoint found at 'True'
+Starting training loop for rank: 2, total batch size: 256
+=> no checkpoint found at 'True'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'True'
+Starting training loop for rank: 4, total batch size: 256
+=> no checkpoint found at 'True'
+=> no checkpoint found at 'True'
+=> no checkpoint found at 'True'
+Starting training loop for rank: 1, total batch size: 256
+Starting training loop for rank: 5, total batch size: 256
+Starting training loop for rank: 6, total batch size: 256
+=> no checkpoint found at 'True'
+Starting training loop for rank: 7, total batch size: 256
+=> no checkpoint found at 'True'
+Starting training loop for rank: 3, total batch size: 256
+=> no checkpoint found at 'True'
+Starting training loop for rank: 2, total batch size: 256
+=> no checkpoint found at 'True'
+Starting training loop for rank: 0, total batch size: 256

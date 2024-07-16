@@ -66,7 +66,8 @@ class Conv1dBlock(nn.Module):
         if drop_out > 0.0:
             self.block = nn.Sequential(
                 zero_module(
-                    nn.Conv1d(inp_channels, out_channels, kernel_size, padding=1),
+                    nn.Conv1d(inp_channels, out_channels,
+                              kernel_size, padding=1),
                 ),
                 Rearrange('batch channels horizon -> batch channels 1 horizon'),
                 nn.GroupNorm(n_groups, out_channels),
@@ -77,7 +78,8 @@ class Conv1dBlock(nn.Module):
         elif if_zero:
             self.block = nn.Sequential(
                 zero_module(
-                    nn.Conv1d(inp_channels, out_channels, kernel_size, padding=1),
+                    nn.Conv1d(inp_channels, out_channels,
+                              kernel_size, padding=1),
                 ),
                 Rearrange('batch channels horizon -> batch channels 1 horizon'),
                 nn.GroupNorm(n_groups, out_channels),
@@ -153,39 +155,62 @@ class Weighted_MSE(nn.Module):
         """
 
         loss_action = F.mse_loss(pred, targ, reduction='none')
-        
-        # previous method
-        # loss_action[:, 0, self.class_dim:self.class_dim + self.action_dim] *= 10.
-        # loss_action[:, -1, self.class_dim:self.class_dim + self.action_dim] *= 10.
+        loss_action[:, 0, self.class_dim:self.class_dim +
+                    self.action_dim] *= 10.
+        loss_action[:, -1, self.class_dim:self.class_dim +
+                    self.action_dim] *= 10.
+        loss_action = loss_action.sum()
+        return loss_action
 
-         # Gradient weight
+
+class Weighted_Gradient_MSE(nn.Module):
+
+    def __init__(self, weights, action_dim, class_dim):
+        super().__init__()
+        # self.register_buffer('weights', weights)
+        self.action_dim = action_dim
+        self.class_dim = class_dim
+
+    def forward(self, pred, targ):
+        """
+        :param pred: [B, T, task_dim+action_dim+observation_dim]
+        :param targ: [B, T, task_dim+action_dim+observation_dim]
+        :return:
+        """
+
+        loss_action = F.mse_loss(pred, targ, reduction='none')
+        # Gradient weight
         batch_size, time_steps, _ = pred.size()
         half_time_steps = time_steps // 2
         if time_steps % 2 == 0:
-            weights = torch.linspace(10, 1, half_time_steps, device=pred.device)
+            weights = torch.linspace(
+                10, 1, half_time_steps, device=pred.device)
             weights = torch.cat([weights, weights.flip(0)])
         else:
             weights = torch.cat([
-                torch.linspace(10, 1, half_time_steps, device=pred.device),
-                torch.tensor([1.], device=pred.device),
-                torch.linspace(1, 10, half_time_steps, device=pred.device).flip(0)
+                torch.linspace(10, 1, half_time_steps+1, device=pred.device),
+                torch.linspace(1, 10, half_time_steps+1,
+                               device=pred.device).flip(0)[1:]
             ])
-            
+
         # Apply weights to the action part of the loss
         for t in range(time_steps):
-            loss_action[:, t, self.class_dim:self.class_dim + self.action_dim] *= weights[t]
-        
+            loss_action[:, t, self.class_dim:self.class_dim +
+                        self.action_dim] *= weights[t]
+
         loss_action = loss_action.sum()
         return loss_action
 
 
 Losses = {
     'Weighted_MSE': Weighted_MSE,
+    'Weighted_Gradient_MSE': Weighted_Gradient_MSE
 }
 
 # -----------------------------------------------------------------------------#
 # -------------------------------- lr_schedule --------------------------------#
 # -----------------------------------------------------------------------------#
+
 
 def get_lr_schedule_with_warmup(optimizer, num_training_steps, last_epoch=-1):
     num_warmup_steps = num_training_steps * 20 / 120
@@ -204,6 +229,8 @@ def get_lr_schedule_with_warmup(optimizer, num_training_steps, last_epoch=-1):
 # -----------------------------------------------------------------------------#
 
 # Taken from PyTorch's examples.imagenet.main
+
+
 class AverageMeter(object):
     """Computes and stores the average and current value"""
 
@@ -228,7 +255,8 @@ class Logger:
         self._log_dir = log_dir
         print('logging outputs to ', log_dir)
         self._n_logged_samples = n_logged_samples
-        self._summ_writer = summary_writer(log_dir, flush_secs=120, max_queue=10)
+        self._summ_writer = summary_writer(
+            log_dir, flush_secs=120, max_queue=10)
         if not if_exist:
             log = logging.getLogger(log_dir)
             if not log.handlers:
@@ -237,7 +265,8 @@ class Logger:
                     os.mkdir(log_dir)
                 fh = logging.FileHandler(os.path.join(log_dir, 'log.txt'))
                 fh.setLevel(logging.INFO)
-                formatter = logging.Formatter(fmt='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S')
+                formatter = logging.Formatter(
+                    fmt='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S')
                 fh.setFormatter(formatter)
                 log.addHandler(fh)
             self.log = log
@@ -247,7 +276,8 @@ class Logger:
 
     def log_scalars(self, scalar_dict, group_name, step, phase):
         """Will log all scalars in the same plot."""
-        self._summ_writer.add_scalars('{}_{}'.format(group_name, phase), scalar_dict, step)
+        self._summ_writer.add_scalars('{}_{}'.format(
+            group_name, phase), scalar_dict, step)
 
     def flush(self):
         self._summ_writer.flush()

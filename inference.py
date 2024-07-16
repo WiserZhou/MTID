@@ -209,7 +209,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     diffusion_model = diffusion.GaussianDiffusion(
         temporal_model, args.horizon, args.observation_dim, args.action_dim, args.class_dim, args.n_diffusion_steps,
-        loss_type='Weighted_MSE', clip_denoised=True,)
+        loss_type=args.loss_kind, clip_denoised=True,)
 
     model = utils.Trainer(diffusion_model, None, args.ema_decay, args.lr, args.gradient_accumulate_every,
                           args.step_start_ema, args.update_ema_every, args.log_freq)
@@ -241,7 +241,7 @@ def main_worker(gpu, ngpus_per_node, args):
         model.ema_model = torch.nn.DataParallel(model.ema_model).cuda()
 
     if args.resume:
-        checkpoint_path = "/home/zhouyufan/Projects/PDPP/save_max/epoch0120_0.pth.tar"
+        checkpoint_path = "/home/zhouyufan/Projects/PDPP/save_max/epoch0185_0.pth.tar"
         if checkpoint_path:
             print("=> loading checkpoint '{}'".format(checkpoint_path), args)
             checkpoint = torch.load(checkpoint_path, map_location='cuda:{}'.format(args.rank))

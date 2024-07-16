@@ -128,7 +128,7 @@ def get_args(description='whl'):
                         default='/home/zhouyufan/Projects/PDPP/output.json',
                         help='path of the generated json file for val')
 
-    parser.add_argument('--epochs', default=140, type=int, metavar='N',
+    parser.add_argument('--epochs', default=200, type=int, metavar='N',
                         help='number of total epochs to run')
     parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
@@ -161,5 +161,8 @@ def get_args(description='whl'):
                              'N processes per node, which has N GPUs. This is the '
                              'fastest way to use PyTorch for either single node or '
                              'multi node data parallel training')
+
+    parser.add_argument('--loss_kind', default='Weighted_MSE', type=str,
+                        help='Weighted_MSE: only 10 on both side ; Weighted_Gradient_MSE: gradient change')
     args = parser.parse_args()
     return args

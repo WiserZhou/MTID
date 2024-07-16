@@ -40,7 +40,7 @@ class GaussianDiffusion(nn.Module):
             ddim_timestep_seq = np.asarray(list(range(0, n_timesteps, c)))
         elif ddim_discr_method == 'quad':
             ddim_timestep_seq = (
-                    (np.linspace(0, np.sqrt(n_timesteps), ddim_timesteps)) ** 2
+                (np.linspace(0, np.sqrt(n_timesteps), ddim_timesteps)) ** 2
             ).astype(int)
         else:
             assert RuntimeError()
@@ -55,13 +55,18 @@ class GaussianDiffusion(nn.Module):
 
         # calculations for diffusion q(x_t | x_{t-1}) and others
         self.register_buffer('sqrt_alphas_cumprod', torch.sqrt(alphas_cumprod))
-        self.register_buffer('sqrt_one_minus_alphas_cumprod', torch.sqrt(1. - alphas_cumprod))
-        self.register_buffer('log_one_minus_alphas_cumprod', torch.log(1. - alphas_cumprod))
-        self.register_buffer('sqrt_recip_alphas_cumprod', torch.sqrt(1. / alphas_cumprod))
-        self.register_buffer('sqrt_recipm1_alphas_cumprod', torch.sqrt(1. / alphas_cumprod - 1))
+        self.register_buffer('sqrt_one_minus_alphas_cumprod',
+                             torch.sqrt(1. - alphas_cumprod))
+        self.register_buffer('log_one_minus_alphas_cumprod',
+                             torch.log(1. - alphas_cumprod))
+        self.register_buffer('sqrt_recip_alphas_cumprod',
+                             torch.sqrt(1. / alphas_cumprod))
+        self.register_buffer('sqrt_recipm1_alphas_cumprod',
+                             torch.sqrt(1. / alphas_cumprod - 1))
 
         # calculations for posterior q(x_{t-1} | x_t, x_0)
-        posterior_variance = betas * (1. - alphas_cumprod_prev) / (1. - alphas_cumprod)
+        posterior_variance = betas * \
+            (1. - alphas_cumprod_prev) / (1. - alphas_cumprod)
         self.register_buffer('posterior_variance', posterior_variance)
 
         # below: log calculation clipped because the posterior variance is 0 at the beginning of the diffusion chain
@@ -78,11 +83,12 @@ class GaussianDiffusion(nn.Module):
 
     def q_posterior(self, x_start, x_t, t):
         posterior_mean = (
-                extract(self.posterior_mean_coef1, t, x_t.shape) * x_start +
-                extract(self.posterior_mean_coef2, t, x_t.shape) * x_t
+            extract(self.posterior_mean_coef1, t, x_t.shape) * x_start +
+            extract(self.posterior_mean_coef2, t, x_t.shape) * x_t
         )
         posterior_variance = extract(self.posterior_variance, t, x_t.shape)
-        posterior_log_variance_clipped = extract(self.posterior_log_variance_clipped, t, x_t.shape)
+        posterior_log_variance_clipped = extract(
+            self.posterior_log_variance_clipped, t, x_t.shape)
         return posterior_mean, posterior_variance, posterior_log_variance_clipped
 
     def p_mean_variance(self, x, cond, t):
@@ -120,26 +126,29 @@ class GaussianDiffusion(nn.Module):
         else:
             alpha_bar_prev = extract(self.alphas_cumprod, t_prev, x.shape)
         sigma = (
-                self.eta
-                * torch.sqrt((1 - alpha_bar_prev) / (1 - alpha_bar))
-                * torch.sqrt(1 - alpha_bar / alpha_bar_prev)
+            self.eta
+            * torch.sqrt((1 - alpha_bar_prev) / (1 - alpha_bar))
+            * torch.sqrt(1 - alpha_bar / alpha_bar_prev)
         )
 
         noise = torch.randn_like(x) * self.random_ratio
         mean_pred = (
-                x_recon * torch.sqrt(alpha_bar_prev)
-                + torch.sqrt(1 - alpha_bar_prev - sigma ** 2) * eps
+            x_recon * torch.sqrt(alpha_bar_prev)
+            + torch.sqrt(1 - alpha_bar_prev - sigma ** 2) * eps
         )
 
-        nonzero_mask = (1 - (t == 0).float()).reshape(b, *((1,) * (len(x.shape) - 1)))
+        nonzero_mask = (1 - (t == 0).float()).reshape(b,
+                                                      *((1,) * (len(x.shape) - 1)))
         return mean_pred + nonzero_mask * sigma * noise
 
     @torch.no_grad()
     def p_sample(self, x, cond, t):
         b, *_, device = *x.shape, x.device
-        model_mean, _, model_log_variance = self.p_mean_variance(x=x, cond=cond, t=t)
+        model_mean, _, model_log_variance = self.p_mean_variance(
+            x=x, cond=cond, t=t)
         noise = torch.randn_like(x) * self.random_ratio
-        nonzero_mask = (1 - (t == 0).float()).reshape(b, *((1,) * (len(x.shape) - 1)))
+        nonzero_mask = (1 - (t == 0).float()).reshape(b,
+                                                      *((1,) * (len(x.shape) - 1)))
         return model_mean + nonzero_mask * (0.5 * model_log_variance).exp() * noise
 
     @torch.no_grad()
@@ -147,9 +156,11 @@ class GaussianDiffusion(nn.Module):
         device = self.betas.device
         batch_size = len(cond[0])
         horizon = self.horizon
-        shape = (batch_size, horizon, self.class_dim + self.action_dim + self.observation_dim)
+        shape = (batch_size, horizon, self.class_dim +
+                 self.action_dim + self.observation_dim)
 
-        x = torch.randn(shape, device=device) * self.random_ratio  # xt for Noise and diffusion
+        x = torch.randn(shape, device=device) * \
+            self.random_ratio  # xt for Noise and diffusion
         # x = torch.zeros(shape, device=device)   # for Deterministic
         x = condition_projection(x, cond, self.action_dim, self.class_dim)
 
@@ -158,20 +169,27 @@ class GaussianDiffusion(nn.Module):
         '''
         if not if_jump:
             for i in reversed(range(0, self.n_timesteps)):
-                timesteps = torch.full((batch_size,), i, device=device, dtype=torch.long)
+                timesteps = torch.full(
+                    (batch_size,), i, device=device, dtype=torch.long)
                 x = self.p_sample(x, cond, timesteps)
-                x = condition_projection(x, cond, self.action_dim, self.class_dim)
+                x = condition_projection(
+                    x, cond, self.action_dim, self.class_dim)
 
         else:
             for i in reversed(range(0, self.ddim_timesteps)):
-                timesteps = torch.full((batch_size,), self.ddim_timestep_seq[i], device=device, dtype=torch.long)
+                timesteps = torch.full(
+                    (batch_size,), self.ddim_timestep_seq[i], device=device, dtype=torch.long)
                 if i == 0:
-                    timesteps_prev = torch.full((batch_size,), 0, device=device, dtype=torch.long)
-                    x = self.p_sample_ddim(x, cond, timesteps, timesteps_prev, True)
+                    timesteps_prev = torch.full(
+                        (batch_size,), 0, device=device, dtype=torch.long)
+                    x = self.p_sample_ddim(
+                        x, cond, timesteps, timesteps_prev, True)
                 else:
-                    timesteps_prev = torch.full((batch_size,), self.ddim_timestep_seq[i-1], device=device, dtype=torch.long)
+                    timesteps_prev = torch.full(
+                        (batch_size,), self.ddim_timestep_seq[i-1], device=device, dtype=torch.long)
                     x = self.p_sample_ddim(x, cond, timesteps, timesteps_prev)
-                x = condition_projection(x, cond, self.action_dim, self.class_dim)
+                x = condition_projection(
+                    x, cond, self.action_dim, self.class_dim)
 
         '''
         The two lines below is for Noise and Deterministic
@@ -188,29 +206,35 @@ class GaussianDiffusion(nn.Module):
             noise = torch.randn_like(x_start) * self.random_ratio
 
         sample = (
-                extract(self.sqrt_alphas_cumprod, t, x_start.shape) * x_start +
-                extract(self.sqrt_one_minus_alphas_cumprod, t, x_start.shape) * noise
+            extract(self.sqrt_alphas_cumprod, t, x_start.shape) * x_start +
+            extract(self.sqrt_one_minus_alphas_cumprod,
+                    t, x_start.shape) * noise
         )
 
         return sample
 
     def p_losses(self, x_start, cond, t):
-        noise = torch.randn_like(x_start) * self.random_ratio   # for Noise and diffusion
+        # for Noise and diffusion
+        noise = torch.randn_like(x_start) * self.random_ratio
         # noise = torch.zeros_like(x_start)   # for Deterministic
         # x_noisy = noise   # for Noise and Deterministic
 
-        x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)   # for diffusion, should be removed for Noise and Deterministic
-        x_noisy = condition_projection(x_noisy, cond, self.action_dim, self.class_dim)
+        # for diffusion, should be removed for Noise and Deterministic
+        x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
+        x_noisy = condition_projection(
+            x_noisy, cond, self.action_dim, self.class_dim)
 
         x_recon = self.model(x_noisy, t)
-        x_recon = condition_projection(x_recon, cond, self.action_dim, self.class_dim)
+        x_recon = condition_projection(
+            x_recon, cond, self.action_dim, self.class_dim)
 
         loss = self.loss_fn(x_recon, x_start)
         return loss
 
     def loss(self, x, cond):
         batch_size = len(x)   # for diffusion
-        t = torch.randint(0, self.n_timesteps, (batch_size,), device=x.device).long()   # for diffusion
+        t = torch.randint(0, self.n_timesteps, (batch_size,),
+                          device=x.device).long()   # for diffusion
         # t = None    # for Noise and Deterministic
         return self.p_losses(x, cond, t)
 

@@ -25,6 +25,7 @@ import numpy as np
 from model.helpers import Logger
 from tqdm import tqdm
 
+
 def reduce_tensor(tensor):
     rt = tensor.clone()
     torch.distributed.all_reduce(rt, op=ReduceOp.SUM)
@@ -50,7 +51,8 @@ def main():
 
     if args.multiprocessing_distributed:
         args.world_size = ngpus_per_node * args.world_size
-        mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
+        mp.spawn(main_worker, nprocs=ngpus_per_node,
+                 args=(ngpus_per_node, args))
     else:
         main_worker(args.gpu, ngpus_per_node, args)
 
@@ -72,7 +74,8 @@ def main_worker(gpu, ngpus_per_node, args):
             torch.cuda.set_device(args.gpu)
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.batch_size_val = int(args.batch_size_val / ngpus_per_node)
-            args.num_thread_reader = int(args.num_thread_reader / ngpus_per_node)
+            args.num_thread_reader = int(
+                args.num_thread_reader / ngpus_per_node)
     elif args.gpu is not None:
         torch.cuda.set_device(args.gpu)
 
@@ -91,8 +94,10 @@ def main_worker(gpu, ngpus_per_node, args):
         model=None,
     )
     if args.distributed:
-        train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
-        test_sampler = torch.utils.data.distributed.DistributedSampler(test_dataset)
+        train_sampler = torch.utils.data.distributed.DistributedSampler(
+            train_dataset)
+        test_sampler = torch.utils.data.distributed.DistributedSampler(
+            test_dataset)
     else:
         train_sampler = None
         test_sampler = None
@@ -147,7 +152,8 @@ def main_worker(gpu, ngpus_per_node, args):
         else:
             model.model.cuda()
             model.ema_model.cuda()
-            model.model = torch.nn.parallel.DistributedDataParallel(model.model, find_unused_parameters=True)
+            model.model = torch.nn.parallel.DistributedDataParallel(
+                model.model, find_unused_parameters=True)
             model.ema_model = torch.nn.parallel.DistributedDataParallel(model.ema_model,
                                                                         find_unused_parameters=True)
 
@@ -158,9 +164,11 @@ def main_worker(gpu, ngpus_per_node, args):
         model.model = torch.nn.DataParallel(model.model).cuda()
         model.ema_model = torch.nn.DataParallel(model.ema_model).cuda()
 
-    scheduler = get_lr_schedule_with_warmup(model.optimizer, int(args.n_train_steps * args.epochs))
+    scheduler = get_lr_schedule_with_warmup(
+        model.optimizer, int(args.n_train_steps * args.epochs))
 
-    checkpoint_dir = os.path.join(os.path.dirname(__file__), 'checkpoint', args.checkpoint_dir)
+    checkpoint_dir = os.path.join(os.path.dirname(
+        __file__), 'checkpoint', args.checkpoint_dir)
     if args.checkpoint_dir != '' and not (os.path.isdir(checkpoint_dir)) and args.rank == 0:
         os.mkdir(checkpoint_dir)
 
@@ -168,7 +176,8 @@ def main_worker(gpu, ngpus_per_node, args):
         checkpoint_path = get_last_checkpoint(checkpoint_dir)
         if checkpoint_path:
             log("=> loading checkpoint '{}'".format(checkpoint_path), args)
-            checkpoint = torch.load(checkpoint_path, map_location='cuda:{}'.format(args.rank))
+            checkpoint = torch.load(
+                checkpoint_path, map_location='cuda:{}'.format(args.rank))
             args.start_epoch = checkpoint["epoch"]
             model.model.load_state_dict(checkpoint["model"])
             model.ema_model.load_state_dict(checkpoint["ema"])
@@ -181,7 +190,8 @@ def main_worker(gpu, ngpus_per_node, args):
             if args.rank == 0:
                 # creat logger
                 tb_logger = Logger(tb_logdir)
-                log("=> loaded checkpoint '{}' (epoch {}){}".format(checkpoint_path, checkpoint["epoch"], args.gpu), args)
+                log("=> loaded checkpoint '{}' (epoch {}){}".format(
+                    checkpoint_path, checkpoint["epoch"], args.gpu), args)
         else:
             # log("=> loading checkpoint '{}' to initialize".format(checkpoint_path), args)
             # checkpoint = torch.load(checkpoint_path, map_location='cuda:{}'.format(args.rank))
@@ -212,7 +222,7 @@ def main_worker(gpu, ngpus_per_node, args):
     old_max_epoch = 0
     save_max = os.path.join(os.path.dirname(__file__), 'save_max')
 
-    for epoch in tqdm(range(args.start_epoch, args.epochs),desc='total train'):
+    for epoch in tqdm(range(args.start_epoch, args.epochs), desc='total train'):
 
         if args.distributed:
             train_sampler.set_epoch(epoch)
@@ -220,11 +230,13 @@ def main_worker(gpu, ngpus_per_node, args):
         # train for one epoch
         if (epoch + 1) % 10 == 0:  # calculate on training set
             losses, acc_top1, acc_top5, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
-            acc_a0, acc_aT = model.train(args.n_train_steps, True, args, scheduler)
+                acc_a0, acc_aT = model.train(
+                    args.n_train_steps, True, args, scheduler)
             losses_reduced = reduce_tensor(losses.cuda()).item()
             acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
             acc_top5_reduced = reduce_tensor(acc_top5.cuda()).item()
-            trajectory_success_rate_meter_reduced = reduce_tensor(trajectory_success_rate_meter.cuda()).item()
+            trajectory_success_rate_meter_reduced = reduce_tensor(
+                trajectory_success_rate_meter.cuda()).item()
             MIoU1_meter_reduced = reduce_tensor(MIoU1_meter.cuda()).item()
             MIoU2_meter_reduced = reduce_tensor(MIoU2_meter.cuda()).item()
             acc_a0_reduced = reduce_tensor(acc_a0.cuda()).item()
@@ -245,7 +257,8 @@ def main_worker(gpu, ngpus_per_node, args):
 
                 tb_logger.flush()
         else:
-            losses = model.train(args.n_train_steps, False, args, scheduler).cuda()
+            losses = model.train(args.n_train_steps, False,
+                                 args, scheduler).cuda()
             losses_reduced = reduce_tensor(losses).item()
             if args.rank == 0:
                 print('lrs:')
@@ -262,13 +275,14 @@ def main_worker(gpu, ngpus_per_node, args):
 
         if ((epoch + 1) % 5 == 0) and args.evaluate:  # or epoch > 18
             losses, acc_top1, acc_top5, \
-            trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
-            acc_a0, acc_aT = validate(test_loader, model.ema_model, args)
+                trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
+                acc_a0, acc_aT = validate(test_loader, model.ema_model, args)
 
             losses_reduced = reduce_tensor(losses.cuda()).item()
             acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
             acc_top5_reduced = reduce_tensor(acc_top5.cuda()).item()
-            trajectory_success_rate_meter_reduced = reduce_tensor(trajectory_success_rate_meter.cuda()).item()
+            trajectory_success_rate_meter_reduced = reduce_tensor(
+                trajectory_success_rate_meter.cuda()).item()
             MIoU1_meter_reduced = reduce_tensor(MIoU1_meter.cuda()).item()
             MIoU2_meter_reduced = reduce_tensor(MIoU2_meter.cuda()).item()
             acc_a0_reduced = reduce_tensor(acc_a0.cuda()).item()
@@ -327,17 +341,21 @@ def log(output, args):
 
 
 def save_checkpoint(state, checkpoint_dir, epoch, n_ckpt=3):
-    torch.save(state, os.path.join(checkpoint_dir, "epoch{:0>4d}.pth.tar".format(epoch)))
+    torch.save(state, os.path.join(checkpoint_dir,
+               "epoch{:0>4d}.pth.tar".format(epoch)))
     if epoch - n_ckpt >= 0:
-        oldest_ckpt = os.path.join(checkpoint_dir, "epoch{:0>4d}.pth.tar".format(epoch - n_ckpt))
+        oldest_ckpt = os.path.join(
+            checkpoint_dir, "epoch{:0>4d}.pth.tar".format(epoch - n_ckpt))
         if os.path.isfile(oldest_ckpt):
             os.remove(oldest_ckpt)
 
 
 def save_checkpoint2(state, checkpoint_dir, old_epoch, epoch, rank):
-    torch.save(state, os.path.join(checkpoint_dir, "epoch{:0>4d}_{}.pth.tar".format(epoch, rank)))
+    torch.save(state, os.path.join(checkpoint_dir,
+               "epoch{:0>4d}_{}.pth.tar".format(epoch, rank)))
     if old_epoch > 0:
-        oldest_ckpt = os.path.join(checkpoint_dir, "epoch{:0>4d}_{}.pth.tar".format(old_epoch, rank))
+        oldest_ckpt = os.path.join(
+            checkpoint_dir, "epoch{:0>4d}_{}.pth.tar".format(old_epoch, rank))
         if os.path.isfile(oldest_ckpt):
             os.remove(oldest_ckpt)
 
