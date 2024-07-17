@@ -80,6 +80,7 @@ class SinusoidalPosEmb(nn.Module):
 class Downsample1d(nn.Module):
     def __init__(self, dim):
         super().__init__()
+        # in_channels, out_channels, kernel_size, stride=1, padding=0
         self.conv = nn.Conv1d(dim, dim, 2, 1, 0)
 
     def forward(self, x):

@@ -121,14 +121,15 @@ def main_worker(gpu, ngpus_per_node, args):
     )
 
     # create model
-    temporal_model = temporal.TemporalUnet(   # temporal
+    temporal_model = temporal.TemporalUnet(
         args.action_dim + args.observation_dim + args.class_dim,
         dim=256,
         dim_mults=(1, 2, 4), )
-
-    # for param in temporal_model.named_parameters():
-    #     if 'time_mlp' not in param[0]:
-    #         param[1].requires_grad = False
+    if args.layer_num == 4:
+        temporal_model = temporal.TemporalUnet(
+            args.action_dim + args.observation_dim + args.class_dim,
+            dim=256,
+            dim_mults=(1, 2, 4), )
 
     diffusion_model = diffusion.GaussianDiffusion(
         temporal_model, args.horizon, args.observation_dim, args.action_dim, args.class_dim, args.n_diffusion_steps,

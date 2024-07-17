@@ -128,7 +128,7 @@ def get_args(description='whl'):
                         default='/home/zhouyufan/Projects/PDPP/output.json',
                         help='path of the generated json file for val')
 
-    parser.add_argument('--epochs', default=180, type=int, metavar='N',
+    parser.add_argument('--epochs', default=150, type=int, metavar='N',
                         help='number of total epochs to run')
     parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
@@ -148,8 +148,6 @@ def get_args(description='whl'):
                         help='node rank for distributed training')
     parser.add_argument('--dist-file', default='dist-file', type=str,
                         help='url used to set up distributed training')
-    parser.add_argument('--dist_port', default=21712, type=int,
-                        help='port used to set up distributed training')
     parser.add_argument('--dist-backend', default='nccl', type=str,
                         help='distributed backend')
     parser.add_argument('--seed', default=217, type=int,
@@ -167,5 +165,9 @@ def get_args(description='whl'):
                         help='Weighted_MSE: only 10 on both side ; Weighted_Gradient_MSE: gradient change')
     parser.add_argument('--ckpt_path', default='', type=str,
                         help='checkpoint path for max')
+    parser.add_argument('--layer_num', default=3, type=int,
+                        help='number of layers in block')
+    parser.add_argument('--dist_port', default=21712, type=int,
+                        help='port used to set up distributed training')
     args = parser.parse_args()
     return args

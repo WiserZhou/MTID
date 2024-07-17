@@ -46,17 +46,27 @@ class ResidualTemporalBlock(nn.Module):
 # Define the Temporal Unet model
 
 
+#  transition_dim=args.action_dim + args.observation_dim + args.class_dim,
 class TemporalUnet(nn.Module):
     def __init__(
         self,
         transition_dim,
-        dim=32,
-        dim_mults=(1, 2, 4, 8),
+        dim=256,
+        dim_mults=(1, 2, 4),
     ):
         super().__init__()
 
         # Determine the dimensions at each stage
+        # transition_dim is the initial dimension (1659)
+        # dim is the base dimension (256)
+        # dim_mults is a list of multipliers ([1, 2, 4])
         dims = [transition_dim, *map(lambda m: dim * m, dim_mults)]
+
+        # dims will be a list combining transition_dim and the scaled values of dim
+        # For example: [1659, 256, 512, 1024]
+
+        # in_out will be a list of tuples representing pairs of consecutive dimensions
+        # [(1659, 256), (256, 512), (512, 1024)]
         in_out = list(zip(dims[:-1], dims[1:]))
 
         time_dim = dim
