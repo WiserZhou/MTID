@@ -32,11 +32,8 @@ class PlanningDataset(Dataset):
         if args.dataset == 'crosstask':
             if is_val:
                 cross_task_data_name = args.json_path_val2
-                # "/data1/wanghanlin/diffusion_planning/jsons_crosstask105/sliding_window_cross_task_data_{}_{}_new_task_id_73_with_event_class.json".format(is_val, self.max_traj_len)
             else:
                 cross_task_data_name = args.json_path_train
-                # "/data1/wanghanlin/diffusion_planning/jsons_crosstask105/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
-                # is_val, self.max_traj_len)
 
             if os.path.exists(cross_task_data_name):
                 with open(cross_task_data_name, 'r') as f:
@@ -47,12 +44,9 @@ class PlanningDataset(Dataset):
         elif args.dataset == 'coin':
             if is_val:
                 coin_data_name = args.json_path_val2
-                # "/data1/wanghanlin/diffusion_planning/jsons_coin/sliding_window_cross_task_data_{}_{}_new_task_id_73_with_event_class.json".format(
-                # is_val, self.max_traj_len)
             else:
                 coin_data_name = args.json_path_train
-                # "/data1/wanghanlin/diffusion_planning/jsons_coin/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
-                # is_val, self.max_traj_len)
+
             if os.path.exists(coin_data_name):
                 with open(coin_data_name, 'r') as f:
                     self.json_data = json.load(f)
@@ -62,12 +56,9 @@ class PlanningDataset(Dataset):
         elif args.dataset == 'NIV':
             if is_val:
                 niv_data_name = args.json_path_val2
-                # "/data1/wanghanlin/diffusion_planning/jsons_niv/sliding_window_cross_task_data_{}_{}_new_task_id_73_with_event_class.json".format(
-                # is_val, self.max_traj_len)
             else:
                 niv_data_name = args.json_path_train
-                # "/data1/wanghanlin/diffusion_planning/jsons_niv/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
-                # is_val, self.max_traj_len)
+
             if os.path.exists(niv_data_name):
                 with open(niv_data_name, 'r') as f:
                     self.json_data = json.load(f)

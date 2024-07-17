@@ -14,7 +14,7 @@ import utils
 
 from torch.distributed import ReduceOp
 from dataloader.data_load import PlanningDataset
-from model import diffusion, temporal
+from model import diffusion, temporal, temporal2
 from utils import *
 from utils.args import get_args
 
@@ -211,10 +211,16 @@ def main_worker(gpu, ngpus_per_node, args):
     )
 
     # create model
-    temporal_model = temporal.TemporalUnet(
-        args.action_dim + args.observation_dim + args.class_dim,
-        dim=256,
-        dim_mults=(1, 2, 4), )
+    if args.layer_num == 4:
+        temporal_model = temporal2.TemporalUnet(
+            args.action_dim + args.observation_dim + args.class_dim,
+            dim=256,
+            dim_mults=(1, 2, 4), )
+    else:
+        temporal_model = temporal.TemporalUnet(
+            args.action_dim + args.observation_dim + args.class_dim,
+            dim=256,
+            dim_mults=(1, 2, 4), )
 
     diffusion_model = diffusion.GaussianDiffusion(
         temporal_model, args.horizon, args.observation_dim, args.action_dim, args.class_dim, args.n_diffusion_steps,
@@ -244,6 +250,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                                                         find_unused_parameters=True)
 
     elif args.gpu is not None:
+        print("hello")
         model.model = model.model.cuda(args.gpu)
         model.ema_model = model.ema_model.cuda(args.gpu)
     else:

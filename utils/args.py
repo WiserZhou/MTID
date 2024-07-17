@@ -132,7 +132,7 @@ def get_args(description='whl'):
                         default='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json',
                         help='path of the generated json file for val train model')
 
-    parser.add_argument('--epochs', default=150, type=int, metavar='N',
+    parser.add_argument('--epochs', default=190, type=int, metavar='N',
                         help='number of total epochs to run')
     parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
@@ -156,9 +156,9 @@ def get_args(description='whl'):
                         help='distributed backend')
     parser.add_argument('--seed', default=217, type=int,
                         help='seed for initializing training. ')
-    parser.add_argument('--gpu', default=None, type=int,
+    parser.add_argument('--gpu', default=2, type=int,
                         help='GPU id to use.')
-    parser.add_argument('--multiprocessing-distributed', default=True, action='store_true',
+    parser.add_argument('--multiprocessing-distributed', default=False, action='store_true',
                         help='Use multi-processing distributed training to launch '
                              'N processes per node, which has N GPUs. This is the '
                              'fastest way to use PyTorch for either single node or '

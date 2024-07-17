@@ -27,10 +27,13 @@ from tqdm import tqdm
 
 
 def reduce_tensor(tensor):
-    rt = tensor.clone()
-    torch.distributed.all_reduce(rt, op=ReduceOp.SUM)
-    rt /= dist.get_world_size()
-    return rt
+    if dist.is_initialized():
+        rt = tensor.clone()
+        dist.all_reduce(rt, op=ReduceOp.SUM)
+        rt /= dist.get_world_size()
+        return rt
+    else:
+        return tensor
 
 
 def main():
@@ -121,12 +124,14 @@ def main_worker(gpu, ngpus_per_node, args):
     )
 
     # create model
-    temporal_model = temporal.TemporalUnet(
-        args.action_dim + args.observation_dim + args.class_dim,
-        dim=256,
-        dim_mults=(1, 2, 4), )
+
     if args.layer_num == 4:
         temporal_model = temporal2.TemporalUnet(
+            args.action_dim + args.observation_dim + args.class_dim,
+            dim=256,
+            dim_mults=(1, 2, 4), )
+    else:
+        temporal_model = temporal.TemporalUnet(
             args.action_dim + args.observation_dim + args.class_dim,
             dim=256,
             dim_mults=(1, 2, 4), )
@@ -142,6 +147,7 @@ def main_worker(gpu, ngpus_per_node, args):
         net_data = torch.load(args.pretrain_cnn_path)
         model.model.load_state_dict(net_data)
         model.ema_model.load_state_dict(net_data)
+
     if args.distributed:
         if args.gpu is not None:
             model.model.cuda(args.gpu)

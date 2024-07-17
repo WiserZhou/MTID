@@ -33,7 +33,8 @@ def main():
 
     if args.multiprocessing_distributed:
         args.world_size = ngpus_per_node * args.world_size
-        mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
+        mp.spawn(main_worker, nprocs=ngpus_per_node,
+                 args=(ngpus_per_node, args))
     else:
         main_worker(args.gpu, ngpus_per_node, args)
 
@@ -46,7 +47,7 @@ def main_worker(gpu, ngpus_per_node, args):
             args.rank = args.rank * ngpus_per_node + gpu
         dist.init_process_group(
             backend=args.dist_backend,
-            init_method=args.dist_url,
+            init_method=f'tcp://localhost:{args.dist_port}',
             world_size=args.world_size,
             rank=args.rank,
         )
@@ -54,7 +55,8 @@ def main_worker(gpu, ngpus_per_node, args):
             torch.cuda.set_device(args.gpu)
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.batch_size_val = int(args.batch_size_val / ngpus_per_node)
-            args.num_thread_reader = int(args.num_thread_reader / ngpus_per_node)
+            args.num_thread_reader = int(
+                args.num_thread_reader / ngpus_per_node)
     elif args.gpu is not None:
         torch.cuda.set_device(args.gpu)
 
@@ -76,14 +78,15 @@ def main_worker(gpu, ngpus_per_node, args):
                 model, device_ids=[args.gpu], find_unused_parameters=True)
         else:
             model.cuda()
-            model = torch.nn.parallel.DistributedDataParallel(model, find_unused_parameters=True)
+            model = torch.nn.parallel.DistributedDataParallel(
+                model, find_unused_parameters=True)
 
     elif args.gpu is not None:
         model = model.cuda(args.gpu)
     else:
         model = torch.nn.DataParallel(model).cuda()
 
-    checkpoint_ = torch.load("/home/zhouyufan/Projects/PDPP/save_max_mlp/epoch0012.pth.tar",
+    checkpoint_ = torch.load("/home/zhouyufan/Projects/PDPP/save_max_mlp/epoch_note2_0012.pth.tar",
                              map_location='cuda:{}'.format(args.rank))
     model.load_state_dict(checkpoint_["model"])
 
@@ -108,12 +111,13 @@ def main_worker(gpu, ngpus_per_node, args):
 
         json_ret.append(json_current)
 
-    data_name = "output.txt"
+    data_name = "output.json"
 
     with open(data_name, 'w') as f:
         json.dump(json_ret, f)
 
     print('acc: ', correct / len(test_dataset))
+
 
 if __name__ == "__main__":
     main()

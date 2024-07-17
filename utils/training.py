@@ -1,6 +1,7 @@
 import copy
 from model.helpers import AverageMeter
 from .accuracy import *
+import torch.distributed as dist
 
 
 def cycle(dl):
@@ -52,7 +53,8 @@ class Trainer(object):
         self.gradient_accumulate_every = gradient_accumulate_every
 
         self.dataloader = cycle(datasetloader)
-        self.optimizer = torch.optim.AdamW(diffusion_model.parameters(), lr=train_lr, weight_decay=0.0)
+        self.optimizer = torch.optim.AdamW(
+            diffusion_model.parameters(), lr=train_lr, weight_decay=0.0)
         # self.optimizer = torch.optim.AdamW(filter(lambda p: p.requires_grad, diffusion_model.parameters()), lr=train_lr, weight_decay=0.0)
 
         self.reset_parameters()
@@ -82,20 +84,30 @@ class Trainer(object):
                 batch = next(self.dataloader)
                 bs, T = batch[1].shape  # [bs, (T+1), ob_dim]
                 global_img_tensors = batch[0].cuda().contiguous().float()
-                img_tensors = torch.zeros((bs, T, args.class_dim + args.action_dim + args.observation_dim))
-                img_tensors[:, 0, args.class_dim+args.action_dim:] = global_img_tensors[:, 0, :]
-                img_tensors[:, -1, args.class_dim+args.action_dim:] = global_img_tensors[:, -1, :]
+                img_tensors = torch.zeros(
+                    (bs, T, args.class_dim + args.action_dim + args.observation_dim))
+                img_tensors[:, 0, args.class_dim +
+                            args.action_dim:] = global_img_tensors[:, 0, :]
+                img_tensors[:, -1, args.class_dim +
+                            args.action_dim:] = global_img_tensors[:, -1, :]
                 img_tensors = img_tensors.cuda()
 
                 video_label = batch[1].view(-1).cuda()  # [bs*T]
                 task_class = batch[2].view(-1).cuda()   # [bs]
 
-                action_label_onehot = torch.zeros((video_label.size(0), self.model.module.action_dim))
+                if dist.is_initialized():
+                    action_label_onehot = torch.zeros(
+                        (video_label.size(0), self.model.module.action_dim))
+                else:
+                    action_label_onehot = torch.zeros(
+                        (video_label.size(0), self.model.action_dim))
                 # [bs*T, ac_dim]
                 ind = torch.arange(0, len(video_label))
                 action_label_onehot[ind, video_label] = 1.
-                action_label_onehot = action_label_onehot.reshape(bs, T, -1).cuda()
-                img_tensors[:, :, args.class_dim:args.class_dim+args.action_dim] = action_label_onehot
+                action_label_onehot = action_label_onehot.reshape(
+                    bs, T, -1).cuda()
+                img_tensors[:, :, args.class_dim:args.class_dim +
+                            args.action_dim] = action_label_onehot
 
                 task_onehot = torch.zeros((task_class.size(0), args.class_dim))
                 # [bs*T, ac_dim]
@@ -103,13 +115,18 @@ class Trainer(object):
                 task_onehot[ind, task_class] = 1.
                 task_onehot = task_onehot.cuda()
                 temp = task_onehot.unsqueeze(1)
-                task_class_ = temp.repeat(1, T, 1)      # [bs, T, args.class_dim]
+                # [bs, T, args.class_dim]
+                task_class_ = temp.repeat(1, T, 1)
                 img_tensors[:, :, :args.class_dim] = task_class_
 
                 cond = {0: global_img_tensors[:, 0, :].float(), T - 1: global_img_tensors[:, -1, :].float(),
                         'task': task_class_}
                 x = img_tensors.float()
-                loss = self.model.module.loss(x, cond)
+
+                if dist.is_initialized():
+                    loss = self.model.module.loss(x, cond)
+                else:
+                    loss = self.model.loss(x, cond)
                 loss = loss / self.gradient_accumulate_every
                 loss.backward()
                 losses.update(loss.item(), bs)
@@ -125,15 +142,24 @@ class Trainer(object):
         if if_calculate_acc:
             with torch.no_grad():
                 output = self.ema_model(cond)
-                actions_pred = output[:, :, args.class_dim:args.class_dim+self.model.module.action_dim]\
-                    .contiguous().view(-1, self.model.module.action_dim)  # [bs*T, action_dim]
 
-                (acc1, acc5), trajectory_success_rate, MIoU1, MIoU2, a0_acc, aT_acc = \
-                    accuracy(actions_pred.cpu(), video_label.cpu(), topk=(1, 5),
-                             max_traj_len=self.model.module.horizon)
+                if dist.is_initialized():
+                    actions_pred = output[:, :, args.class_dim:args.class_dim+self.model.module.action_dim]\
+                        .contiguous().view(-1, self.model.module.action_dim)  # [bs*T, action_dim]
+
+                    (acc1, acc5), trajectory_success_rate, MIoU1, MIoU2, a0_acc, aT_acc = \
+                        accuracy(actions_pred.cpu(), video_label.cpu(), topk=(1, 5),
+                                 max_traj_len=self.model.module.horizon)
+                else:
+                    actions_pred = output[:, :, args.class_dim:args.class_dim+self.model.action_dim]\
+                        .contiguous().view(-1, self.model.action_dim)  # [bs*T, action_dim]
+
+                    (acc1, acc5), trajectory_success_rate, MIoU1, MIoU2, a0_acc, aT_acc = \
+                        accuracy(actions_pred.cpu(), video_label.cpu(), topk=(1, 5),
+                                 max_traj_len=self.model.horizon)
 
                 return torch.tensor(losses.avg), acc1, acc5, torch.tensor(trajectory_success_rate), \
-                       torch.tensor(MIoU1), torch.tensor(MIoU2), a0_acc, aT_acc
+                    torch.tensor(MIoU1), torch.tensor(MIoU2), a0_acc, aT_acc
 
         else:
             return torch.tensor(losses.avg)
