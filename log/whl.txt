@@ -638,3 +638,35 @@ Starting training loop for rank: 7, total batch size: 256
 Starting training loop for rank: 5, total batch size: 256
 => no checkpoint found at 'False'
 Starting training loop for rank: 6, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 1, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 2, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 3, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 4, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 5, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 7, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 6, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 1, total batch size: 256
+=> no checkpoint found at 'False'
+=> no checkpoint found at 'False'
+Starting training loop for rank: 5, total batch size: 256
+Starting training loop for rank: 6, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 7, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 4, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 2, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 3, total batch size: 256

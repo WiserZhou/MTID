@@ -72,7 +72,7 @@ bash download.sh
 1. Train MLPs for task category prediction(By default,8 GPUs are used for training), you can modify the dataset, train steps, horizon(prediction length), json files savepath etc. in `args.py`. 
 
 ```
-nohup python train_mlp.py --dist_port=21712 --name=note > output_note.log 2>&1 &
+nohup python train_mlp.py --dist_port=21712 --name=note > out/output_note.log 2>&1 &
 ```
 
 ​	  Dimensions for different datasets are listed below:
@@ -95,7 +95,7 @@ CUDA_VISIBLE_DEVICES=0 python temp.py --multiprocessing-distributed --num_thread
 2. Train PDPP: Modify the 'json_path_val' in `args.py` as the output file of `temp.py` and run:
 
 ```
-nohup python main_distributed.py --loss_kind=Weighted_Gradient_MSE --dist_port=21712 --layer_num=4 --name=your_note > output_note.log 2>&1 &
+nohup python main_distributed.py --loss_kind=Weighted_Gradient_MSE --dist_port=21712 --layer_num=4 --name=your_note > out/output_note.log 2>&1 &
 ```
 dist_port:21712 is default number
 

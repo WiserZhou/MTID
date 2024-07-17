@@ -126,7 +126,11 @@ def get_args(description='whl'):
     parser.add_argument('--json_path_val',
                         type=str,
                         default='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/test_list.json',
-                        help='path of the generated json file for val')
+                        help='path of the generated json file for val train mlp')
+    parser.add_argument('--json_path_val2',
+                        type=str,
+                        default='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json',
+                        help='path of the generated json file for val train model')
 
     parser.add_argument('--epochs', default=150, type=int, metavar='N',
                         help='number of total epochs to run')

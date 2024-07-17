@@ -31,12 +31,12 @@ class PlanningDataset(Dataset):
 
         if args.dataset == 'crosstask':
             if is_val:
-                cross_task_data_name = args.json_path_val
-                    # "/data1/wanghanlin/diffusion_planning/jsons_crosstask105/sliding_window_cross_task_data_{}_{}_new_task_id_73_with_event_class.json".format(is_val, self.max_traj_len)
+                cross_task_data_name = args.json_path_val2
+                # "/data1/wanghanlin/diffusion_planning/jsons_crosstask105/sliding_window_cross_task_data_{}_{}_new_task_id_73_with_event_class.json".format(is_val, self.max_traj_len)
             else:
                 cross_task_data_name = args.json_path_train
-                    # "/data1/wanghanlin/diffusion_planning/jsons_crosstask105/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
-                    # is_val, self.max_traj_len)
+                # "/data1/wanghanlin/diffusion_planning/jsons_crosstask105/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
+                # is_val, self.max_traj_len)
 
             if os.path.exists(cross_task_data_name):
                 with open(cross_task_data_name, 'r') as f:
@@ -46,13 +46,13 @@ class PlanningDataset(Dataset):
                 assert 0
         elif args.dataset == 'coin':
             if is_val:
-                coin_data_name = args.json_path_val
-                    # "/data1/wanghanlin/diffusion_planning/jsons_coin/sliding_window_cross_task_data_{}_{}_new_task_id_73_with_event_class.json".format(
-                    # is_val, self.max_traj_len)
+                coin_data_name = args.json_path_val2
+                # "/data1/wanghanlin/diffusion_planning/jsons_coin/sliding_window_cross_task_data_{}_{}_new_task_id_73_with_event_class.json".format(
+                # is_val, self.max_traj_len)
             else:
                 coin_data_name = args.json_path_train
-                    # "/data1/wanghanlin/diffusion_planning/jsons_coin/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
-                    # is_val, self.max_traj_len)
+                # "/data1/wanghanlin/diffusion_planning/jsons_coin/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
+                # is_val, self.max_traj_len)
             if os.path.exists(coin_data_name):
                 with open(coin_data_name, 'r') as f:
                     self.json_data = json.load(f)
@@ -61,13 +61,13 @@ class PlanningDataset(Dataset):
                 assert 0
         elif args.dataset == 'NIV':
             if is_val:
-                niv_data_name = args.json_path_val
-                    # "/data1/wanghanlin/diffusion_planning/jsons_niv/sliding_window_cross_task_data_{}_{}_new_task_id_73_with_event_class.json".format(
-                    # is_val, self.max_traj_len)
+                niv_data_name = args.json_path_val2
+                # "/data1/wanghanlin/diffusion_planning/jsons_niv/sliding_window_cross_task_data_{}_{}_new_task_id_73_with_event_class.json".format(
+                # is_val, self.max_traj_len)
             else:
                 niv_data_name = args.json_path_train
-                    # "/data1/wanghanlin/diffusion_planning/jsons_niv/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
-                    # is_val, self.max_traj_len)
+                # "/data1/wanghanlin/diffusion_planning/jsons_niv/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
+                # is_val, self.max_traj_len)
             if os.path.exists(niv_data_name):
                 with open(niv_data_name, 'r') as f:
                     self.json_data = json.load(f)
@@ -105,7 +105,8 @@ class PlanningDataset(Dataset):
                 image_start = images[len(images) - M: len(images)]
             image_start_cat = image_start[0]
             for w in range(len(image_start) - 1):
-                image_start_cat = np.concatenate((image_start_cat, image_start[w + 1]), axis=0)
+                image_start_cat = np.concatenate(
+                    (image_start_cat, image_start[w + 1]), axis=0)
             images_list.append(image_start_cat)
             labels_onehot_list.append(action_label)
 
@@ -113,7 +114,8 @@ class PlanningDataset(Dataset):
         image_end = images[end_idx - 2:end_idx + M - 2]
         image_end_cat = image_end[0]
         for w in range(len(image_end) - 1):
-            image_end_cat = np.concatenate((image_end_cat, image_end[w + 1]), axis=0)
+            image_end_cat = np.concatenate(
+                (image_end_cat, image_end[w + 1]), axis=0)
         images_list.append(image_end_cat)
         return images_list, labels_onehot_list, idx_list
 
