@@ -15,7 +15,7 @@ from torch.distributed import ReduceOp
 
 import utils
 from dataloader.data_load import PlanningDataset
-from model import diffusion, temporal
+from model import diffusion, temporal, temporal2
 from model.helpers import get_lr_schedule_with_warmup
 
 from utils import *
@@ -126,7 +126,7 @@ def main_worker(gpu, ngpus_per_node, args):
         dim=256,
         dim_mults=(1, 2, 4), )
     if args.layer_num == 4:
-        temporal_model = temporal.TemporalUnet(
+        temporal_model = temporal2.TemporalUnet(
             args.action_dim + args.observation_dim + args.class_dim,
             dim=256,
             dim_mults=(1, 2, 4), )

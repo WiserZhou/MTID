@@ -286,17 +286,17 @@ def main_worker(gpu, ngpus_per_node, args):
                 tb_logger = Logger(tb_logdir)
             log("=> loaded checkpoint '{}' (epoch {}){}".format(
                 checkpoint_path, checkpoint["epoch"], args.gpu), args)
-        else:
-            if args.rank == 0:
-                # creat logger
-                time_pre = time.strftime("%Y%m%d%H%M%S", time.localtime())
-                logname = args.log_root + '_' + args.name + '_' + time_pre + '_' + args.dataset
-                tb_logdir = os.path.join(args.log_root, logname)
-                if not (os.path.exists(tb_logdir)):
-                    os.makedirs(tb_logdir)
-                tb_logger = Logger(tb_logdir)
-                tb_logger.log_info(args)
-            log("=> no checkpoint found at '{}'".format(args.resume), args)
+    else:
+        if args.rank == 0:
+            # creat logger
+            time_pre = time.strftime("%Y%m%d%H%M%S", time.localtime())
+            logname = args.log_root + '_' + args.name + '_' + time_pre + '_' + args.dataset
+            tb_logdir = os.path.join(args.log_root, logname)
+            if not (os.path.exists(tb_logdir)):
+                os.makedirs(tb_logdir)
+            tb_logger = Logger(tb_logdir)
+            tb_logger.log_info(args)
+        log("=> no checkpoint found at '{}'".format(args.resume), args)
 
     if args.cudnn_benchmark:
         cudnn.benchmark = True
