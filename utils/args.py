@@ -128,7 +128,7 @@ def get_args(description='whl'):
                         default='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json',
                         help='path of the generated json file for val train model')
 
-    parser.add_argument('--epochs', default=190, type=int, metavar='N',
+    parser.add_argument('--epochs', default=120, type=int, metavar='N',
                         help='number of total epochs to run')
     parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
@@ -173,7 +173,7 @@ def get_args(description='whl'):
                         type=int,
                         default=3,
                         help='')
-    parser.add_argument('--weight', default=10, type=float,
+    parser.add_argument('--weight', default=6, type=float,
                         help='weight of the loss function')
     args = parser.parse_args()
     return args

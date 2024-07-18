@@ -144,26 +144,47 @@ class PlanningDataset(Dataset):
         return images_list, labels_onehot_list, idx_list
 
     def sample_single(self, index):
+        """
+        Samples a single video sequence for training or validation.
+
+        Args:
+        - index (int): Index of the video in the dataset.
+
+        Returns:
+        - frames (torch.Tensor): Tensor containing frames from the video.
+        - labels_tensor (torch.Tensor): Tensor containing labels for each frame.
+        - event_class/task_class (torch.Tensor): Tensor containing the class label for the video.
+        """
+        # Get folder information based on the index
         folder_id = self.vid_names[index]
 
+        # Determine if we are in validation mode
         if self.is_val:
             event_class = folder_id['event_class']
         else:
             task_class = folder_id['task_id']
 
+        # Load video frames based on the dataset type
         if self.args.dataset == 'crosstask':
+            # If the video ID is different from the last one loaded, load new frames
             if folder_id['vid'] != self.last_vid:
                 images_ = np.load(folder_id['feature'], allow_pickle=True)
                 self.images = images_['frames_features']
                 self.last_vid = folder_id['vid']
         else:
+            # Load video frames for other datasets
             images_ = np.load(folder_id['feature'], allow_pickle=True)
             self.images = images_['frames_features']
+
+        # Curate the dataset to get frames and labels within the legal range
         images, labels_matrix, idx_list = self.curate_dataset(
             self.images, folder_id['legal_range'], M=self.M)
+
+        # Convert the images and labels to torch tensors
         frames = torch.tensor(np.array(images))
         labels_tensor = torch.tensor(labels_matrix, dtype=torch.long)
 
+        # Return the appropriate class label based on the mode (validation or training)
         if self.is_val:
             event_class = torch.tensor(event_class, dtype=torch.long)
             return frames, labels_tensor, event_class

@@ -289,7 +289,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 tb_logger.flush()
 
         # Evaluate the model every 2 epochs if evaluation is enabled
-        if ((epoch + 1) % 2 == 0) and args.evaluate:
+        if args.evaluate:
             losses, acc_top1, acc_top5, \
                 trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
                 acc_a0, acc_aT = validate(test_loader, model.ema_model, args)

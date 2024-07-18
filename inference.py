@@ -225,9 +225,8 @@ def main_worker(gpu, ngpus_per_node, args):
             dim=256,
             dim_mults=(1, 2, 4), )
 
-    diffusion_model = diffusion.GaussianDiffusion(
-        temporal_model, args.horizon, args.observation_dim, args.action_dim, args.class_dim, args.n_diffusion_steps,
-        loss_type=args.loss_kind, clip_denoised=True,)
+    diffusion_model = diffusion.GaussianDiffusion(args, temporal_model, args.horizon, args.observation_dim,
+                                                  args.action_dim, args.class_dim, args.n_diffusion_steps, loss_type=args.loss_kind, clip_denoised=True,)
 
     model = utils.Trainer(diffusion_model, None, args.ema_decay, args.lr, args.gradient_accumulate_every,
                           args.step_start_ema, args.update_ema_every, args.log_freq)

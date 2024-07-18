@@ -1,61 +1,0 @@
-nohup: ignoring input
-Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', log_root='/home/zhouyufan/Projects/PDPP/log/log', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, pretrain_cnn_path='', momemtum=0.9, log_freq=500, save_freq=1, gradient_accumulate_every=1, ema_decay=0.995, step_start_ema=400, update_ema_every=10, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='crosstask', action_dim=105, observation_dim=1536, class_dim=18, n_diffusion_steps=200, n_train_steps=200, root='/home/zhouyufan/Projects/PDPP/dataset/crosstask', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/train_list.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/test_list.json', json_path_val2='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json', epochs=190, start_epoch=0, lr=0.0005, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', seed=217, gpu=1, multiprocessing_distributed=False, name='9.5w', loss_kind='Weighted_Gradient_MSE', ckpt_path='', layer_num=3, dist_port=21712, horizon=3, weight=9.5)
-Loaded /home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/train_list.json
-Loaded /home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json
-logging outputs to  /home/zhouyufan/Projects/PDPP/log/log_9.5w_20240718103356_crosstask
-total train:   0%|          | 0/190 [00:00<?, ?it/s]total train:   1%|          | 1/190 [00:10<32:03, 10.18s/it]lrs:
-1.5789473684210526e-05
----------------------------------
-lrs:
-3.157894736842105e-05
----------------------------------
-/home/zhouyufan/Projects/PDPP/utils/eval.py:88: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
-total train:   1%|          | 2/190 [00:39<1:06:53, 21.35s/it]1.35282564163208 0
-total train:   2%|▏         | 3/190 [00:48<49:05, 15.75s/it]  lrs:
-4.736842105263158e-05
----------------------------------
-lrs:
-6.31578947368421e-05
----------------------------------
-total train:   2%|▏         | 4/190 [01:20<1:09:15, 22.34s/it]1.35282564163208 1.35282564163208
-total train:   3%|▎         | 5/190 [01:29<54:08, 17.56s/it]  lrs:
-7.894736842105265e-05
----------------------------------
-lrs:
-9.473684210526316e-05
----------------------------------
-total train:   3%|▎         | 6/190 [02:02<1:09:30, 22.67s/it]1.35282564163208 1.35282564163208
-total train:   4%|▎         | 7/190 [02:12<56:23, 18.49s/it]  lrs:
-0.00011052631578947369
----------------------------------
-lrs:
-0.0001263157894736842
----------------------------------
-total train:   4%|▍         | 8/190 [02:51<1:16:00, 25.06s/it]1.6801221370697021 1.35282564163208
-total train:   5%|▍         | 9/190 [03:08<1:08:01, 22.55s/it]lrs:
-0.00014210526315789474
----------------------------------
-/home/zhouyufan/Projects/PDPP/utils/training.py:162: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  return torch.tensor(losses.avg), acc1, acc5, torch.tensor(trajectory_success_rate), \
-total train:   5%|▌         | 10/190 [03:53<1:27:56, 29.31s/it]1.9637792110443115 1.6801221370697021
-total train:   6%|▌         | 11/190 [04:03<1:10:12, 23.53s/it]lrs:
-0.0001736842105263158
----------------------------------
-lrs:
-0.00018947368421052632
----------------------------------
-total train:   6%|▋         | 12/190 [04:44<1:25:58, 28.98s/it]8.61880874633789 1.9637792110443115
-total train:   7%|▋         | 13/190 [05:01<1:14:23, 25.22s/it]lrs:
-0.00020526315789473685
----------------------------------
-lrs:
-0.00022105263157894738
----------------------------------
-total train:   7%|▋         | 14/190 [05:39<1:25:46, 29.24s/it]18.80864143371582 8.61880874633789
-total train:   8%|▊         | 15/190 [06:00<1:17:36, 26.61s/it]lrs:
-0.0002368421052631579
----------------------------------
-lrs:
-0.0002526315789473684
----------------------------------
