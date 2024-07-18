@@ -188,11 +188,11 @@ def condition_projection(x, conditions, action_dim, class_dim):
 
 class Weighted_MSE(nn.Module):
 
-    def __init__(self, weights, action_dim, class_dim):
+    def __init__(self,  action_dim, class_dim, weight):
         super().__init__()
-        # self.register_buffer('weights', weights)
         self.action_dim = action_dim
         self.class_dim = class_dim
+        self.weight = weight
 
     def forward(self, pred, targ):
         """
@@ -203,20 +203,21 @@ class Weighted_MSE(nn.Module):
 
         loss_action = F.mse_loss(pred, targ, reduction='none')
         loss_action[:, 0, self.class_dim:self.class_dim +
-                    self.action_dim] *= 10.
+                    self.action_dim] *= self.weight
         loss_action[:, -1, self.class_dim:self.class_dim +
-                    self.action_dim] *= 10.
+                    self.action_dim] *= self.weight
         loss_action = loss_action.sum()
         return loss_action
 
 
 class Weighted_Gradient_MSE(nn.Module):
 
-    def __init__(self, weights, action_dim, class_dim):
+    def __init__(self,  action_dim, class_dim, weight):
         super().__init__()
         # self.register_buffer('weights', weights)
         self.action_dim = action_dim
         self.class_dim = class_dim
+        self.weight = weight
 
     def forward(self, pred, targ):
         """
@@ -231,12 +232,13 @@ class Weighted_Gradient_MSE(nn.Module):
         half_time_steps = time_steps // 2
         if time_steps % 2 == 0:
             weights = torch.linspace(
-                10, 1, half_time_steps, device=pred.device)
+                self.weight, 1, half_time_steps, device=pred.device)
             weights = torch.cat([weights, weights.flip(0)])
         else:
             weights = torch.cat([
-                torch.linspace(10, 1, half_time_steps+1, device=pred.device),
-                torch.linspace(1, 10, half_time_steps +
+                torch.linspace(self.weight, 1, half_time_steps +
+                               1, device=pred.device),
+                torch.linspace(1, self.weight, half_time_steps +
                                1, device=pred.device)[1:]
             ])
 

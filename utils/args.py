@@ -87,10 +87,6 @@ def get_args(description='whl'):
                         type=int,
                         default=1,
                         help='')
-    parser.add_argument('--horizon',
-                        type=int,
-                        default=3,
-                        help='')
     parser.add_argument('--dataset',
                         type=str,
                         default='crosstask',
@@ -156,7 +152,7 @@ def get_args(description='whl'):
                         help='distributed backend')
     parser.add_argument('--seed', default=217, type=int,
                         help='seed for initializing training. ')
-    parser.add_argument('--gpu', default=2, type=int,
+    parser.add_argument('--gpu', default=6, type=int,
                         help='GPU id to use.')
     parser.add_argument('--multiprocessing-distributed', default=False, action='store_true',
                         help='Use multi-processing distributed training to launch '
@@ -173,5 +169,11 @@ def get_args(description='whl'):
                         help='number of layers in block')
     parser.add_argument('--dist_port', default=21712, type=int,
                         help='port used to set up distributed training')
+    parser.add_argument('--horizon',
+                        type=int,
+                        default=3,
+                        help='')
+    parser.add_argument('--weight', default=10, type=float,
+                        help='weight of the loss function')
     args = parser.parse_args()
     return args

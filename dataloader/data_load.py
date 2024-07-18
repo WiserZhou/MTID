@@ -83,30 +83,63 @@ class PlanningDataset(Dataset):
         self.frame_cnts = frame_cnts
 
     def curate_dataset(self, images, legal_range, M=2):
+        """
+        Curates a dataset by selecting and concatenating image segments based on specified ranges.
+
+        Args:
+        - images (list or np.array): A list or array of images.
+        - legal_range (list of tuples): A list of tuples where each tuple contains 
+        (start_idx, end_idx, action_label). 
+        - start_idx (int): The starting index of the segment.
+        - end_idx (int): The ending index of the segment.
+        - action_label (int or list): The action label corresponding to the segment.
+        - M (int, optional): The number of images to include in each segment. Defaults to 2.
+
+        Returns:
+        - images_list (list): A list of concatenated image segments.
+        - labels_onehot_list (list): A list of action labels corresponding to the image segments.
+        - idx_list (list): A list of starting indices of the segments.
+        """
+
         images_list = []
         labels_onehot_list = []
         idx_list = []
+
+        # Loop through the legal ranges to select and process image segments
         for start_idx, end_idx, action_label in legal_range:
             idx = start_idx
             idx_list.append(idx)
+
+            # Determine the start index for image extraction
             image_start_idx = max(0, idx)
+
+            # Extract M images starting from the determined index
             if image_start_idx + M <= len(images):
                 image_start = images[image_start_idx: image_start_idx + M]
             else:
                 image_start = images[len(images) - M: len(images)]
+
+            # Concatenate the extracted images into a single image
             image_start_cat = image_start[0]
             for w in range(len(image_start) - 1):
                 image_start_cat = np.concatenate(
                     (image_start_cat, image_start[w + 1]), axis=0)
+
             images_list.append(image_start_cat)
             labels_onehot_list.append(action_label)
 
+        # Ensure the end_idx is at least 2
         end_idx = max(2, end_idx)
+
+        # Extract M images ending at the determined index
         image_end = images[end_idx - 2:end_idx + M - 2]
+
+        # Concatenate the extracted images into a single image
         image_end_cat = image_end[0]
         for w in range(len(image_end) - 1):
             image_end_cat = np.concatenate(
                 (image_end_cat, image_end[w + 1]), axis=0)
+
         images_list.append(image_end_cat)
         return images_list, labels_onehot_list, idx_list
 

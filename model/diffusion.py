@@ -12,7 +12,7 @@ from .helpers import (
 
 
 class GaussianDiffusion(nn.Module):
-    def __init__(self, model, horizon, observation_dim, action_dim, class_dim, n_timesteps=200,
+    def __init__(self, args, model, horizon, observation_dim, action_dim, class_dim, n_timesteps=200,
                  loss_type='Weighted_MSE', clip_denoised=False, ddim_discr_method='uniform',
                  ):
         super().__init__()
@@ -21,6 +21,7 @@ class GaussianDiffusion(nn.Module):
         self.action_dim = action_dim
         self.class_dim = class_dim
         self.model = model
+        self.weight = args.weight
 
         betas = cosine_beta_schedule(n_timesteps)
         alphas = 1. - betas
@@ -77,7 +78,8 @@ class GaussianDiffusion(nn.Module):
         self.register_buffer('posterior_mean_coef2',
                              (1. - alphas_cumprod_prev) * np.sqrt(alphas) / (1. - alphas_cumprod))
         self.loss_type = loss_type
-        self.loss_fn = Losses[loss_type](None, self.action_dim, self.class_dim)
+        self.loss_fn = Losses[loss_type](
+            self.action_dim, self.class_dim, self.weight)
 
     # ------------------------------------------ sampling ------------------------------------------#
 

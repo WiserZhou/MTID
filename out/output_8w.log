@@ -1,0 +1,44 @@
+nohup: ignoring input
+Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', log_root='/home/zhouyufan/Projects/PDPP/log/log', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, pretrain_cnn_path='', momemtum=0.9, log_freq=500, save_freq=1, gradient_accumulate_every=1, ema_decay=0.995, step_start_ema=400, update_ema_every=10, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='crosstask', action_dim=105, observation_dim=1536, class_dim=18, n_diffusion_steps=200, n_train_steps=200, root='/home/zhouyufan/Projects/PDPP/dataset/crosstask', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/train_list.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/test_list.json', json_path_val2='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json', epochs=190, start_epoch=0, lr=0.0005, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', seed=217, gpu=4, multiprocessing_distributed=False, name='8w', loss_kind='Weighted_Gradient_MSE', ckpt_path='', layer_num=3, dist_port=21712, horizon=3, weight=8.0)
+Loaded /home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/train_list.json
+Loaded /home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json
+logging outputs to  /home/zhouyufan/Projects/PDPP/log/log_8w_20240718103552_crosstask
+total train:   0%|          | 0/190 [00:00<?, ?it/s]total train:   1%|          | 1/190 [00:09<30:45,  9.77s/it]lrs:
+1.5789473684210526e-05
+---------------------------------
+lrs:
+3.157894736842105e-05
+---------------------------------
+/home/zhouyufan/Projects/PDPP/utils/eval.py:88: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+total train:   1%|          | 2/190 [00:46<1:20:05, 25.56s/it]1.3310059309005737 0
+total train:   2%|▏         | 3/190 [00:56<58:16, 18.70s/it]  lrs:
+4.736842105263158e-05
+---------------------------------
+lrs:
+6.31578947368421e-05
+---------------------------------
+total train:   2%|▏         | 4/190 [01:40<1:29:00, 28.71s/it]1.3310059309005737 1.3310059309005737
+total train:   3%|▎         | 5/190 [01:51<1:08:25, 22.19s/it]lrs:
+7.894736842105265e-05
+---------------------------------
+lrs:
+9.473684210526316e-05
+---------------------------------
+total train:   3%|▎         | 6/190 [02:28<1:23:02, 27.08s/it]1.3310059309005737 1.3310059309005737
+total train:   4%|▎         | 7/190 [02:43<1:11:09, 23.33s/it]lrs:
+0.00011052631578947369
+---------------------------------
+lrs:
+0.0001263157894736842
+---------------------------------
+total train:   4%|▍         | 8/190 [03:25<1:28:10, 29.07s/it]1.5710233449935913 1.3310059309005737
+total train:   5%|▍         | 9/190 [03:40<1:15:06, 24.90s/it]lrs:
+0.00014210526315789474
+---------------------------------
+/home/zhouyufan/Projects/PDPP/utils/training.py:162: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(losses.avg), acc1, acc5, torch.tensor(trajectory_success_rate), \
+total train:   5%|▌         | 10/190 [04:26<1:33:31, 31.17s/it]1.6801221370697021 1.5710233449935913
+total train:   6%|▌         | 11/190 [04:36<1:14:28, 24.97s/it]lrs:
+0.0001736842105263158
+---------------------------------

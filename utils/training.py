@@ -121,6 +121,7 @@ class Trainer(object):
 
                 cond = {0: global_img_tensors[:, 0, :].float(), T - 1: global_img_tensors[:, -1, :].float(),
                         'task': task_class_}
+
                 x = img_tensors.float()
 
                 if dist.is_initialized():

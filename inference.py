@@ -134,10 +134,13 @@ def test(val_loader, model, args):
 
 
 def reduce_tensor(tensor):
-    rt = tensor.clone()
-    torch.distributed.all_reduce(rt, op=ReduceOp.SUM)
-    rt /= dist.get_world_size()
-    return rt
+    if dist.is_initialized():
+        rt = tensor.clone()
+        torch.distributed.all_reduce(rt, op=ReduceOp.SUM)
+        rt /= dist.get_world_size()
+        return rt
+    else:
+        return tensor
 
 
 def main():

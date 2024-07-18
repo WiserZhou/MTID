@@ -24,6 +24,7 @@ from utils.args import get_args
 import numpy as np
 from model.helpers import Logger
 from tqdm import tqdm
+import subprocess
 
 
 def reduce_tensor(tensor):
@@ -39,6 +40,7 @@ def reduce_tensor(tensor):
 def main():
     # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
     args = get_args()
+
     os.environ['PYTHONHASHSEED'] = str(args.seed)
 
     if args.verbose:
@@ -136,9 +138,9 @@ def main_worker(gpu, ngpus_per_node, args):
             dim=256,
             dim_mults=(1, 2, 4), )
 
-    diffusion_model = diffusion.GaussianDiffusion(
-        temporal_model, args.horizon, args.observation_dim, args.action_dim, args.class_dim, args.n_diffusion_steps,
-        loss_type=args.loss_kind, clip_denoised=True, )
+    diffusion_model = diffusion.GaussianDiffusion(args, temporal_model,  args.horizon, args.observation_dim,
+                                                  args.action_dim, args.class_dim, args.n_diffusion_steps,
+                                                  loss_type=args.loss_kind, clip_denoised=True,)
 
     model = utils.Trainer(diffusion_model, train_loader, args.ema_decay, args.lr, args.gradient_accumulate_every,
                           args.step_start_ema, args.update_ema_every, args.log_freq)
@@ -385,6 +387,36 @@ def get_last_checkpoint(checkpoint_dir):
         return all_ckpt[-1]
     else:
         return ''
+
+
+def run_python_file(file_path, args=None):
+    """
+    Executes a Python file using subprocess.
+
+    Args:
+    - file_path (str): Path to the Python file to be executed.
+    - args (list, optional): List of arguments to be passed to the Python file.
+
+    Returns:
+    - output (str): Standard output from the executed command.
+    - error (str): Standard error from the executed command.
+    """
+    command = ['python', file_path]
+
+    if args:
+        command.extend(args)
+
+    try:
+        result = subprocess.run(
+            command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        return result.stdout, result.stderr
+    except subprocess.CalledProcessError as e:
+        return e.stdout, e.stderr
+
+# Example usage
+# output, error = run_python_file('path/to/your_script.py', args=['--arg1', 'value1', '--arg2', 'value2'])
+# print('Output:', output)
+# print('Error:', error)
 
 
 if __name__ == "__main__":

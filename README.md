@@ -95,7 +95,7 @@ CUDA_VISIBLE_DEVICES=0 python temp.py --num_thread_reader=1 --resume --batch_siz
 2. Train PDPP: Modify the 'json_path_val' in `args.py` as the output file of `temp.py` and run:
 
 ```
-nohup python main_distributed.py --loss_kind=Weighted_Gradient_MSE --dist_port=21712 --layer_num=4 --name=your_note > out/output_note.log 2>&1 &
+nohup python main_distributed.py --loss_kind=Weighted_Gradient_MSE --layer_num=3 --name=your_note --gpu=0 > out/output_note.log 2>&1 &
 ```
 dist_port:21712 is default number
 
