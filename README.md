@@ -16,7 +16,8 @@ This repository gives the official PyTorch implementation of [PDPP:Projected Dif
 In a conda env with cuda available, run:
 
 ```
-pip install -r requirements.txt
+conda env create -f environment.yaml
+conda activate PDPP
 ```
 
 
@@ -72,7 +73,7 @@ bash download.sh
 1. Train MLPs for task category prediction(By default,8 GPUs are used for training), you can modify the dataset, train steps, horizon(prediction length), json files savepath etc. in `args.py`. 
 
 ```
-nohup python train_mlp.py --dist_port=21712 --name=note > out/output_note.log 2>&1 &
+nohup python train_mlp.py --name=note > out/output_note.log 2>&1 &
 ```
 
 ​	  Dimensions for different datasets are listed below:
@@ -95,9 +96,8 @@ CUDA_VISIBLE_DEVICES=0 python temp.py --num_thread_reader=1 --resume --batch_siz
 2. Train PDPP: Modify the 'json_path_val' in `args.py` as the output file of `temp.py` and run:
 
 ```
-nohup python main_distributed.py --loss_kind=Weighted_Gradient_MSE --layer_num=3 --name=your_note --gpu=0 > out/output_note.log 2>&1 &
+nohup python main_distributed.py --layer_num=3 --name=your_note --gpu=0 > out/output_note.log 2>&1 &
 ```
-dist_port:21712 is default number
 
 
 ​	  Training settings for different datasets are listed below:
@@ -127,9 +127,7 @@ dist_port:21712 is default number
 
 ​	  Modify the checkpoint path(L244) as the evaluated model in `inference.py` and run:
 
-```
-python inference.py --resume --ckpt_path=/path > output.txt
-```
+
 
 ​	  **Results** of given checkpoints:
 

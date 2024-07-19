@@ -7,6 +7,10 @@ def get_args(description='whl'):
                         type=str,
                         default='/home/zhouyufan/Projects/PDPP/checkpoint',
                         help='checkpoint dir root')
+    parser.add_argument('--checkpoint_max_root',
+                        type=str,
+                        default='/home/zhouyufan/Projects/PDPP/save_max',
+                        help='checkpoint max dir root')
     parser.add_argument('--log_root',
                         type=str,
                         default='/home/zhouyufan/Projects/PDPP/log/log',
@@ -127,9 +131,6 @@ def get_args(description='whl'):
                         type=str,
                         default='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json',
                         help='path of the generated json file for val train model')
-
-    parser.add_argument('--epochs', default=120, type=int, metavar='N',
-                        help='number of total epochs to run')
     parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
     parser.add_argument('--lr', '--learning-rate', default=5e-4, type=float,
@@ -161,7 +162,7 @@ def get_args(description='whl'):
                              'multi node data parallel training')
     parser.add_argument('--name', default='default', type=str,
                         help='note the specific log and checkpoint')
-    parser.add_argument('--loss_kind', default='Weighted_MSE', type=str,
+    parser.add_argument('--loss_kind', default='Weighted_Gradient_MSE', type=str,
                         help='Weighted_MSE: only 10 on both side ; Weighted_Gradient_MSE: gradient change')
     parser.add_argument('--ckpt_path', default='', type=str,
                         help='checkpoint path for max')
@@ -175,5 +176,7 @@ def get_args(description='whl'):
                         help='')
     parser.add_argument('--weight', default=6, type=float,
                         help='weight of the loss function')
+    parser.add_argument('--epochs', default=120, type=int, metavar='N',
+                        help='number of total epochs to run')
     args = parser.parse_args()
     return args

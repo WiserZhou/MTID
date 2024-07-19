@@ -75,7 +75,7 @@ def accuracy2(output, target, topk=(1,), max_traj_len=0):
         return res[0], trajectory_success_rate, MIoU1, MIoU2, correct_a0, correct_aT
 
 
-def test(val_loader, model, args):
+def test_inference(val_loader, model, args):
     model.eval()
     acc_top1 = AverageMeter()
     trajectory_success_rate_meter = AverageMeter()
@@ -291,7 +291,7 @@ def main_worker(gpu, ngpus_per_node, args):
         torch.manual_seed(tmp)
         torch.cuda.manual_seed_all(tmp)
 
-        acc_top1, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, acc_a0, acc_aT = test(
+        acc_top1, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, acc_a0, acc_aT = test_inference(
             test_loader, model.ema_model, args)
 
         acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()

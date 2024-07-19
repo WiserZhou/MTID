@@ -77,6 +77,57 @@ class SinusoidalPosEmb(nn.Module):
         return emb
 
 
+class FourierPosEmb(nn.Module):
+    """
+    FourierPosEmb is a module that generates Fourier positional embeddings.
+    These embeddings are used to provide the model with information about 
+    the positions of elements in the sequence using Fourier features.
+    """
+
+    def __init__(self, dim, scale=1.0):
+        """
+        Initialize the FourierPosEmb module.
+
+        Parameters:
+        - dim (int): The dimension of the positional embeddings.
+        - scale (float): The scaling factor for the random projection.
+        """
+        super().__init__()
+        self.dim = dim
+        self.scale = scale
+        # Initialize the random projection matrix
+        self.proj = nn.Parameter(torch.randn(
+            1, dim) * scale, requires_grad=False)
+
+    def forward(self, x):
+        """
+        Forward pass to generate the positional embeddings.
+
+        Parameters:
+        - x (Tensor): A tensor containing the positions for which to generate embeddings.
+
+        Returns:
+        - Tensor: A tensor containing the Fourier positional embeddings.
+        """
+        # Get the device of the input tensor (CPU or GPU)
+        device = x.device
+
+        x = x.float()
+
+        # Project the input positions using the random projection matrix
+        x_proj = x[:, None] @ self.proj.to(device)
+
+        # Calculate the sine and cosine of the projected values
+        # Concatenate these values along the last dimension to create the final embeddings
+        # Resulting shape will be (batch_size, dim)
+        emb = torch.cat((x_proj.sin(), x_proj.cos()), dim=-1)
+
+        return emb
+
+# RuntimeError: mat1 and mat2 shapes cannot be multiplied (256x512 and 256x1024)
+# nohup python main_distributed.py --layer_num=5 --name=5layer --gpu=1 > out/output_5layer.log 2>&1
+
+
 class Downsample1d(nn.Module):
     def __init__(self, dim):
         super().__init__()

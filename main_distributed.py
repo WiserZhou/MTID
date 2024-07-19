@@ -15,7 +15,7 @@ from torch.distributed import ReduceOp
 
 import utils
 from dataloader.data_load import PlanningDataset
-from model import diffusion, temporal, temporal2
+from model import diffusion, temporal, temporal2, temporal_fourier
 from model.helpers import get_lr_schedule_with_warmup
 
 from utils import *
@@ -25,6 +25,7 @@ import numpy as np
 from model.helpers import Logger
 from tqdm import tqdm
 import subprocess
+from utils.inference import test_inference
 
 
 def reduce_tensor(tensor):
@@ -38,7 +39,6 @@ def reduce_tensor(tensor):
 
 
 def main():
-    # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
     args = get_args()
 
     os.environ['PYTHONHASHSEED'] = str(args.seed)
@@ -64,7 +64,6 @@ def main():
 
 def main_worker(gpu, ngpus_per_node, args):
     args.gpu = gpu
-    # print('gpuid:', args.gpu)
 
     if args.distributed:
         if args.multiprocessing_distributed:
@@ -129,6 +128,11 @@ def main_worker(gpu, ngpus_per_node, args):
 
     if args.layer_num == 4:
         temporal_model = temporal2.TemporalUnet(
+            args.action_dim + args.observation_dim + args.class_dim,
+            dim=256,
+            dim_mults=(1, 2, 4), )
+    elif args.layer_num == 5:
+        temporal_model = temporal_fourier.TemporalUnet(
             args.action_dim + args.observation_dim + args.class_dim,
             dim=256,
             dim_mults=(1, 2, 4), )
@@ -202,10 +206,6 @@ def main_worker(gpu, ngpus_per_node, args):
                 log("=> loaded checkpoint '{}' (epoch {}){}".format(
                     checkpoint_path, checkpoint["epoch"], args.gpu), args)
     else:
-        # log("=> loading checkpoint '{}' to initialize".format(checkpoint_path), args)
-        # checkpoint = torch.load(checkpoint_path, map_location='cuda:{}'.format(args.rank))
-        # model.model.load_state_dict(checkpoint["model"], strict=False)
-        # model.ema_model.load_state_dict(checkpoint["ema"], strict=False)
         time_pre = time.strftime("%Y%m%d%H%M%S", time.localtime())
         logname = args.log_root + '_' + args.name + '_' + time_pre + '_' + args.dataset
         tb_logdir = os.path.join(args.log_root, logname)
@@ -230,6 +230,8 @@ def main_worker(gpu, ngpus_per_node, args):
     max_acc = 0
     old_max_epoch = 0
     save_max = os.path.join(os.path.dirname(__file__), 'save_max')
+
+    ckpt_path = ''
 
     # Main training loop across epochs
     for epoch in tqdm(range(args.start_epoch, args.epochs), desc='total train'):
@@ -324,17 +326,17 @@ def main_worker(gpu, ngpus_per_node, args):
             # Save checkpoint if the new trajectory success rate is better
             if trajectory_success_rate_meter_reduced >= max_eva:
                 if not (trajectory_success_rate_meter_reduced == max_eva and acc_top1_reduced < max_acc):
-                    save_checkpoint2(args.name,
-                                     {
-                                         "epoch": epoch + 1,
-                                         "model": model.model.state_dict(),
-                                         "ema": model.ema_model.state_dict(),
-                                         "optimizer": model.optimizer.state_dict(),
-                                         "step": model.step,
-                                         "tb_logdir": tb_logdir,
-                                         "scheduler": scheduler.state_dict(),
-                                     }, save_max, old_max_epoch, epoch + 1, args.rank
-                                     )
+                    ckpt_path = save_checkpoint_max(args.name,
+                                                    {
+                                                        "epoch": epoch + 1,
+                                                        "model": model.model.state_dict(),
+                                                        "ema": model.ema_model.state_dict(),
+                                                        "optimizer": model.optimizer.state_dict(),
+                                                        "step": model.step,
+                                                        "tb_logdir": tb_logdir,
+                                                        "scheduler": scheduler.state_dict(),
+                                                    }, save_max, old_max_epoch, epoch + 1, args.rank
+                                                    )
                     max_eva = trajectory_success_rate_meter_reduced
                     max_acc = acc_top1_reduced
                     old_max_epoch = epoch + 1
@@ -353,6 +355,68 @@ def main_worker(gpu, ngpus_per_node, args):
                                     "scheduler": scheduler.state_dict(),
                                 }, checkpoint_dir, epoch + 1
                                 )
+    # add inference
+    ckpt_path = os.path.join(args.checkpoint_max_root, ckpt_path)
+    if ckpt_path:
+        print("=> loading checkpoint '{}'".format(ckpt_path), args)
+        checkpoint = torch.load(
+            ckpt_path, map_location='cuda:{}'.format(args.rank))
+        args.start_epoch = checkpoint["epoch"]
+        model.model.load_state_dict(checkpoint["model"], strict=True)
+        model.ema_model.load_state_dict(checkpoint["ema"], strict=True)
+        model.step = checkpoint["step"]
+
+    time_start = time.time()
+    acc_top1_reduced_sum = []
+    trajectory_success_rate_meter_reduced_sum = []
+    MIoU1_meter_reduced_sum = []
+    MIoU2_meter_reduced_sum = []
+    acc_a0_reduced_sum = []
+    acc_aT_reduced_sum = []
+    test_times = 1
+
+    for epoch in range(0, test_times):
+        tmp = epoch
+        random.seed(tmp)
+        np.random.seed(tmp)
+        torch.manual_seed(tmp)
+        torch.cuda.manual_seed_all(tmp)
+
+        acc_top1, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, acc_a0, acc_aT = test_inference(
+            test_loader, model.ema_model, args)
+
+        acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
+        trajectory_success_rate_meter_reduced = reduce_tensor(
+            trajectory_success_rate_meter.cuda()).item()
+        MIoU1_meter_reduced = reduce_tensor(MIoU1_meter.cuda()).item()
+        MIoU2_meter_reduced = reduce_tensor(MIoU2_meter.cuda()).item()
+        acc_a0_reduced = reduce_tensor(acc_a0.cuda()).item()
+        acc_aT_reduced = reduce_tensor(acc_aT.cuda()).item()
+
+        acc_top1_reduced_sum.append(acc_top1_reduced)
+        trajectory_success_rate_meter_reduced_sum.append(
+            trajectory_success_rate_meter_reduced)
+        MIoU1_meter_reduced_sum.append(MIoU1_meter_reduced)
+        MIoU2_meter_reduced_sum.append(MIoU2_meter_reduced)
+        acc_a0_reduced_sum.append(acc_a0_reduced)
+        acc_aT_reduced_sum.append(acc_aT_reduced)
+
+    if args.rank == 0:
+        time_end = time.time()
+        print('time: ', time_end - time_start)
+        print('-----------------Mean&Var-----------------------')
+        print('Val/EpochAcc@1', sum(acc_top1_reduced_sum) /
+              test_times, np.var(acc_top1_reduced_sum))
+        print('Val/Traj_Success_Rate', sum(trajectory_success_rate_meter_reduced_sum) /
+              test_times, np.var(trajectory_success_rate_meter_reduced_sum))
+        print('Val/MIoU1', sum(MIoU1_meter_reduced_sum) /
+              test_times, np.var(MIoU1_meter_reduced_sum))
+        print('Val/MIoU2', sum(MIoU2_meter_reduced_sum) /
+              test_times, np.var(MIoU2_meter_reduced_sum))
+        print('Val/acc_a0', sum(acc_a0_reduced_sum) /
+              test_times, np.var(acc_a0_reduced_sum))
+        print('Val/acc_aT', sum(acc_aT_reduced_sum) /
+              test_times, np.var(acc_aT_reduced_sum))
 
 
 def log(output, args):
@@ -370,7 +434,9 @@ def save_checkpoint(name, state, checkpoint_dir, epoch, n_ckpt=3):
             os.remove(oldest_ckpt)
 
 
-def save_checkpoint2(name, state, checkpoint_dir, old_epoch, epoch, rank):
+def save_checkpoint_max(name, state, checkpoint_dir, old_epoch, epoch, rank):
+
+    cktp_name = "epoch_{}_{:0>4d}_{}.pth.tar".format(name, epoch, rank)
     torch.save(state, os.path.join(checkpoint_dir,
                "epoch_{}_{:0>4d}_{}.pth.tar".format(name, epoch, rank)))
     if old_epoch > 0:
@@ -378,6 +444,7 @@ def save_checkpoint2(name, state, checkpoint_dir, old_epoch, epoch, rank):
             checkpoint_dir, "epoch_{}_{:0>4d}_{}.pth.tar".format(name, old_epoch, rank))
         if os.path.isfile(oldest_ckpt):
             os.remove(oldest_ckpt)
+    return cktp_name
 
 
 def get_last_checkpoint(checkpoint_dir):

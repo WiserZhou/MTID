@@ -8,6 +8,7 @@ from .helpers import (
     Downsample1d,
     Upsample1d,
     Conv1dBlock,
+    FourierPosEmb,
 )
 
 # Define a residual block used in the Temporal Unet
@@ -73,7 +74,7 @@ class TemporalUnet(nn.Module):
 
         # Define the time embedding module (for diffusion models)
         self.time_mlp = nn.Sequential(    # should be removed for Noise and Deterministic Baselines
-            SinusoidalPosEmb(dim),
+            FourierPosEmb(dim),
             nn.Linear(dim, dim * 4),
             nn.Mish(),
             nn.Linear(dim * 4, dim),
@@ -99,8 +100,6 @@ class TemporalUnet(nn.Module):
         self.mid_block1 = ResidualTemporalBlock(
             mid_dim, mid_dim, embed_dim=time_dim)
         self.mid_block2 = ResidualTemporalBlock(
-            mid_dim, mid_dim, embed_dim=time_dim)
-        self.mid_block3 = ResidualTemporalBlock(
             mid_dim, mid_dim, embed_dim=time_dim)
 
         # Create upsampling blocks
@@ -130,7 +129,7 @@ class TemporalUnet(nn.Module):
         h = []
 
         # Forward pass through downsampling blocks
-        for resnet, resnet2,  downsample in self.downs:
+        for resnet, resnet2, downsample in self.downs:
             x = resnet(x, t)
             x = resnet2(x, t)
             h.append(x)
@@ -139,10 +138,9 @@ class TemporalUnet(nn.Module):
         # Forward pass through middle blocks
         x = self.mid_block1(x, t)
         x = self.mid_block2(x, t)
-        x = self.mid_block3(x, t)
 
         # Forward pass through upsampling blocks
-        for resnet, resnet2,  upsample in self.ups:
+        for resnet, resnet2, upsample in self.ups:
             x = torch.cat((x, h.pop()), dim=1)
             x = resnet(x, t)
             x = resnet2(x, t)
