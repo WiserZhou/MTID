@@ -202,15 +202,16 @@ class Conv1dBlock(nn.Module):
 # ---------------------------------- sampling ---------------------------------#
 # -----------------------------------------------------------------------------#
 
+# self.sqrt_alphas_cumprod, t, x_start.shape
 def extract(a, t, x_shape):
-    b, *_ = t.shape
+    batch_size, *_ = t.shape
     out = a.gather(-1, t)
-    return out.reshape(b, *((1,) * (len(x_shape) - 1)))
+    return out.reshape(batch_size, *((1,) * (len(x_shape) - 1)))
 
 
 def cosine_beta_schedule(timesteps, s=0.008, dtype=torch.float32):
     """
-    cosine schedule
+    cosine condition_projection
     as proposed in https://openreview.net/forum?id=-NEXDKk8gZ
     """
     steps = timesteps + 1
@@ -223,10 +224,13 @@ def cosine_beta_schedule(timesteps, s=0.008, dtype=torch.float32):
 
 
 def condition_projection(x, conditions, action_dim, class_dim):
+
+    # clone the observation dim at the start and end
     for t, val in conditions.items():
         if t != 'task':
             x[:, t, class_dim + action_dim:] = val.clone()
 
+    # set the observation to zero except for start and end
     x[:, 1:-1, class_dim + action_dim:] = 0.
     x[:, :, :class_dim] = conditions['task']
 

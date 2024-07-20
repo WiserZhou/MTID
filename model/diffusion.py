@@ -15,7 +15,7 @@ from .helpers import (
 
 class GaussianDiffusion(nn.Module):
     def __init__(self, args, model, horizon, observation_dim, action_dim, class_dim, n_timesteps=200,
-                 loss_type='Weighted_MSE', clip_denoised=False, ddim_discr_method='uniform'):
+                 loss_type='Weighted_Gradient_MSE', clip_denoised=False, ddim_discr_method='uniform'):
         super().__init__()
         self.horizon = horizon  # Set the horizon (sequence length)
         self.observation_dim = observation_dim  # Set the observation dimension
@@ -233,10 +233,12 @@ class GaussianDiffusion(nn.Module):
 
         # For diffusion, add noise to the input
         x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
+
         x_noisy = condition_projection(
             x_noisy, cond, self.action_dim, self.class_dim)
 
         x_recon = self.model(x_noisy, t)  # Reconstruct from noisy input
+
         x_recon = condition_projection(
             x_recon, cond, self.action_dim, self.class_dim)
 
@@ -246,6 +248,8 @@ class GaussianDiffusion(nn.Module):
     # Compute the loss for the batch
     def loss(self, x, cond):
         batch_size = len(x)  # Get the batch size
+
+        # t.shape = (batch_size,)
         t = torch.randint(0, self.n_timesteps, (batch_size,),
                           device=x.device).long()  # Random timestep for diffusion
         # t = None    # for Noise and Deterministic

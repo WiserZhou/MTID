@@ -34,10 +34,12 @@ def test(val_loader, model, args, all_ref):
     for i_batch, sample_batch in enumerate(val_loader):
         for i in range(len(sample_batch[0])):
             # compute output
-            global_img_tensors = sample_batch[0][i].cuda().contiguous().unsqueeze(0)  # [1, T+1, ob_dim]
+            global_img_tensors = sample_batch[0][i].cuda(
+            ).contiguous().unsqueeze(0)  # [1, T+1, ob_dim]
             video_label = sample_batch[1][i].cuda().unsqueeze(0)  # [1, T]
             _, T = video_label.size()
-            task_class = sample_batch[2][i].view(-1).cuda().unsqueeze(0)  # [1, 1]
+            # [1, 1]
+            task_class = sample_batch[2][i].view(-1).cuda().unsqueeze(0)
             # video_vid = sample_batch[3][i]
 
             cond = {}
@@ -46,8 +48,10 @@ def test(val_loader, model, args, all_ref):
             ratio_list = []
 
             with torch.no_grad():
-                cond[0] = global_img_tensors[:, 0, :].float().repeat(num_sampling, 1)
-                cond[T - 1] = global_img_tensors[:, -1, :].float().repeat(num_sampling, 1)
+                cond[0] = global_img_tensors[:, 0,
+                                             :].float().repeat(num_sampling, 1)
+                cond[T - 1] = global_img_tensors[:, -1,
+                                                 :].float().repeat(num_sampling, 1)
                 task_class = task_class.repeat(num_sampling, 1)
 
                 task_onehot = torch.zeros((task_class.size(0), args.class_dim))
@@ -60,7 +64,8 @@ def test(val_loader, model, args, all_ref):
 
                 output = model(cond, if_jump=True)
                 actions_pred = output.contiguous()
-                actions_pred_logits = actions_pred[:, :, args.class_dim:args.class_dim + args.action_dim].contiguous()
+                actions_pred_logits = actions_pred[:, :,
+                                                   args.class_dim:args.class_dim + args.action_dim].contiguous()
                 actions_pred = torch.argmax(actions_pred_logits, dim=-1)
                 actions_pred = actions_pred.view(num_sampling, -1)
                 sample_listing = actions_pred
@@ -69,8 +74,8 @@ def test(val_loader, model, args, all_ref):
                 gt_sample = np.repeat(gt.cpu().numpy(), bz, axis=0)
                 criter = (
                     (gt_sample[:, [0, -1]] == all_ref[:, [0, -1]])
-                        .all(axis=1)
-                        .nonzero()[0]
+                    .all(axis=1)
+                    .nonzero()[0]
                 )
 
                 dist_samples = all_ref[criter]
@@ -97,14 +102,16 @@ def test(val_loader, model, args, all_ref):
                         ref_onehot += ref_onehot_tmp
 
                     ref_dist = ref_onehot
-                    itm_onehot = torch.FloatTensor(args.horizon, act_size).cuda()
+                    itm_onehot = torch.FloatTensor(
+                        args.horizon, act_size).cuda()
                     itm_onehot.zero_()
 
                     for itm in sample_listing:
                         ###########################################
                         # Convert indivisual sample into onehot() #
                         ###########################################
-                        itm_onehot_tmp = torch.FloatTensor(args.horizon, act_size).cuda()
+                        itm_onehot_tmp = torch.FloatTensor(
+                            args.horizon, act_size).cuda()
                         itm_onehot_tmp.zero_()
                         itm_onehot_tmp.scatter_(
                             1, itm.cuda().view(args.horizon, -1), 1)
@@ -218,7 +225,8 @@ def main():
 
     if args.multiprocessing_distributed:
         args.world_size = ngpus_per_node * args.world_size
-        mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
+        mp.spawn(main_worker, nprocs=ngpus_per_node,
+                 args=(ngpus_per_node, args))
     else:
         main_worker(args.gpu, ngpus_per_node, args)
 
@@ -240,7 +248,8 @@ def main_worker(gpu, ngpus_per_node, args):
             torch.cuda.set_device(args.gpu)
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.batch_size_val = int(args.batch_size_val / ngpus_per_node)
-            args.num_thread_reader = int(args.num_thread_reader / ngpus_per_node)
+            args.num_thread_reader = int(
+                args.num_thread_reader / ngpus_per_node)
     elif args.gpu is not None:
         torch.cuda.set_device(args.gpu)
 
@@ -252,7 +261,8 @@ def main_worker(gpu, ngpus_per_node, args):
         model=None,
     )
     if args.distributed:
-        test_sampler = torch.utils.data.distributed.DistributedSampler(test_dataset)
+        test_sampler = torch.utils.data.distributed.DistributedSampler(
+            test_dataset)
         test_sampler.shuffle = False
     else:
         test_sampler = None
@@ -274,7 +284,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     diffusion_model = diffusion.GaussianDiffusion(
         temporal_model, args.horizon, args.observation_dim, args.action_dim, args.class_dim, args.n_diffusion_steps,
-        loss_type='Weighted_MSE', clip_denoised=True, )
+        loss_type='Weighted_Gradient_MSE', clip_denoised=True, )
 
     model = utils.Trainer(diffusion_model, None, args.ema_decay, args.lr, args.gradient_accumulate_every,
                           args.step_start_ema, args.update_ema_every, args.log_freq)
@@ -294,7 +304,8 @@ def main_worker(gpu, ngpus_per_node, args):
         else:
             model.model.cuda()
             model.ema_model.cuda()
-            model.model = torch.nn.parallel.DistributedDataParallel(model.model, find_unused_parameters=True)
+            model.model = torch.nn.parallel.DistributedDataParallel(
+                model.model, find_unused_parameters=True)
             model.ema_model = torch.nn.parallel.DistributedDataParallel(model.ema_model,
                                                                         find_unused_parameters=True)
 
@@ -308,7 +319,8 @@ def main_worker(gpu, ngpus_per_node, args):
     if args.resume:
         checkpoint_path = ""
         if checkpoint_path:
-            checkpoint = torch.load(checkpoint_path, map_location='cuda:{}'.format(args.rank))
+            checkpoint = torch.load(
+                checkpoint_path, map_location='cuda:{}'.format(args.rank))
             args.start_epoch = checkpoint["epoch"]
             model.model.load_state_dict(checkpoint["model"])
             model.ema_model.load_state_dict(checkpoint["ema"])
@@ -329,7 +341,8 @@ def main_worker(gpu, ngpus_per_node, args):
     all_ref = np.array(reference)
 
     for epoch in range(0, test_times):
-        avg_nll, avg_mc, avg_mc_recall, len_unique_avg, avg_kl = test(test_loader, model.ema_model, args, all_ref)
+        avg_nll, avg_mc, avg_mc_recall, len_unique_avg, avg_kl = test(
+            test_loader, model.ema_model, args, all_ref)
         if args.rank == 0:
             print(
                 "NLL {}, MC-Prec {}, MC-Rec {}, Avg.length {}, KL {}".format(
