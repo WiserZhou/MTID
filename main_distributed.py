@@ -15,7 +15,7 @@ from torch.distributed import ReduceOp
 
 import utils
 from dataloader.data_load import PlanningDataset
-from model import diffusion, temporal, temporal2, temporal_fourier
+from model import diffusion, temporal, temporal2, temporal_fourier, temporalPredictor
 from model.helpers import get_lr_schedule_with_warmup
 
 from utils import *
@@ -127,20 +127,25 @@ def main_worker(gpu, ngpus_per_node, args):
     # create model
 
     if args.layer_num == 4:
-        temporal_model = temporal2.TemporalUnet(
-            args.action_dim + args.observation_dim + args.class_dim,
-            dim=256,
-            dim_mults=(1, 2, 4), )
+        temporal_model = temporal2.TemporalUnet(args,
+                                                args.action_dim + args.observation_dim + args.class_dim,
+                                                dim=256,
+                                                dim_mults=(1, 2, 4), )
     elif args.layer_num == 5:
-        temporal_model = temporal_fourier.TemporalUnet(
-            args.action_dim + args.observation_dim + args.class_dim,
-            dim=256,
-            dim_mults=(1, 2, 4), )
+        temporal_model = temporal_fourier.TemporalUnet(args,
+                                                       args.action_dim + args.observation_dim + args.class_dim,
+                                                       dim=256,
+                                                       dim_mults=(1, 2, 4), )
+    elif args.layer_num == 6:
+        temporal_model = temporalPredictor.TemporalUnet(args,
+                                                        args.action_dim + args.observation_dim + args.class_dim,
+                                                        dim=256,
+                                                        dim_mults=(1, 2, 4), )
     else:
-        temporal_model = temporal.TemporalUnet(
-            args.action_dim + args.observation_dim + args.class_dim,
-            dim=256,
-            dim_mults=(1, 2, 4), )
+        temporal_model = temporal.TemporalUnet(args,
+                                               args.action_dim + args.observation_dim + args.class_dim,
+                                               dim=256,
+                                               dim_mults=(1, 2, 4), )
 
     diffusion_model = diffusion.GaussianDiffusion(args, temporal_model,  args.horizon, args.observation_dim,
                                                   args.action_dim, args.class_dim, args.n_diffusion_steps,
