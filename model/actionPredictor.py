@@ -58,8 +58,9 @@ class ImageEncoder(nn.Module):
 
 
 class SemanticSpaceInterpolation(nn.Module):
-    def __init__(self, dimension_num):
+    def __init__(self, dimension_num, block_num):
         super(SemanticSpaceInterpolation, self).__init__()
+        self.block_num = block_num
         self.dimension_num = dimension_num
         # Introduce a linear layer to generate the alpha values dynamically for each frame
         self.alpha_generator = nn.Linear(
@@ -81,6 +82,8 @@ class SemanticSpaceInterpolation(nn.Module):
         # Shape: (2, batch_size, observation_dim)
         x_combined = torch.stack([x1, x2], dim=0)
 
+        # print(x_combined.shape)torch.Size([2, 256, 1536])
+
         # Generate an alpha matrix of shape (batch_size, dimension_num)
         alpha_matrix = self.alpha_generator(
             torch.ones(batch_size, self.dimension_num).to(x1.device))
@@ -93,15 +96,26 @@ class SemanticSpaceInterpolation(nn.Module):
         # Expand the alpha matrix to (batch_size, dimension_num)
         alpha_matrix = alpha_matrix.view(batch_size, self.dimension_num)
 
+        # print(alpha_matrix.shape)torch.Size([256, 1536])
+
         # Compute the interpolated frames
         # RuntimeError: The size of tensor a (12) must match the size of tensor b (1536) at non-singleton dimension 2
 
         interpolated_frames = (
             1 - alpha_matrix) * x_combined[0].unsqueeze(0) + alpha_matrix * x_combined[1].unsqueeze(0)
 
+        # print(interpolated_frames.shape)torch.Size([1, 256, 1536])
+        interpolated_frames = interpolated_frames.repeat_interleave(
+            self.block_num, dim=0)
+
+        # print(interpolated_frames.shape)torch.Size([12, 256, 1536])
+
         # Rearrange dimensions to (dimension_num, batch_size, observation_dim)
         interpolated_frames = interpolated_frames.permute(1, 0, 2)
 
+        # print(interpolated_frames.shape)torch.Size([256, 12, 1536])
+
+        # torch.Size([256, 12, 1536])
         return interpolated_frames
 
 # Transformer Block
@@ -120,10 +134,11 @@ class TransformerBlock(nn.Module):
 
 
 class MotionPredictor(nn.Module):
-    def __init__(self, input_dim, output_dim, dimension_num, num_transformer_blocks=1):
+    def __init__(self, input_dim, output_dim, dimension_num, block_num, num_transformer_blocks=1):
         super(MotionPredictor, self).__init__()
         self.encoder = ImageEncoder(input_dim, output_dim)
-        self.interpolator = SemanticSpaceInterpolation(dimension_num)
+        self.interpolator = SemanticSpaceInterpolation(
+            dimension_num, block_num)
         self.transformer_blocks = nn.ModuleList([TransformerBlock(
             output_dim, num_heads=8, num_layers=6) for _ in range(num_transformer_blocks)])
 
@@ -135,19 +150,28 @@ class MotionPredictor(nn.Module):
 #   x[:, -1, self.args.action_dim + self.args.observation_dim:],
     def forward(self, x1, x2):
 
+        # print(x1.shape)torch.Size([256, 1536])
+
         x1_encoded = self.encoder(x1)
         x2_encoded = self.encoder(x2)
+
+        # print(x1_encoded.shape)torch.Size([256, 1536, 1])
 
         interpolated_frames = self.interpolator(
             x1_encoded, x2_encoded)
 
+        # print(interpolated_frames.shape)  # torch.Size([256, 12, 1536])
+
         # shape (num_frames, batch_size, observation_dim)
         # num_frames, batch_size, observation_dim = interpolated_frames.shape
-
         transformer_input = interpolated_frames
+        # print(transformer_input.shape)torch.Size([256, 12, 1536])
 
         for transformer_block in self.transformer_blocks:
             transformer_input = transformer_block(transformer_input)
 
+        output = transformer_input + interpolated_frames
+        # print(output.shape)torch.Size([256, 12, 1536])
+
         # resnet connect
-        return transformer_input + interpolated_frames
+        return output

@@ -29,7 +29,7 @@ class CrossAttention(nn.Module):
     def forward(self, x, context):
 
         # print(x.shape)  # torch.Size([256, 256, 3])
-        # print(context.shape)# torch.Size([1, 1536])
+        # print(context.shape)  # torch.Size([256, 1536])
 
         # Ensure input tensors are 3-dimensional
         if x.dim() == 2:
@@ -157,7 +157,8 @@ class TemporalUnet(nn.Module):
             nn.Conv1d(dim, transition_dim, 1),
         )
         self.motionPredictor = MotionPredictor(self.args.observation_dim, self.args.observation_dim,
-                                               self.args.observation_dim
+                                               self.args.observation_dim,
+                                               self.block_num
                                                )
 
     # x shape (batch_size,horizon,dimension)
@@ -167,6 +168,9 @@ class TemporalUnet(nn.Module):
         # shape (num_frames, batch_size, observation_dim)
         cross_features = self.motionPredictor(x[:, 0, self.args.class_dim + self.args.action_dim:],
                                               x[:, -1, self.args.class_dim + self.args.action_dim:])
+
+        # print(cross_features.shape) torch.Size([256, 12, 1536])
+        cross_features = cross_features.permute(1, 0, 2)
 
         # x shape (batch_size,horizon,dimension)
         # Rearrange input tensor dimensions
