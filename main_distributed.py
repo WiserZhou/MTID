@@ -25,7 +25,7 @@ import numpy as np
 from model.helpers import Logger
 from tqdm import tqdm
 import subprocess
-from utils.inference import test_inference
+from inference import test_inference
 
 
 def reduce_tensor(tensor):
@@ -231,7 +231,7 @@ def main_worker(gpu, ngpus_per_node, args):
     old_max_epoch = 0
     save_max = os.path.join(os.path.dirname(__file__), 'save_max')
 
-    ckpt_path = ''
+    ckpt_max_path = ''
 
     # Main training loop across epochs
     for epoch in tqdm(range(args.start_epoch, args.epochs), desc='total train'):
@@ -240,57 +240,25 @@ def main_worker(gpu, ngpus_per_node, args):
         if args.distributed:
             train_sampler.set_epoch(epoch)
 
-        # Perform training for one epoch, and calculate additional metrics every 10 epochs
-        if (epoch + 1) % 10 == 0:  # calculate on training set
-            losses, acc_top1, acc_top5, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
-                acc_a0, acc_aT = model.train(
-                    args.n_train_steps, True, args, scheduler)
+        # Train the model
+        losses = model.train(args.n_train_steps, False,
+                             args, scheduler).cuda()
+        losses_reduced = reduce_tensor(losses).item()
+        if args.rank == 0:
+            print('')
+            print('lrs:')
+            for p in model.optimizer.param_groups:
+                print(p['lr'])
+            print('---------------------------------')
 
-            # Reduce tensors for distributed training
-            losses_reduced = reduce_tensor(losses.cuda()).item()
-            acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
-            acc_top5_reduced = reduce_tensor(acc_top5.cuda()).item()
-            trajectory_success_rate_meter_reduced = reduce_tensor(
-                trajectory_success_rate_meter.cuda()).item()
-            MIoU1_meter_reduced = reduce_tensor(MIoU1_meter.cuda()).item()
-            MIoU2_meter_reduced = reduce_tensor(MIoU2_meter.cuda()).item()
-            acc_a0_reduced = reduce_tensor(acc_a0.cuda()).item()
-            acc_aT_reduced = reduce_tensor(acc_aT.cuda()).item()
+            logs = OrderedDict()
+            logs['Train/EpochLoss'] = losses_reduced
+            for key, value in logs.items():
+                tb_logger.log_scalar(value, key, epoch + 1)
 
-            # If the current process is the main process (rank 0), log the metrics
-            if args.rank == 0:
-                logs = OrderedDict()
-                logs['Train/EpochLoss'] = losses_reduced
-                logs['Train/EpochAcc@1'] = acc_top1_reduced
-                logs['Train/EpochAcc@5'] = acc_top5_reduced
-                logs['Train/Traj_Success_Rate'] = trajectory_success_rate_meter_reduced
-                logs['Train/MIoU1'] = MIoU1_meter_reduced
-                logs['Train/MIoU2'] = MIoU2_meter_reduced
-                logs['Train/acc_a0'] = acc_a0_reduced
-                logs['Train/acc_aT'] = acc_aT_reduced
-                for key, value in logs.items():
-                    tb_logger.log_scalar(value, key, epoch + 1)
+            tb_logger.flush()
 
-                tb_logger.flush()
-        else:
-            # Train the model without calculating additional metrics
-            losses = model.train(args.n_train_steps, False,
-                                 args, scheduler).cuda()
-            losses_reduced = reduce_tensor(losses).item()
-            if args.rank == 0:
-                print('lrs:')
-                for p in model.optimizer.param_groups:
-                    print(p['lr'])
-                print('---------------------------------')
-
-                logs = OrderedDict()
-                logs['Train/EpochLoss'] = losses_reduced
-                for key, value in logs.items():
-                    tb_logger.log_scalar(value, key, epoch + 1)
-
-                tb_logger.flush()
-
-        # Evaluate the model every 2 epochs if evaluation is enabled
+        # Evaluate the model every epochs if evaluation is enabled
         if args.evaluate:
             losses, acc_top1, acc_top5, \
                 trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
@@ -326,17 +294,17 @@ def main_worker(gpu, ngpus_per_node, args):
             # Save checkpoint if the new trajectory success rate is better
             if trajectory_success_rate_meter_reduced >= max_eva:
                 if not (trajectory_success_rate_meter_reduced == max_eva and acc_top1_reduced < max_acc):
-                    ckpt_path = save_checkpoint_max(args.name,
-                                                    {
-                                                        "epoch": epoch + 1,
-                                                        "model": model.model.state_dict(),
-                                                        "ema": model.ema_model.state_dict(),
-                                                        "optimizer": model.optimizer.state_dict(),
-                                                        "step": model.step,
-                                                        "tb_logdir": tb_logdir,
-                                                        "scheduler": scheduler.state_dict(),
-                                                    }, save_max, old_max_epoch, epoch + 1, args.rank
-                                                    )
+                    ckpt_max_path = save_checkpoint_max(args.name,
+                                                        {
+                                                            "epoch": epoch + 1,
+                                                            "model": model.model.state_dict(),
+                                                            "ema": model.ema_model.state_dict(),
+                                                            "optimizer": model.optimizer.state_dict(),
+                                                            "step": model.step,
+                                                            "tb_logdir": tb_logdir,
+                                                            "scheduler": scheduler.state_dict(),
+                                                        }, save_max, old_max_epoch, epoch + 1, args.rank
+                                                        )
                     max_eva = trajectory_success_rate_meter_reduced
                     max_acc = acc_top1_reduced
                     old_max_epoch = epoch + 1
@@ -355,12 +323,13 @@ def main_worker(gpu, ngpus_per_node, args):
                                     "scheduler": scheduler.state_dict(),
                                 }, checkpoint_dir, epoch + 1
                                 )
+
     # add inference
-    ckpt_path = os.path.join(args.checkpoint_max_root, ckpt_path)
-    if ckpt_path:
-        print("=> loading checkpoint '{}'".format(ckpt_path), args)
+    ckpt_max_path = os.path.join(args.checkpoint_max_root, ckpt_max_path)
+    if ckpt_max_path:
+        print("=> loading checkpoint '{}'".format(ckpt_max_path), args)
         checkpoint = torch.load(
-            ckpt_path, map_location='cuda:{}'.format(args.rank))
+            ckpt_max_path, map_location='cuda:{}'.format(args.rank))
         args.start_epoch = checkpoint["epoch"]
         model.model.load_state_dict(checkpoint["model"], strict=True)
         model.ema_model.load_state_dict(checkpoint["ema"], strict=True)

@@ -23,5 +23,5 @@ def print_checkpoint_info(checkpoint_path):
 
 
 if __name__ == "__main__":
-    checkpoint_path = "/home/zhouyufan/Projects/PDPP/save_max/epoch_gra_4layer_0134_0.pth.tar"
+    checkpoint_path = "/home/zhouyufan/Projects/PDPP/save_max/epoch_4layer2_0041_0.pth.tar"
     print_checkpoint_info(checkpoint_path)

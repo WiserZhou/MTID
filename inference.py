@@ -252,7 +252,6 @@ def main_worker(gpu, ngpus_per_node, args):
                                                                         find_unused_parameters=True)
 
     elif args.gpu is not None:
-        print("hello")
         model.model = model.model.cuda(args.gpu)
         model.ema_model = model.ema_model.cuda(args.gpu)
     else:

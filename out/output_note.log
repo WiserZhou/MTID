@@ -1,0 +1,156 @@
+nohup: ignoring input
+Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log/log', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, pretrain_cnn_path='', momemtum=0.9, log_freq=500, save_freq=1, gradient_accumulate_every=1, ema_decay=0.995, step_start_ema=400, update_ema_every=10, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='crosstask', action_dim=105, observation_dim=1536, class_dim=18, n_diffusion_steps=200, n_train_steps=200, root='/home/zhouyufan/Projects/PDPP/dataset/crosstask', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/train_list.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/test_list.json', json_path_val2='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json', start_epoch=0, lr=0.0005, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', seed=217, gpu=1, multiprocessing_distributed=False, name='your_note', loss_kind='Weighted_Gradient_MSE', ckpt_path='', layer_num=3, dist_port=21712, horizon=3, weight=6, epochs=120)
+Loaded /home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/train_list.json
+Loaded /home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json
+logging outputs to  /home/zhouyufan/Projects/PDPP/log/log_your_note_20240720094559_crosstask
+total train:   0%|          | 0/120 [00:00<?, ?it/s]
+lrs:
+2.5e-05
+---------------------------------
+/home/zhouyufan/Projects/PDPP/utils/eval.py:88: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+total train:   1%|          | 1/120 [00:29<58:56, 29.72s/it]4.669430732727051 0
+
+lrs:
+5e-05
+---------------------------------
+total train:   2%|▏         | 2/120 [00:59<58:32, 29.76s/it]1.3310059309005737 4.669430732727051
+
+lrs:
+7.5e-05
+---------------------------------
+total train:   2%|▎         | 3/120 [01:27<56:36, 29.03s/it]1.3310059309005737 4.669430732727051
+
+lrs:
+0.0001
+---------------------------------
+total train:   3%|▎         | 4/120 [01:56<56:15, 29.10s/it]1.3310059309005737 4.669430732727051
+
+lrs:
+0.000125
+---------------------------------
+total train:   4%|▍         | 5/120 [02:26<56:23, 29.42s/it]1.3310059309005737 4.669430732727051
+
+lrs:
+0.00015
+---------------------------------
+total train:   5%|▌         | 6/120 [02:54<54:58, 28.93s/it]1.3310059309005737 4.669430732727051
+
+lrs:
+0.000175
+---------------------------------
+total train:   6%|▌         | 7/120 [03:23<54:33, 28.96s/it]1.6583024263381958 4.669430732727051
+
+lrs:
+0.0002
+---------------------------------
+total train:   7%|▋         | 8/120 [03:51<53:24, 28.61s/it]1.8546802997589111 4.669430732727051
+
+lrs:
+0.00022500000000000002
+---------------------------------
+total train:   8%|▊         | 9/120 [04:20<53:08, 28.72s/it]2.1383373737335205 4.669430732727051
+
+lrs:
+0.00025
+---------------------------------
+total train:   8%|▊         | 10/120 [04:48<52:13, 28.49s/it]3.753000259399414 4.669430732727051
+
+lrs:
+0.000275
+---------------------------------
+total train:   9%|▉         | 11/120 [05:20<53:29, 29.45s/it]7.331442356109619 4.669430732727051
+
+lrs:
+0.0003
+---------------------------------
+total train:  10%|█         | 12/120 [05:52<54:20, 30.19s/it]11.040802955627441 7.331442356109619
+
+lrs:
+0.00032500000000000004
+---------------------------------
+total train:  11%|█         | 13/120 [06:21<53:13, 29.84s/it]17.346715927124023 11.040802955627441
+
+lrs:
+0.00035
+---------------------------------
+total train:  12%|█▏        | 14/120 [06:50<52:29, 29.72s/it]21.470651626586914 17.346715927124023
+
+lrs:
+0.000375
+---------------------------------
+total train:  12%|█▎        | 15/120 [07:19<51:21, 29.35s/it]25.13637351989746 21.470651626586914
+
+lrs:
+0.0004
+---------------------------------
+total train:  13%|█▎        | 16/120 [07:45<49:31, 28.58s/it]27.842025756835938 25.13637351989746
+
+lrs:
+0.000425
+---------------------------------
+total train:  14%|█▍        | 17/120 [08:14<49:13, 28.67s/it]30.50403594970703 27.842025756835938
+
+lrs:
+0.00045000000000000004
+---------------------------------
+total train:  15%|█▌        | 18/120 [08:44<49:17, 29.00s/it]31.965961456298828 30.50403594970703
+
+lrs:
+0.000475
+---------------------------------
+total train:  16%|█▌        | 19/120 [09:15<49:34, 29.45s/it]33.187870025634766 31.965961456298828
+
+lrs:
+0.0005
+---------------------------------
+total train:  17%|█▋        | 20/120 [09:44<48:59, 29.40s/it]33.97338104248047 33.187870025634766
+
+lrs:
+0.0005
+---------------------------------
+total train:  18%|█▊        | 21/120 [10:14<49:04, 29.74s/it]34.51887512207031 33.97338104248047
+
+lrs:
+0.0005
+---------------------------------
+total train:  18%|█▊        | 22/120 [10:46<49:24, 30.25s/it]35.173465728759766 34.51887512207031
+
+lrs:
+0.0005
+---------------------------------
+total train:  19%|█▉        | 23/120 [11:14<47:56, 29.66s/it]36.198997497558594 35.173465728759766
+
+lrs:
+0.0005
+---------------------------------
+total train:  20%|██        | 24/120 [11:45<47:49, 29.89s/it]36.67903137207031 36.198997497558594
+
+lrs:
+0.0005
+---------------------------------
+total train:  21%|██        | 25/120 [12:12<46:03, 29.09s/it]36.65721130371094 36.67903137207031
+
+lrs:
+0.0005
+---------------------------------
+total train:  22%|██▏       | 26/120 [12:40<45:20, 28.95s/it]36.74449157714844 36.67903137207031
+
+lrs:
+0.0005
+---------------------------------
+total train:  22%|██▎       | 27/120 [13:08<44:26, 28.67s/it]37.137245178222656 36.74449157714844
+
+lrs:
+0.0005
+---------------------------------
+total train:  23%|██▎       | 28/120 [13:39<44:56, 29.31s/it]37.420902252197266 37.137245178222656
+
+lrs:
+0.0005
+---------------------------------
+total train:  24%|██▍       | 29/120 [14:11<45:40, 30.12s/it]37.464542388916016 37.420902252197266
+
+lrs:
+0.0005
+---------------------------------
