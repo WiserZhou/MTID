@@ -2,7 +2,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
+import einops
+from einops.layers.torch import Rearrange
 
+from .helpers import (
+    SinusoidalPosEmb,
+    Downsample1d,
+    Upsample1d,
+    Conv1dBlock,
+)
 # Image Encoder
 
 
@@ -23,16 +31,37 @@ class ImageEncoder(nn.Module):
 
 
 class SemanticSpaceInterpolation(nn.Module):
-    def __init__(self):
+    def __init__(self, num_frames):
         super(SemanticSpaceInterpolation, self).__init__()
+        # Introduce a linear layer to generate the alpha values dynamically for each frame
+        self.alpha_generator = nn.Linear(1, num_frames)
+        # Use ReLU activation function to ensure the alpha values are positive
+        self.relu = nn.ReLU()
+        # Use Sigmoid activation function to constrain the alpha values between 0 and 1
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x1, x2, num_frames):
         batch_size, channels, height, width = x1.shape
-        interpolated_frames = torch.zeros(
-            batch_size, num_frames, channels, height, width).to(x1.device)
-        for i in range(num_frames):
-            alpha = i / (num_frames - 1)
-            interpolated_frames[:, i] = (1 - alpha) * x1 + alpha * x2
+
+        # Generate an alpha matrix of shape (batch_size, num_frames)
+        alpha_matrix = self.alpha_generator(
+            torch.ones(batch_size, 1).to(x1.device))
+        # Ensure alpha values are positive
+        alpha_matrix = self.relu(alpha_matrix)
+        # Constrain alpha values between 0 and 1
+        alpha_matrix = self.sigmoid(alpha_matrix)
+
+        # Expand the alpha matrix to (batch_size, num_frames, channels, height, width)
+        alpha_matrix = alpha_matrix.view(batch_size, num_frames, 1, 1, 1)
+
+        # Duplicate x1 and x2 to match the shape of alpha_matrix
+        x1_repeated = x1.unsqueeze(1).repeat(1, num_frames, 1, 1, 1)
+        x2_repeated = x2.unsqueeze(1).repeat(1, num_frames, 1, 1, 1)
+
+        # Compute the interpolated frames
+        interpolated_frames = (1 - alpha_matrix) * \
+            x1_repeated + alpha_matrix * x2_repeated
+
         return interpolated_frames
 
 # Transformer Block
@@ -47,36 +76,55 @@ class TransformerBlock(nn.Module):
     def forward(self, x):
         x = self.transformer(x)
         return x
+# Motion Predictor with Transformer blocks
 
-# U-Net Model (simplified version)
+
+class MotionPredictor(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim, num_transformer_blocks):
+        super(MotionPredictor, self).__init__()
+        self.encoder = ImageEncoder(input_dim, hidden_dim)
+        self.interpolator = SemanticSpaceInterpolation()
+        self.transformer_blocks = nn.ModuleList([TransformerBlock(
+            hidden_dim, num_heads=8, num_layers=6) for _ in range(num_transformer_blocks)])
+        self.unet = TemporalUnet(
+            hidden_dim, output_dim, num_transformer_blocks)
+
+    def forward(self, x1, x2, num_frames):
+        x1_encoded = self.encoder(x1)
+        x2_encoded = self.encoder(x2)
+        interpolated_frames = self.interpolator(
+            x1_encoded, x2_encoded, num_frames)
+
+        batch_size, num_frames, channels, height, width = interpolated_frames.shape
+        transformer_input = interpolated_frames.view(
+            batch_size, num_frames, -1)
+
+        cross_attentions = []
+        for transformer_block in self.transformer_blocks:
+            transformer_output = transformer_block(transformer_input)
+            cross_attentions.append(transformer_output.view(
+                batch_size, num_frames, channels, height, width))
+
+        outputs = []
+        for i in range(num_frames):
+            unet_output = self.unet(interpolated_frames[:, i], [
+                                    cross_attentions[j][:, i] for j in range(len(cross_attentions))])
+            outputs.append(unet_output)
+
+        return torch.stack(outputs, dim=1)
+
+# Transition Video Diffusion Model
 
 
-class UNet(nn.Module):
-    def __init__(self, input_channels, output_channels):
-        super(UNet, self).__init__()
-        self.encoder1 = nn.Conv2d(input_channels, 64, kernel_size=3, padding=1)
-        self.encoder2 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
-        self.decoder1 = nn.Conv2d(128, 64, kernel_size=3, padding=1)
-        self.decoder2 = nn.Conv2d(
-            64, output_channels, kernel_size=3, padding=1)
+class TransitionVideoDiffusionModel(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim, num_transformer_blocks):
+        super(TransitionVideoDiffusionModel, self).__init__()
+        self.motion_predictor = MotionPredictor(
+            input_dim, hidden_dim, output_dim, num_transformer_blocks)
 
-    def forward(self, x, cross_attentions):
-        x1 = F.relu(self.encoder1(x))
-        x2 = F.relu(self.encoder2(x1))
+    def forward(self, x1, x2, num_frames):
+        return self.motion_predictor(x1, x2, num_frames)
 
-        # Using cross-attentions from the transformer blocks
-        x2 = x2 + cross_attentions[0]
-
-        x3 = F.relu(self.decoder1(x2))
-
-        # Using cross-attentions from the transformer blocks
-        x3 = x3 + cross_attentions[1]
-
-        x4 = self.decoder2(x3)
-
-        return x4
-
-# Motion Predictor
 
 # Define a residual block used in the Temporal Unet
 
@@ -185,55 +233,6 @@ class TemporalUnet(nn.Module):
         x = self.final_conv(x)
         x = einops.rearrange(x, 'b t h -> b h t')
         return x
-
-# Motion Predictor with Transformer blocks
-
-
-class MotionPredictor(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim, num_transformer_blocks):
-        super(MotionPredictor, self).__init__()
-        self.encoder = ImageEncoder(input_dim, hidden_dim)
-        self.interpolator = SemanticSpaceInterpolation()
-        self.transformer_blocks = nn.ModuleList([TransformerBlock(
-            hidden_dim, num_heads=8, num_layers=6) for _ in range(num_transformer_blocks)])
-        self.unet = TemporalUnet(
-            hidden_dim, output_dim, num_transformer_blocks)
-
-    def forward(self, x1, x2, num_frames):
-        x1_encoded = self.encoder(x1)
-        x2_encoded = self.encoder(x2)
-        interpolated_frames = self.interpolator(
-            x1_encoded, x2_encoded, num_frames)
-
-        batch_size, num_frames, channels, height, width = interpolated_frames.shape
-        transformer_input = interpolated_frames.view(
-            batch_size, num_frames, -1)
-
-        cross_attentions = []
-        for transformer_block in self.transformer_blocks:
-            transformer_output = transformer_block(transformer_input)
-            cross_attentions.append(transformer_output.view(
-                batch_size, num_frames, channels, height, width))
-
-        outputs = []
-        for i in range(num_frames):
-            unet_output = self.unet(interpolated_frames[:, i], [
-                                    cross_attentions[j][:, i] for j in range(len(cross_attentions))])
-            outputs.append(unet_output)
-
-        return torch.stack(outputs, dim=1)
-
-# Transition Video Diffusion Model
-
-
-class TransitionVideoDiffusionModel(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim, num_transformer_blocks):
-        super(TransitionVideoDiffusionModel, self).__init__()
-        self.motion_predictor = MotionPredictor(
-            input_dim, hidden_dim, output_dim, num_transformer_blocks)
-
-    def forward(self, x1, x2, num_frames):
-        return self.motion_predictor(x1, x2, num_frames)
 
 
 # Example usage
