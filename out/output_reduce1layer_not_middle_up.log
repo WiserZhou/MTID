@@ -1,0 +1,56 @@
+nohup: ignoring input
+Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log/log', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, pretrain_cnn_path='', momemtum=0.9, log_freq=500, save_freq=1, gradient_accumulate_every=1, ema_decay=0.995, step_start_ema=400, update_ema_every=10, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='crosstask', action_dim=105, observation_dim=1536, class_dim=18, n_diffusion_steps=200, n_train_steps=200, root='/home/zhouyufan/Projects/PDPP/dataset/crosstask', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/train_list.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/test_list.json', json_path_val2='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json', start_epoch=0, lr=0.0005, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', seed=217, gpu=3, multiprocessing_distributed=False, name='reduce1layers_not_middle_up', loss_kind='Weighted_Gradient_MSE', ckpt_path='', layer_num=5, dist_port=21712, horizon=3, weight=6, epochs=70)
+Loaded /home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/train_list.json
+Loaded /home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json
+logging outputs to  /home/zhouyufan/Projects/PDPP/log/log_reduce1layers_not_middle_up_20240723002755_crosstask
+total train:   0%|          | 0/70 [00:00<?, ?it/s]
+lrs:
+4.2857142857142856e-05
+---------------------------------
+/home/zhouyufan/Projects/PDPP/utils/eval.py:88: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+total train:   1%|▏         | 1/70 [00:27<31:55, 27.77s/it]1.701941967010498 0
+
+lrs:
+8.571428571428571e-05
+---------------------------------
+total train:   3%|▎         | 2/70 [00:53<30:05, 26.55s/it]2.2910757064819336 1.701941967010498
+
+lrs:
+0.00012857142857142855
+---------------------------------
+total train:   4%|▍         | 3/70 [01:19<29:24, 26.34s/it]2.5092732906341553 2.2910757064819336
+
+lrs:
+0.00017142857142857143
+---------------------------------
+total train:   6%|▌         | 4/70 [01:45<28:35, 25.99s/it]2.923849105834961 2.5092732906341553
+
+lrs:
+0.00021428571428571427
+---------------------------------
+total train:   7%|▋         | 5/70 [02:09<27:27, 25.35s/it]1.6801221370697021 2.923849105834961
+
+lrs:
+0.0002571428571428571
+---------------------------------
+total train:   9%|▊         | 6/70 [02:35<27:19, 25.62s/it]1.6583024263381958 2.923849105834961
+
+lrs:
+0.0003
+---------------------------------
+total train:  10%|█         | 7/70 [03:00<26:51, 25.59s/it]1.6583024263381958 2.923849105834961
+
+lrs:
+0.00034285714285714285
+---------------------------------
+total train:  11%|█▏        | 8/70 [03:26<26:32, 25.69s/it]1.6583024263381958 2.923849105834961
+
+lrs:
+0.00038571428571428567
+---------------------------------
+total train:  13%|█▎        | 9/70 [03:53<26:25, 25.99s/it]1.6583024263381958 2.923849105834961
+
+lrs:
+0.00042857142857142855
+---------------------------------

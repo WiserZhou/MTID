@@ -15,7 +15,7 @@ from torch.distributed import ReduceOp
 
 import utils
 from dataloader.data_load import PlanningDataset
-from model import diffusion, temporal, temporal2, temporal_fourier, temporalPredictor
+from model import diffusion, temporal, temporal2, temporal_fourier, temporalPredictor, temporal_reduce, temporal_reduce_copy, temporal_reduce_copy2, temporal_reduce_copy3
 from model.helpers import get_lr_schedule_with_warmup
 
 from utils import *
@@ -29,36 +29,69 @@ from inference import test_inference
 
 
 def reduce_tensor(tensor):
+    # Check if the distributed package is initialized.
+    # This ensures that we are running in a distributed environment.
     if dist.is_initialized():
+
+        # Clone the tensor to avoid modifying the original tensor.
+        # This is necessary because the all_reduce operation will modify the tensor in-place.
         rt = tensor.clone()
+
+        # Perform an all-reduce operation on the cloned tensor.
+        # The all_reduce operation sums up the values of the tensor across all processes.
+        # All processes will end up with the same reduced value.
         dist.all_reduce(rt, op=ReduceOp.SUM)
+
+        # Normalize the result by dividing it by the number of processes.
+        # This is done to get the average value across all processes.
         rt /= dist.get_world_size()
+
+        # Return the reduced and normalized tensor.
         return rt
+
+    # If the distributed package is not initialized,
+    # it means we are not in a distributed environment.
+    # In this case, simply return the original tensor.
     else:
         return tensor
 
 
 def main():
+    # Parse command-line arguments using a predefined function get_args().
+    # This is typically used to handle program options and parameters.
     args = get_args()
 
+    # Set the PYTHONHASHSEED environment variable to ensure reproducibility.
+    # This is important when using hash-based operations which might be non-deterministic.
     os.environ['PYTHONHASHSEED'] = str(args.seed)
 
+    # Print the parsed arguments if verbose mode is enabled.
     if args.verbose:
         print(args)
+
+    # Set seeds for various random number generators to ensure reproducibility.
     if args.seed is not None:
         random.seed(args.seed)
         np.random.seed(args.seed)
         torch.manual_seed(args.seed)
         torch.cuda.manual_seed_all(args.seed)
 
+    # Determine if the script is running in a distributed setup.
+    # This is true if there is more than one GPU available or if multiprocessing is requested.
     args.distributed = args.world_size > 1 or args.multiprocessing_distributed
     ngpus_per_node = torch.cuda.device_count()
 
+    # If multiprocessing is requested, adjust the world size accordingly.
+    # Spawn multiple processes to handle each GPU, effectively parallelizing the workload.
     if args.multiprocessing_distributed:
         args.world_size = ngpus_per_node * args.world_size
+        # Use the multiprocessing module's spawn function to launch workers.
+        # Each worker will run the main_worker function.
         mp.spawn(main_worker, nprocs=ngpus_per_node,
                  args=(ngpus_per_node, args))
     else:
+        # If not in a multiprocessing or distributed setup, just run the main_worker function directly.
+        # This is typically for single-GPU or non-distributed runs.
         main_worker(args.gpu, ngpus_per_node, args)
 
 
@@ -127,21 +160,21 @@ def main_worker(gpu, ngpus_per_node, args):
     # create model
 
     if args.layer_num == 4:
-        temporal_model = temporal2.TemporalUnet(args,
-                                                dim=256,
-                                                dim_mults=(1, 2, 4), )
+        temporal_model = temporal_reduce_copy3.TemporalUnet(args,
+                                                            dim=256,
+                                                            dim_mults=(1, 2, 4), )
     elif args.layer_num == 5:
-        temporal_model = temporal_fourier.TemporalUnet(args,
-                                                       dim=256,
-                                                       dim_mults=(1, 2, 4), )
+        temporal_model = temporal_reduce_copy2.TemporalUnet(args,
+                                                            dim=256,
+                                                            dim_mults=(1, 2, 4), )
     elif args.layer_num == 6:
-        temporal_model = temporalPredictor.TemporalUnet(args,
-                                                        dim=256,
-                                                        dim_mults=(1, 2, 4), )
+        temporal_model = temporal_reduce_copy.TemporalUnet(args,
+                                                           dim=256,
+                                                           dim_mults=(1, 2, 4), )
     else:
-        temporal_model = temporal.TemporalUnet(args,
-                                               dim=256,
-                                               dim_mults=(1, 2, 4), )
+        temporal_model = temporal_reduce.TemporalUnet(args,
+                                                      dim=256,
+                                                      dim_mults=(1, 2, 4), )
 
     diffusion_model = diffusion.GaussianDiffusion(args, temporal_model,  args.horizon, args.observation_dim,
                                                   args.action_dim, args.class_dim, args.n_diffusion_steps,

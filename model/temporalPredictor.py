@@ -42,7 +42,7 @@ class CrossAttention(nn.Module):
             nn.Mish(),
             nn.Linear(embed_dim * 4, embed_dim)
         )
-        self.linears = DynamicLinearModel(observation_dim)
+        self.dynamic_linears = DynamicLinearModel(observation_dim)
 
     def forward(self, x, context):
 
@@ -60,15 +60,7 @@ class CrossAttention(nn.Module):
         # print(x.shape)  # torch.Size([3, 256, 256])
         # print(context.shape)  # torch.Size([1, 256, 1536])
 
-        # print(x.device)
-        # print(context.device)
-
-        # context = einops.rearrange(context, 'c b s -> s b c')
-        # context.cuda()
-        # print(context.device)
-        context = self.linears(context, x.shape[2])
-        # print(context.device)
-        # context = einops.rearrange(context, 's b c -> c b s')
+        context = self.dynamic_linears(context, x.shape[2])
 
         attn_output, _ = self.multihead_attn(x, context, context)
         x = x + attn_output
@@ -108,8 +100,6 @@ class ResidualTemporalBlock(nn.Module):
 
         # Forward pass with time embedding (for diffusion models)
         out = self.blocks[0](x) + self.time_mlp(t)   # for diffusion
-        # Uncomment the following line for Noise and Deterministic Baselines
-        # out = self.blocks[0](x)
 
         # print(out.shape)  # torch.Size([256, 256, 3])
         out = self.cross_attention(out, context)

@@ -110,7 +110,7 @@ class TemporalUnet(nn.Module):
 
             self.ups.append(nn.ModuleList([
                 ResidualTemporalBlock(dim_out * 2, dim_in, embed_dim=time_dim),
-                ResidualTemporalBlock(dim_in, dim_in, embed_dim=time_dim),
+                # ResidualTemporalBlock(dim_in, dim_in, embed_dim=time_dim),
                 Upsample1d(dim_in) if not is_last else nn.Identity()
             ]))
 
@@ -153,12 +153,12 @@ class TemporalUnet(nn.Module):
         # print("middle-------------")
 
         # Forward pass through upsampling blocks
-        for resnet, resnet2, upsample in self.ups:
+        for resnet,  upsample in self.ups:
             x = torch.cat((x, h.pop()), dim=1)
             # print(x.shape)
             x = resnet(x, t)
             # print(x.shape)
-            x = resnet2(x, t)
+            # x = resnet2(x, t)
             x = upsample(x)
             # print("down--------------")
 

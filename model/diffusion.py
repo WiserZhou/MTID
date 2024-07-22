@@ -226,6 +226,8 @@ class GaussianDiffusion(nn.Module):
 
     # Compute the loss for the denoising process
     def p_losses(self, x_start, cond, t):
+
+        # print("p_loss")
         # Generate noise for Noise and diffusion
         noise = torch.randn_like(x_start) * self.random_ratio
         # noise = torch.zeros_like(x_start)   # for Deterministic

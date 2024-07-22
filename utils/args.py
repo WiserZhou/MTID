@@ -177,7 +177,7 @@ def get_args(description='whl'):
                         help='')
     parser.add_argument('--weight', default=6, type=float,
                         help='weight of the loss function')
-    parser.add_argument('--epochs', default=120, type=int, metavar='N',
+    parser.add_argument('--epochs', default=70, type=int, metavar='N',
                         help='number of total epochs to run')
     args = parser.parse_args()
     return args

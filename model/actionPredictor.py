@@ -20,7 +20,7 @@ class ImageEncoder(nn.Module):
     # input shape (batch_size,observation_dim)
     def forward(self, x):
 
-        print("")
+        # print("")
 
         x = x.unsqueeze(2)
         x = F.relu(self.conv1(x))
@@ -97,10 +97,7 @@ class SemanticSpaceInterpolation(nn.Module):
         alpha_matrix = alpha_matrix.view(batch_size, self.dimension_num)
 
         # print(alpha_matrix.shape)torch.Size([256, 1536])
-
         # Compute the interpolated frames
-        # RuntimeError: The size of tensor a (12) must match the size of tensor b (1536) at non-singleton dimension 2
-
         interpolated_frames = (
             1 - alpha_matrix) * x_combined[0].unsqueeze(0) + alpha_matrix * x_combined[1].unsqueeze(0)
 
@@ -109,12 +106,10 @@ class SemanticSpaceInterpolation(nn.Module):
             self.block_num, dim=0)
 
         # print(interpolated_frames.shape)torch.Size([12, 256, 1536])
-
         # Rearrange dimensions to (dimension_num, batch_size, observation_dim)
         interpolated_frames = interpolated_frames.permute(1, 0, 2)
 
         # print(interpolated_frames.shape)torch.Size([256, 12, 1536])
-
         # torch.Size([256, 12, 1536])
         return interpolated_frames
 
@@ -145,11 +140,11 @@ class MotionPredictor(nn.Module):
         self.residual_conv = nn.Conv1d(input_dim, output_dim, 1) \
             if input_dim != output_dim else nn.Identity()
 
-        self.ffn = nn.Sequential(
-            nn.Linear(output_dim, dimension_num * 4),
-            nn.Mish(),
-            nn.Linear(dimension_num * 4, dimension_num)
-        )
+        # self.ffn = nn.Sequential(
+        #     nn.Linear(output_dim, dimension_num * 4),
+        #     nn.Mish(),
+        #     nn.Linear(dimension_num * 4, dimension_num)
+        # )
 
 #   MotionPredictor(
 #   x[:, 0, self.args.action_dim + self.args.observation_dim:],
