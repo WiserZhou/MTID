@@ -167,7 +167,8 @@ def get_args(description='whl'):
     parser.add_argument('--ckpt_path', default='', type=str,
                         help='checkpoint path for max')
     parser.add_argument('--layer_num', default=3, type=int,
-                        help='number of layers in block')
+                        help='number of layers in block;' +
+                        '3:simple,4:add mid block,5:change to fourier loss,6:predictor block')
     parser.add_argument('--dist_port', default=21712, type=int,
                         help='port used to set up distributed training')
     parser.add_argument('--horizon',

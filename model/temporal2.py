@@ -50,11 +50,13 @@ class ResidualTemporalBlock(nn.Module):
 class TemporalUnet(nn.Module):
     def __init__(
         self,
-        transition_dim,
+        args,
         dim=256,
         dim_mults=(1, 2, 4),
     ):
         super().__init__()
+
+        transition_dim = args.action_dim + args.observation_dim + args.class_dim
 
         # Determine the dimensions at each stage
         # transition_dim is the initial dimension (1659)

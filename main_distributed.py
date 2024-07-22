@@ -128,22 +128,18 @@ def main_worker(gpu, ngpus_per_node, args):
 
     if args.layer_num == 4:
         temporal_model = temporal2.TemporalUnet(args,
-                                                args.action_dim + args.observation_dim + args.class_dim,
                                                 dim=256,
                                                 dim_mults=(1, 2, 4), )
     elif args.layer_num == 5:
         temporal_model = temporal_fourier.TemporalUnet(args,
-                                                       args.action_dim + args.observation_dim + args.class_dim,
                                                        dim=256,
                                                        dim_mults=(1, 2, 4), )
     elif args.layer_num == 6:
         temporal_model = temporalPredictor.TemporalUnet(args,
-                                                        args.action_dim + args.observation_dim + args.class_dim,
                                                         dim=256,
                                                         dim_mults=(1, 2, 4), )
     else:
         temporal_model = temporal.TemporalUnet(args,
-                                               args.action_dim + args.observation_dim + args.class_dim,
                                                dim=256,
                                                dim_mults=(1, 2, 4), )
 

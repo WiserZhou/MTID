@@ -138,12 +138,18 @@ class MotionPredictor(nn.Module):
         super(MotionPredictor, self).__init__()
         self.encoder = ImageEncoder(input_dim, output_dim)
         self.interpolator = SemanticSpaceInterpolation(
-            dimension_num, block_num)
+            output_dim, block_num)
         self.transformer_blocks = nn.ModuleList([TransformerBlock(
             output_dim, num_heads=8, num_layers=6) for _ in range(num_transformer_blocks)])
 
         self.residual_conv = nn.Conv1d(input_dim, output_dim, 1) \
             if input_dim != output_dim else nn.Identity()
+
+        self.ffn = nn.Sequential(
+            nn.Linear(output_dim, dimension_num * 4),
+            nn.Mish(),
+            nn.Linear(dimension_num * 4, dimension_num)
+        )
 
 #   MotionPredictor(
 #   x[:, 0, self.args.action_dim + self.args.observation_dim:],
@@ -172,6 +178,9 @@ class MotionPredictor(nn.Module):
 
         output = transformer_input + interpolated_frames
         # print(output.shape)torch.Size([256, 12, 1536])
+
+        # output = self.ffn(output)
+        # print(output.shape)torch.Size([256, 12, 256])
 
         # resnet connect
         return output

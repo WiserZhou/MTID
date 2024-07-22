@@ -40,6 +40,7 @@ class ResidualTemporalBlock(nn.Module):
         out = self.blocks[0](x) + self.time_mlp(t)   # for diffusion
         # Uncomment the following line for Noise and Deterministic Baselines
         # out = self.blocks[0](x)
+        print(out.shape)
         out = self.blocks[1](out)
         return out + self.residual_conv(x)
 
@@ -50,11 +51,13 @@ class ResidualTemporalBlock(nn.Module):
 class TemporalUnet(nn.Module):
     def __init__(
         self,
-        transition_dim,
+        args,
         dim=256,
         dim_mults=(1, 2, 4),
     ):
         super().__init__()
+
+        transition_dim = args.action_dim + args.observation_dim + args.class_dim
 
         # Determine the dimensions at each stage
         # transition_dim is the initial dimension (1659)
@@ -127,25 +130,43 @@ class TemporalUnet(nn.Module):
         t = self.time_mlp(time)   # for diffusion
         h = []
 
+        print("start-------------------------------")
+
         # Forward pass through downsampling blocks
         for resnet, resnet2, downsample in self.downs:
+            # print(x.shape)
             x = resnet(x, t)
+            # print(x.shape)
             x = resnet2(x, t)
             h.append(x)
             x = downsample(x)
+            print("up--------------")
+
+        print("middle-------------")
 
         # Forward pass through middle blocks
+        # print(x.shape)
         x = self.mid_block1(x, t)
+        # print(x.shape)
         x = self.mid_block2(x, t)
+
+        print("middle-------------")
 
         # Forward pass through upsampling blocks
         for resnet, resnet2, upsample in self.ups:
             x = torch.cat((x, h.pop()), dim=1)
+            # print(x.shape)
             x = resnet(x, t)
+            # print(x.shape)
             x = resnet2(x, t)
             x = upsample(x)
+            print("down--------------")
 
+        print("final-----------------------")
         # Final convolution and rearrange dimensions back
+        print(x.shape)
         x = self.final_conv(x)
+        print(x.shape)
         x = einops.rearrange(x, 'b t h -> b h t')
+        print(x.shape)
         return x
