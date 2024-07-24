@@ -92,6 +92,7 @@ class TemporalUnet(nn.Module):
             self.downs.append(nn.ModuleList([
                 ResidualTemporalBlock(dim_in, dim_out, embed_dim=time_dim),
                 ResidualTemporalBlock(dim_out, dim_out, embed_dim=time_dim),
+                ResidualTemporalBlock(dim_out, dim_out, embed_dim=time_dim),
                 Downsample1d(dim_out) if not is_last else nn.Identity()
             ]))
 
@@ -102,8 +103,8 @@ class TemporalUnet(nn.Module):
             mid_dim, mid_dim, embed_dim=time_dim)
         self.mid_block2 = ResidualTemporalBlock(
             mid_dim, mid_dim, embed_dim=time_dim)
-        self.mid_block3 = ResidualTemporalBlock(
-            mid_dim, mid_dim, embed_dim=time_dim)
+        # self.mid_block3 = ResidualTemporalBlock(
+        #     mid_dim, mid_dim, embed_dim=time_dim)
 
         # Create upsampling blocks
         for ind, (dim_in, dim_out) in enumerate(reversed(in_out[1:])):
@@ -132,16 +133,17 @@ class TemporalUnet(nn.Module):
         h = []
 
         # Forward pass through downsampling blocks
-        for resnet, resnet2,  downsample in self.downs:
+        for resnet, resnet2, resnet3,  downsample in self.downs:
             x = resnet(x, t)
             x = resnet2(x, t)
+            x = resnet3(x, t)
             h.append(x)
             x = downsample(x)
 
         # Forward pass through middle blocks
         x = self.mid_block1(x, t)
         x = self.mid_block2(x, t)
-        x = self.mid_block3(x, t)
+        # x = self.mid_block3(x, t)
 
         # Forward pass through upsampling blocks
         for resnet, resnet2,  upsample in self.ups:

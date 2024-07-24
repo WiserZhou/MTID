@@ -12,38 +12,42 @@ from .helpers import (
 
 # Define the GaussianDiffusion class inheriting from nn.Module
 
+# diffusion_model = diffusion.GaussianDiffusion(args, temporal_model,  args.horizon, args.observation_dim,
+#                                                   args.action_dim, args.class_dim, args.n_diffusion_steps,
+#                                                   loss_type=args.loss_kind, clip_denoised=True,)
+
 
 class GaussianDiffusion(nn.Module):
-    def __init__(self, args, model, horizon, observation_dim, action_dim, class_dim, n_timesteps=200,
-                 loss_type='Weighted_Gradient_MSE', clip_denoised=False, ddim_discr_method='uniform'):
+    def __init__(self, args, model, ddim_discr_method='uniform'):
         super().__init__()
-        self.horizon = horizon  # Set the horizon (sequence length)
-        self.observation_dim = observation_dim  # Set the observation dimension
-        self.action_dim = action_dim  # Set the action dimension
-        self.class_dim = class_dim  # Set the class dimension
+        self.horizon = args.horizon  # Set the horizon (sequence length)
+        self.observation_dim = args.observation_dim  # Set the observation dimension
+        self.action_dim = args.action_dim  # Set the action dimension
+        self.class_dim = args.class_dim  # Set the class dimension
         self.model = model  # Set the model (e.g., UNet)
         self.weight = args.weight  # Set the weight for the loss function
 
+        # Set the number of timesteps for diffusion
+        self.n_timesteps = args.n_diffusion_steps
+        self.clip_denoised = args.clip_denoised  # Whether to clip the denoised output
+        self.eta = 0.0  # Eta parameter for DDIM sampling
+        self.random_ratio = 1.0  # Ratio of random noise
+
         # Calculate the beta schedule using a cosine function
-        betas = cosine_beta_schedule(n_timesteps)
+        betas = cosine_beta_schedule(self.n_timesteps)
         alphas = 1. - betas
         alphas_cumprod = torch.cumprod(alphas, dim=0)
         alphas_cumprod_prev = torch.cat([torch.ones(1), alphas_cumprod[:-1]])
-
-        self.n_timesteps = n_timesteps  # Set the number of timesteps for diffusion
-        self.clip_denoised = clip_denoised  # Whether to clip the denoised output
-        self.eta = 0.0  # Eta parameter for DDIM sampling
-        self.random_ratio = 1.0  # Ratio of random noise
 
         # ---------------------------ddim (Denoising Diffusion Implicit Models)--------------------------------
         ddim_timesteps = 10
 
         if ddim_discr_method == 'uniform':
-            c = n_timesteps // ddim_timesteps
-            ddim_timestep_seq = np.asarray(list(range(0, n_timesteps, c)))
+            c = self.n_timesteps // ddim_timesteps
+            ddim_timestep_seq = np.asarray(list(range(0, self.n_timesteps, c)))
         elif ddim_discr_method == 'quad':
             ddim_timestep_seq = (
-                (np.linspace(0, np.sqrt(n_timesteps), ddim_timesteps)) ** 2
+                (np.linspace(0, np.sqrt(self.n_timesteps), ddim_timesteps)) ** 2
             ).astype(int)
         else:
             raise RuntimeError("Unknown DDIM discretization method")
@@ -79,8 +83,8 @@ class GaussianDiffusion(nn.Module):
                              (1. - alphas_cumprod_prev) * np.sqrt(alphas) / (1. - alphas_cumprod))
 
         # Set the loss type and corresponding loss function
-        self.loss_type = loss_type
-        self.loss_fn = Losses[loss_type](
+        self.loss_type = args.loss_type
+        self.loss_fn = Losses[args.loss_type](
             self.action_dim, self.class_dim, self.weight)
 
     # ------------------------------------------ sampling ------------------------------------------#

@@ -184,7 +184,8 @@ class TemporalUnet(nn.Module):
             Conv1dBlock(dim, dim, kernel_size=3, if_zero=True),
             nn.Conv1d(dim, transition_dim, 1),
         )
-        self.motionPredictor = MotionPredictor(self.args.observation_dim,
+        self.motionPredictor = MotionPredictor(self.args,
+                                               self.args.observation_dim,
                                                self.args.observation_dim,
                                                dim,
                                                self.block_num

@@ -66,17 +66,14 @@ class Trainer(object):
     """
     Manages the training process for a diffusion model including EMA, gradient accumulation, and scheduling.
     """
+#  args.ema_decay, args.lr, args.gradient_accumulate_every,
+#                           args.step_start_ema, args.update_ema_every, args.log_freq
 
     def __init__(
             self,
+            args,
             diffusion_model,
             datasetloader,
-            ema_decay=0.995,
-            train_lr=1e-5,
-            gradient_accumulate_every=1,
-            step_start_ema=400,
-            update_ema_every=10,
-            log_freq=100,
     ):
         """
         Initializes the Trainer with the model, dataloader, and training parameters.
@@ -93,19 +90,17 @@ class Trainer(object):
         """
         super().__init__()
         self.model = diffusion_model
-        self.ema = EMA(ema_decay)
+        self.ema = EMA(args.ema_decay)
         self.ema_model = copy.deepcopy(self.model)
-        self.update_ema_every = update_ema_every
+        self.update_ema_every = args.update_ema_every
 
-        self.step_start_ema = step_start_ema
-        self.log_freq = log_freq
-        self.gradient_accumulate_every = gradient_accumulate_every
+        self.step_start_ema = args.step_start_ema
+        self.log_freq = args.log_freq
+        self.gradient_accumulate_every = args.gradient_accumulate_every
 
         self.dataloader = cycle(datasetloader)
         self.optimizer = torch.optim.AdamW(
-            diffusion_model.parameters(), lr=train_lr, weight_decay=0.0)
-        # Uncomment the line below to exclude non-trainable parameters
-        # self.optimizer = torch.optim.AdamW(filter(lambda p: p.requires_grad, diffusion_model.parameters()), lr=train_lr, weight_decay=0.0)
+            diffusion_model.parameters(), lr=args.lr, weight_decay=0.0)
 
         self.reset_parameters()
         self.step = 0

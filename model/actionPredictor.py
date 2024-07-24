@@ -14,17 +14,61 @@ class ImageEncoder(nn.Module):
         super(ImageEncoder, self).__init__()
         self.conv1 = nn.Conv1d(
             input_channels, output_channels, kernel_size=3, stride=1, padding=1)
+        # self.conv2 = nn.Conv1d(
+        #     output_channels, output_channels, kernel_size=3, stride=1, padding=1)
+
+    # input shape (batch_size,observation_dim)
+    def forward(self, x):
+
+        x = x.unsqueeze(2)
+        x = F.relu(self.conv1(x))
+        # x = F.relu(self.conv2(x))
+
+        x = x.squeeze(2)
+
+        return x
+
+
+class ImageEncoder2(nn.Module):
+    def __init__(self, input_channels, output_channels):
+        super(ImageEncoder2, self).__init__()
+        self.conv1 = nn.Conv1d(
+            input_channels, output_channels, kernel_size=3, stride=1, padding=1)
+        self.conv2 = nn.Conv1d(
+            output_channels, output_channels, kernel_size=3, stride=1, padding=1)
+        self.conv3 = nn.Conv1d(
+            output_channels, output_channels, kernel_size=3, stride=1, padding=1)
+
+    # input shape (batch_size,observation_dim)
+    def forward(self, x):
+
+        x = x.unsqueeze(2)
+        x = F.relu(self.conv1(x))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+
+        x = x.squeeze(2)
+
+        return x
+
+
+class ImageEncoder3(nn.Module):
+    def __init__(self, input_channels, output_channels):
+        super(ImageEncoder3, self).__init__()
+        self.conv1 = nn.Conv1d(
+            input_channels, output_channels, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv1d(
             output_channels, output_channels, kernel_size=3, stride=1, padding=1)
 
     # input shape (batch_size,observation_dim)
     def forward(self, x):
 
-        # print("")
-
         x = x.unsqueeze(2)
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
+
+        x = x.squeeze(2)
+
         return x
 
 # class ImageEncoder(nn.Module):
@@ -73,8 +117,6 @@ class SemanticSpaceInterpolation(nn.Module):
     def forward(self, x1, x2):
 
         # print(x1.shape)torch.Size([256, 1536, 1])
-        x1 = x1.squeeze(2)
-        x2 = x2.squeeze(2)
 
         batch_size, *_ = x1.shape
 
@@ -129,13 +171,18 @@ class TransformerBlock(nn.Module):
 
 
 class MotionPredictor(nn.Module):
-    def __init__(self, input_dim, output_dim, dimension_num, block_num, num_transformer_blocks=1):
+    def __init__(self, args, input_dim, output_dim, dimension_num, block_num, num_transformer_blocks=1):
         super(MotionPredictor, self).__init__()
-        self.encoder = ImageEncoder(input_dim, output_dim)
+        if args.debug == 0:
+            self.encoder = ImageEncoder(input_dim, output_dim)
+        elif args.debug == 1:
+            self.encoder = ImageEncoder2(input_dim, output_dim)
+        else:
+            print("ERROR!")
         self.interpolator = SemanticSpaceInterpolation(
             output_dim, block_num)
         self.transformer_blocks = nn.ModuleList([TransformerBlock(
-            output_dim, num_heads=8, num_layers=6) for _ in range(num_transformer_blocks)])
+            output_dim, num_heads=8, num_layers=args.transformer_num) for _ in range(num_transformer_blocks)])
 
         self.residual_conv = nn.Conv1d(input_dim, output_dim, 1) \
             if input_dim != output_dim else nn.Identity()
@@ -155,6 +202,9 @@ class MotionPredictor(nn.Module):
 
         x1_encoded = self.encoder(x1)
         x2_encoded = self.encoder(x2)
+
+        # x1_encoded = x1
+        # x2_encoded = x2
 
         # print(x1_encoded.shape)torch.Size([256, 1536, 1])
 

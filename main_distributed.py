@@ -15,7 +15,7 @@ from torch.distributed import ReduceOp
 
 import utils
 from dataloader.data_load import PlanningDataset
-from model import diffusion, temporal, temporal2, temporal_fourier, temporalPredictor, temporal_reduce, temporal_reduce_copy, temporal_reduce_copy2, temporal_reduce_copy3
+from model import diffusion, temporal, temporal2, temporal_fourier, temporalPredictor
 from model.helpers import get_lr_schedule_with_warmup
 
 from utils import *
@@ -158,30 +158,14 @@ def main_worker(gpu, ngpus_per_node, args):
     )
 
     # create model
+    temporal_model = temporalPredictor.TemporalUnet(args,
+                                                    dim=256,
+                                                    dim_mults=(1, 2, 4), )
 
-    if args.layer_num == 4:
-        temporal_model = temporal_reduce_copy3.TemporalUnet(args,
-                                                            dim=256,
-                                                            dim_mults=(1, 2, 4), )
-    elif args.layer_num == 5:
-        temporal_model = temporal_reduce_copy2.TemporalUnet(args,
-                                                            dim=256,
-                                                            dim_mults=(1, 2, 4), )
-    elif args.layer_num == 6:
-        temporal_model = temporal_reduce_copy.TemporalUnet(args,
-                                                           dim=256,
-                                                           dim_mults=(1, 2, 4), )
-    else:
-        temporal_model = temporal_reduce.TemporalUnet(args,
-                                                      dim=256,
-                                                      dim_mults=(1, 2, 4), )
+    diffusion_model = diffusion.GaussianDiffusion(
+        args, temporal_model)
 
-    diffusion_model = diffusion.GaussianDiffusion(args, temporal_model,  args.horizon, args.observation_dim,
-                                                  args.action_dim, args.class_dim, args.n_diffusion_steps,
-                                                  loss_type=args.loss_kind, clip_denoised=True,)
-
-    model = utils.Trainer(diffusion_model, train_loader, args.ema_decay, args.lr, args.gradient_accumulate_every,
-                          args.step_start_ema, args.update_ema_every, args.log_freq)
+    model = utils.Trainer(args, diffusion_model, train_loader)
 
     if args.pretrain_cnn_path:
         net_data = torch.load(args.pretrain_cnn_path)
@@ -274,23 +258,51 @@ def main_worker(gpu, ngpus_per_node, args):
         if args.distributed:
             train_sampler.set_epoch(epoch)
 
-        # Train the model
-        losses = model.train(args.n_train_steps, False,
-                             args, scheduler).cuda()
-        losses_reduced = reduce_tensor(losses).item()
-        if args.rank == 0:
-            print('')
-            print('lrs:')
-            for p in model.optimizer.param_groups:
-                print(p['lr'])
-            print('---------------------------------')
+        # train for one epoch
+        if (epoch + 1) % 10 == 0:  # calculate on training set
+            losses, acc_top1, acc_top5, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
+                acc_a0, acc_aT = model.train(
+                    args.n_train_steps, True, args, scheduler)
+            losses_reduced = reduce_tensor(losses.cuda()).item()
+            acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
+            acc_top5_reduced = reduce_tensor(acc_top5.cuda()).item()
+            trajectory_success_rate_meter_reduced = reduce_tensor(
+                trajectory_success_rate_meter.cuda()).item()
+            MIoU1_meter_reduced = reduce_tensor(MIoU1_meter.cuda()).item()
+            MIoU2_meter_reduced = reduce_tensor(MIoU2_meter.cuda()).item()
+            acc_a0_reduced = reduce_tensor(acc_a0.cuda()).item()
+            acc_aT_reduced = reduce_tensor(acc_aT.cuda()).item()
 
-            logs = OrderedDict()
-            logs['Train/EpochLoss'] = losses_reduced
-            for key, value in logs.items():
-                tb_logger.log_scalar(value, key, epoch + 1)
+            if args.rank == 0:
+                logs = OrderedDict()
+                logs['Train/EpochLoss'] = losses_reduced
+                logs['Train/EpochAcc@1'] = acc_top1_reduced
+                logs['Train/EpochAcc@5'] = acc_top5_reduced
+                logs['Train/Traj_Success_Rate'] = trajectory_success_rate_meter_reduced
+                logs['Train/MIoU1'] = MIoU1_meter_reduced
+                logs['Train/MIoU2'] = MIoU2_meter_reduced
+                logs['Train/acc_a0'] = acc_a0_reduced
+                logs['Train/acc_aT'] = acc_aT_reduced
+                for key, value in logs.items():
+                    tb_logger.log_scalar(value, key, epoch + 1)
 
-            tb_logger.flush()
+                tb_logger.flush()
+        else:
+            losses = model.train(args.n_train_steps, False,
+                                 args, scheduler).cuda()
+            losses_reduced = reduce_tensor(losses).item()
+            if args.rank == 0:
+                print('lrs:')
+                for p in model.optimizer.param_groups:
+                    print(p['lr'])
+                print('---------------------------------')
+
+                logs = OrderedDict()
+                logs['Train/EpochLoss'] = losses_reduced
+                for key, value in logs.items():
+                    tb_logger.log_scalar(value, key, epoch + 1)
+
+                tb_logger.flush()
 
         # Evaluate the model every epochs if evaluation is enabled
         if args.evaluate:
@@ -406,20 +418,28 @@ def main_worker(gpu, ngpus_per_node, args):
 
     if args.rank == 0:
         time_end = time.time()
-        print('time: ', time_end - time_start)
+
+        timeP = time_end - time_start
+        EpochAcc1 = sum(acc_top1_reduced_sum) / test_times
+        Traj_Success_Rate = sum(
+            trajectory_success_rate_meter_reduced_sum) / test_times
+        MIoU2 = sum(MIoU2_meter_reduced_sum) / test_times
+
+        print('time: ', timeP)
         print('-----------------Mean&Var-----------------------')
-        print('Val/EpochAcc@1', sum(acc_top1_reduced_sum) /
-              test_times, np.var(acc_top1_reduced_sum))
-        print('Val/Traj_Success_Rate', sum(trajectory_success_rate_meter_reduced_sum) /
-              test_times, np.var(trajectory_success_rate_meter_reduced_sum))
+        print('Val/EpochAcc@1', EpochAcc1)
+        print('Val/Traj_Success_Rate', Traj_Success_Rate)
         print('Val/MIoU1', sum(MIoU1_meter_reduced_sum) /
               test_times, np.var(MIoU1_meter_reduced_sum))
-        print('Val/MIoU2', sum(MIoU2_meter_reduced_sum) /
-              test_times, np.var(MIoU2_meter_reduced_sum))
+        print('Val/MIoU2', MIoU2)
         print('Val/acc_a0', sum(acc_a0_reduced_sum) /
               test_times, np.var(acc_a0_reduced_sum))
         print('Val/acc_aT', sum(acc_aT_reduced_sum) /
               test_times, np.var(acc_aT_reduced_sum))
+
+        # print experiment results
+        print(
+            f"{args.name} {args.dataset} {args.horizon} {old_max_epoch} {Traj_Success_Rate} {EpochAcc1} {MIoU2}")
 
 
 def log(output, args):

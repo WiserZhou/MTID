@@ -43,30 +43,10 @@ def get_args(description='whl'):
                         type=float,
                         default=0.9,
                         help='SGD momemtum')
-    parser.add_argument('--log_freq',
-                        type=int,
-                        default=500,
-                        help='how many steps do we log once')
     parser.add_argument('--save_freq',
                         type=int,
                         default=1,
                         help='how many epochs do we save once')
-    parser.add_argument('--gradient_accumulate_every',
-                        type=int,
-                        default=1,
-                        help='accumulation_steps')
-    parser.add_argument('--ema_decay',
-                        type=float,
-                        default=0.995,
-                        help='')
-    parser.add_argument('--step_start_ema',
-                        type=int,
-                        default=400,
-                        help='')
-    parser.add_argument('--update_ema_every',
-                        type=int,
-                        default=10,
-                        help='')
     parser.add_argument('--crop_only',
                         type=int,
                         default=1,
@@ -107,10 +87,6 @@ def get_args(description='whl'):
                         type=int,
                         default=18,
                         help='')
-    parser.add_argument('--n_diffusion_steps',
-                        type=int,
-                        default=200,
-                        help='')
     parser.add_argument('--n_train_steps',
                         type=int,
                         default=200,
@@ -133,8 +109,6 @@ def get_args(description='whl'):
                         help='path of the generated json file for val train model')
     parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
-    parser.add_argument('--lr', '--learning-rate', default=5e-4, type=float,
-                        metavar='LR', help='initial learning rate', dest='lr')
     parser.add_argument('--resume', dest='resume', action='store_true',
                         help='resume training from last checkpoint')
     parser.add_argument('-e', '--evaluate', default=True, dest='evaluate', action='store_true',
@@ -151,8 +125,7 @@ def get_args(description='whl'):
                         help='url used to set up distributed training')
     parser.add_argument('--dist-backend', default='nccl', type=str,
                         help='distributed backend')
-    parser.add_argument('--seed', default=217, type=int,
-                        help='seed for initializing training. ')
+
     parser.add_argument('--gpu', default=6, type=int,
                         help='GPU id to use.')
     parser.add_argument('--multiprocessing-distributed', default=False, action='store_true',
@@ -162,22 +135,58 @@ def get_args(description='whl'):
                              'multi node data parallel training')
     parser.add_argument('--name', default='default', type=str,
                         help='note the specific log and checkpoint')
-    parser.add_argument('--loss_kind', default='Weighted_Gradient_MSE', type=str,
+    parser.add_argument('--loss_type', default='Weighted_Gradient_MSE', type=str,
                         help='Weighted_MSE: only 10 on both side ; Weighted_Gradient_MSE: gradient change')
     parser.add_argument('--ckpt_path', default='', type=str,
                         help='checkpoint path for max')
-    parser.add_argument('--layer_num', default=3, type=int,
-                        help='number of layers in block;' +
-                        '3:simple,4:add mid block,5:change to fourier loss,6:predictor block')
     parser.add_argument('--dist_port', default=21712, type=int,
                         help='port used to set up distributed training')
     parser.add_argument('--horizon',
                         type=int,
                         default=3,
                         help='')
-    parser.add_argument('--weight', default=6, type=float,
-                        help='weight of the loss function')
     parser.add_argument('--epochs', default=70, type=int, metavar='N',
                         help='number of total epochs to run')
+    parser.add_argument('--log_freq',
+                        type=int,
+                        default=500,
+                        help='how many steps do we log once')
+
+    # parameters that need to be modified
+    parser.add_argument('--seed', default=217, type=int,
+                        help='seed for initializing training. ')
+    parser.add_argument('--weight', default=6, type=float,
+                        help='weight of the loss function')
+    parser.add_argument('--n_diffusion_steps',
+                        type=int,
+                        default=200,
+                        help='')
+    parser.add_argument('--clip_denoised', default=True,
+                        action='store_true', help='')
+    parser.add_argument('--ddim_discr_method',
+                        default='uniform', type=str, help='quad or uniform')
+    parser.add_argument('--lr', '--learning-rate', default=5e-4, type=float,
+                        metavar='LR', help='initial learning rate', dest='lr')
+    parser.add_argument('--ema_decay',
+                        type=float,
+                        default=0.995,
+                        help='')
+    parser.add_argument('--gradient_accumulate_every',
+                        type=int,
+                        default=1,
+                        help='accumulation_steps')
+    parser.add_argument('--step_start_ema',
+                        type=int,
+                        default=400,
+                        help='')
+    parser.add_argument('--update_ema_every',
+                        type=int,
+                        default=10,
+                        help='')
+
+    parser.add_argument('--debug', type=int, default=0, help='try')
+    parser.add_argument('--transformer_num', type=int,
+                        default=5, help='layer nums for transformer blocks')
+
     args = parser.parse_args()
     return args
