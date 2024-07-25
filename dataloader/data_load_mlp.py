@@ -149,18 +149,20 @@ class PlanningDataset(Dataset):
                     task_vids = val_vids
                 else:
                     # If this is the training set, exclude validation videos from the training video list
-                    task_vids = {task: [vid for vid in vids if task not in val_vids or vid not in val_vids[task]] 
-                                for task, vids in all_task_vids.items()}
+                    task_vids = {task: [vid for vid in vids if task not in val_vids or vid not in val_vids[task]]
+                                 for task, vids in all_task_vids.items()}
 
                 # Read task information from the primary tasks file
-                primary_info = read_task_info(os.path.join(root, 'crosstask_release', 'tasks_primary.txt'))
+                primary_info = read_task_info(os.path.join(
+                    root, 'crosstask_release', 'tasks_primary.txt'))
 
                 # Store the number of steps for each task
                 self.n_steps = primary_info['n_steps']
                 all_tasks = set(self.n_steps.keys())
 
                 # Filter the task videos to only include tasks that are in the primary task list
-                task_vids = {task: vids for task, vids in task_vids.items() if task in all_tasks}
+                task_vids = {task: vids for task,
+                             vids in task_vids.items() if task in all_tasks}
 
                 # Create a list of all video-task pairs
                 all_vids = []
@@ -176,9 +178,11 @@ class PlanningDataset(Dataset):
 
                     # Determine the path to the video features based on whether the crosstask_use_feature_how flag is set
                     if self.crosstask_use_feature_how:
-                        video_path = os.path.join(self.features_path, str(task) + '_' + str(vid) + '.npy')
+                        video_path = os.path.join(
+                            self.features_path, str(task) + '_' + str(vid) + '.npy')
                     else:
-                        video_path = os.path.join(self.features_path, str(vid) + '.npy')
+                        video_path = os.path.join(
+                            self.features_path, str(vid) + '.npy')
 
                     # Process the video to get the legal range of frames
                     legal_range = self.process_single(task, vid)
@@ -197,17 +201,17 @@ class PlanningDataset(Dataset):
 
                     # Create data entries for each possible sub-sequence of the legal range
                     for i in range(len(legal_range) - self.max_traj_len + 1):
-                        legal_range_current = legal_range[i:i + self.max_traj_len]
+                        legal_range_current = legal_range[i:i +
+                                                          self.max_traj_len]
                         json_data.append({'id': {'vid': vid, 'task': task, 'feature': video_path,
-                                                'legal_range': legal_range_current, 'task_id': self.task_class[task]},
-                                        'instruction_len': self.n_steps[task]})
+                                                 'legal_range': legal_range_current, 'task_id': self.task_class[task]},
+                                          'instruction_len': self.n_steps[task]})
 
                 # Save the JSON data to a file
                 self.json_data = json_data
                 # print(cross_task_data_name)
                 with open(cross_task_data_name, 'w') as f:
                     json.dump(json_data, f)
-
 
         elif args.dataset == 'coin':
             coin_path = os.path.join(root, '../coin', 'full_npy')
@@ -238,7 +242,8 @@ class PlanningDataset(Dataset):
                         coin_data = json.load(f)
                 for i in coin_data:
                     for (k, v) in i.items():
-                        file_name = v['class'] + '_' + str(v['recipe_type']) + '_' + k + '.npy'
+                        file_name = v['class'] + '_' + \
+                            str(v['recipe_type']) + '_' + k + '.npy'
                         file_path = coin_path + file_name
                         images_ = np.load(file_path, allow_pickle=True)
                         images = images_['frames_features']
@@ -258,9 +263,11 @@ class PlanningDataset(Dataset):
                             end_idx = math.ceil(end_idx)
 
                             if end_idx < images.shape[0]:
-                                legal_range.append((start_idx, end_idx, action_label))
+                                legal_range.append(
+                                    (start_idx, end_idx, action_label))
                             else:
-                                legal_range.append((start_idx, images.shape[0] - 1, action_label))
+                                legal_range.append(
+                                    (start_idx, images.shape[0] - 1, action_label))
 
                         temp_len = len(legal_range)
                         temp = []
@@ -272,7 +279,8 @@ class PlanningDataset(Dataset):
                         legal_range = temp
 
                         for i in range(len(legal_range) - self.max_traj_len + 1):
-                            legal_range_current = legal_range[i:i + self.max_traj_len]
+                            legal_range_current = legal_range[i:i +
+                                                              self.max_traj_len]
                             json_data.append({'id': {'vid': k, 'feature': file_path,
                                                      'legal_range': legal_range_current, 'task_id': v['recipe_type']},
                                               'instruction_len': 0})
@@ -293,7 +301,6 @@ class PlanningDataset(Dataset):
                 niv_data_name = args.json_path_val
             else:
                 niv_data_name = args.json_path_train
-
 
             if os.path.exists(niv_data_name):
                 with open(niv_data_name, 'r') as f:
@@ -326,9 +333,11 @@ class PlanningDataset(Dataset):
                         end_idx = math.ceil(float(ends[i]))
 
                         if end_idx < images.shape[0]:
-                            legal_range.append((start_idx, end_idx, action_label))
+                            legal_range.append(
+                                (start_idx, end_idx, action_label))
                         else:
-                            legal_range.append((start_idx, images.shape[0] - 1, action_label))
+                            legal_range.append(
+                                (start_idx, images.shape[0] - 1, action_label))
 
                     temp_len = len(legal_range)
                     temp = []
@@ -340,7 +349,8 @@ class PlanningDataset(Dataset):
                     legal_range = temp
 
                     for i in range(len(legal_range) - self.max_traj_len + 1):
-                        legal_range_current = legal_range[i:i + self.max_traj_len]
+                        legal_range_current = legal_range[i:i +
+                                                          self.max_traj_len]
                         json_data.append({'id': {'feature': path,
                                                  'legal_range': legal_range_current, 'task_id': d['task_id']},
                                           'instruction_len': 0})
@@ -360,7 +370,8 @@ class PlanningDataset(Dataset):
         if self.crosstask_use_feature_how:
             if not os.path.exists(os.path.join(self.features_path, str(task) + '_' + str(vid) + '.npy')):
                 return False
-            images_ = np.load(os.path.join(self.features_path, str(task) + '_' + str(vid) + '.npy'), allow_pickle=True)
+            images_ = np.load(os.path.join(self.features_path, str(
+                task) + '_' + str(vid) + '.npy'), allow_pickle=True)
             images = images_['frames_features']
         else:
             if not os.path.exists(os.path.join(self.features_path, vid + '.npy')):
@@ -378,7 +389,8 @@ class PlanningDataset(Dataset):
             if end_idx < images.shape[0]:
                 legal_range_ret.append((start_idx, end_idx, action_label))
             else:
-                legal_range_ret.append((start_idx, images.shape[0] - 1, action_label))
+                legal_range_ret.append(
+                    (start_idx, images.shape[0] - 1, action_label))
 
         return legal_range_ret
 
@@ -419,7 +431,8 @@ class PlanningDataset(Dataset):
                 image_start = images[len(images) - M: len(images)]
             image_start_cat = image_start[0]
             for w in range(len(image_start) - 1):
-                image_start_cat = np.concatenate((image_start_cat, image_start[w + 1]), axis=0)
+                image_start_cat = np.concatenate(
+                    (image_start_cat, image_start[w + 1]), axis=0)
             images_list.append(image_start_cat)
             labels_onehot_list.append(action_label)
 
@@ -427,7 +440,8 @@ class PlanningDataset(Dataset):
         image_end = images[end_idx - 2:end_idx + M - 2]
         image_end_cat = image_end[0]
         for w in range(len(image_end) - 1):
-            image_end_cat = np.concatenate((image_end_cat, image_end[w + 1]), axis=0)
+            image_end_cat = np.concatenate(
+                (image_end_cat, image_end[w + 1]), axis=0)
         images_list.append(image_end_cat)
         return images_list, labels_onehot_list, idx_list
 
@@ -445,7 +459,8 @@ class PlanningDataset(Dataset):
                     self.images = images_['frames_features']
                     self.last_vid = folder_id['vid']
                 else:
-                    self.images = np.load(os.path.join(self.features_path, folder_id['vid'] + '.npy'))
+                    self.images = np.load(os.path.join(
+                        self.features_path, folder_id['vid'] + '.npy'))
         else:
             images_ = np.load(folder_id['feature'], allow_pickle=True)
             self.images = images_['frames_features']

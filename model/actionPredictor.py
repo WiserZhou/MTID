@@ -14,49 +14,6 @@ class ImageEncoder(nn.Module):
         super(ImageEncoder, self).__init__()
         self.conv1 = nn.Conv1d(
             input_channels, output_channels, kernel_size=3, stride=1, padding=1)
-        # self.conv2 = nn.Conv1d(
-        #     output_channels, output_channels, kernel_size=3, stride=1, padding=1)
-
-    # input shape (batch_size,observation_dim)
-    def forward(self, x):
-
-        x = x.unsqueeze(2)
-        x = F.relu(self.conv1(x))
-        # x = F.relu(self.conv2(x))
-
-        x = x.squeeze(2)
-
-        return x
-
-
-class ImageEncoder2(nn.Module):
-    def __init__(self, input_channels, output_channels):
-        super(ImageEncoder2, self).__init__()
-        self.conv1 = nn.Conv1d(
-            input_channels, output_channels, kernel_size=3, stride=1, padding=1)
-        self.conv2 = nn.Conv1d(
-            output_channels, output_channels, kernel_size=3, stride=1, padding=1)
-        self.conv3 = nn.Conv1d(
-            output_channels, output_channels, kernel_size=3, stride=1, padding=1)
-
-    # input shape (batch_size,observation_dim)
-    def forward(self, x):
-
-        x = x.unsqueeze(2)
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
-
-        x = x.squeeze(2)
-
-        return x
-
-
-class ImageEncoder3(nn.Module):
-    def __init__(self, input_channels, output_channels):
-        super(ImageEncoder3, self).__init__()
-        self.conv1 = nn.Conv1d(
-            input_channels, output_channels, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv1d(
             output_channels, output_channels, kernel_size=3, stride=1, padding=1)
 
@@ -71,33 +28,34 @@ class ImageEncoder3(nn.Module):
 
         return x
 
-# class ImageEncoder(nn.Module):
-#     def __init__(self):
-#         super(ImageEncoder, self).__init__()
-#         # Load the CLIP model directly
-#         self.model, _ = AutoModel.from_pretrained(
-#             "/home/zhouyufan/Projects/PDPP/dataset/ViT-B-32__openai")
-#         self.preprocess = transforms.Compose([
-#             transforms.Resize((224, 224)),
-#             transforms.ToTensor(),
-#             transforms.Normalize(
-#                 (0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711)),
-#         ])
 
-#     # input shape (batch_size,observation_dim)
-#     def forward(self, images):
-#         # Assume images are already loaded and in the form of (batch_size, height, width, channels)
-#         # Convert images to (batch_size, channels, height, width)
-#         images = images.permute(0, 3, 1, 2)
+class ImageEncoderByCLIP(nn.Module):
+    def __init__(self):
+        super(ImageEncoder, self).__init__()
+        # Load the CLIP model directly
+        self.model, _ = AutoModel.from_pretrained(
+            "/home/zhouyufan/Projects/PDPP/dataset/ViT-B-32__openai")
+        self.preprocess = transforms.Compose([
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                (0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711)),
+        ])
 
-#         # Preprocess images
-#         images = torch.stack([self.preprocess(image) for image in images])
+    # input shape (batch_size,observation_dim)
+    def forward(self, images):
+        # Assume images are already loaded and in the form of (batch_size, height, width, channels)
+        # Convert images to (batch_size, channels, height, width)
+        images = images.permute(0, 3, 1, 2)
 
-#         # Encode images using CLIP
-#         with torch.no_grad():
-#             image_features = self.model.encode_image(images)
+        # Preprocess images
+        images = torch.stack([self.preprocess(image) for image in images])
 
-#         return image_features
+        # Encode images using CLIP
+        with torch.no_grad():
+            image_features = self.model.encode_image(images)
+
+        return image_features
 # Semantic Space Interpolation
 
 
@@ -175,8 +133,8 @@ class MotionPredictor(nn.Module):
         super(MotionPredictor, self).__init__()
         if args.debug == 0:
             self.encoder = ImageEncoder(input_dim, output_dim)
-        elif args.debug == 1:
-            self.encoder = ImageEncoder2(input_dim, output_dim)
+        elif args.debug == 2:
+            self.encoder == ImageEncoderByCLIP(input_dim, output_dim)
         else:
             print("ERROR!")
         self.interpolator = SemanticSpaceInterpolation(

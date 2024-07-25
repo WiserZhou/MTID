@@ -166,7 +166,6 @@ def main():
 
     args.distributed = args.world_size > 1 or args.multiprocessing_distributed
     ngpus_per_node = torch.cuda.device_count()
-    # print('ngpus_per_node:', ngpus_per_node)
 
     if args.multiprocessing_distributed:
         args.world_size = ngpus_per_node * args.world_size
@@ -427,7 +426,7 @@ def train(train_loader, n_train_steps, model, scheduler, args, optimizer, if_cal
         for i in range(args.gradient_accumulate_every):
             batch = next(train_loader_)
 
-            bs, T, dim = batch[0].shape  # [bs, (T+1), ob_dim]
+            bs, T, dim = bath[0].shape  # [bs, (T+1), ob_dim]
             with torch.set_grad_enabled(True):
                 task_class = batch[2].view(-1).cuda()  # [bs]
 
