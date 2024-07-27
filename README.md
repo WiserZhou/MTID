@@ -47,7 +47,8 @@ mv actions_one_hot.npy crosstask_release
 提取码：xkth
 ```
 
- open this folder and put these files at crosstask_release/ and overwrite the previous files.
+open this folder and put these files at crosstask_release/ and overwrite the previous files.
+Now we just need this.
 
 #### COIN
 
