@@ -5,4 +5,4 @@ checkpoint_mlp/
 __pycache__
 nohup.out
 output.txt
-dataset/
+dataset/*

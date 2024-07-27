@@ -5,7 +5,7 @@ from torch.nn import TransformerEncoder, TransformerEncoderLayer
 import clip
 from PIL import Image
 import torchvision.transforms as transforms
-from transformers import AutoModel
+from transformers import AutoModel, AutoProcessor
 # Image Encoder
 
 
@@ -30,32 +30,39 @@ class ImageEncoder(nn.Module):
 
 
 class ImageEncoderByCLIP(nn.Module):
-    def __init__(self):
-        super(ImageEncoder, self).__init__()
-        # Load the CLIP model directly
-        self.model, _ = AutoModel.from_pretrained(
-            "/home/zhouyufan/Projects/PDPP/dataset/ViT-B-32__openai")
-        self.preprocess = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize(
-                (0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711)),
-        ])
+    def __init__(self, input_dim, output_dim):
+        super(ImageEncoderByCLIP, self).__init__()
 
-    # input shape (batch_size,observation_dim)
-    def forward(self, images):
-        # Assume images are already loaded and in the form of (batch_size, height, width, channels)
-        # Convert images to (batch_size, channels, height, width)
-        images = images.permute(0, 3, 1, 2)
+        # Assuming input_dim is the flattened image size (e.g., 32x32x15 = 1536)
+        # and we need to reshape the input to a valid image size before passing to CLIP
+        # Simplified calculation for demonstration
+        self.input_height = int(input_dim ** 0.5)
+        self.input_width = self.input_height
+        self.input_channels = 3  # Assuming RGB images
+
+        # Load the CLIP model and processor directly
+        self.processor = AutoProcessor.from_pretrained(
+            "openai/clip-vit-base-patch32")
+        self.model = AutoModel.from_pretrained("openai/clip-vit-base-patch32")
+
+    # input shape (batch_size, observation_dim)
+    def forward(self, flat_images):
+        # Reshape the flat images to the correct image dimensions
+        images = flat_images.view(-1, self.input_channels,
+                                  self.input_height, self.input_width)
 
         # Preprocess images
-        images = torch.stack([self.preprocess(image) for image in images])
+        pixel_values = self.processor(
+            images=images, return_tensors="pt").pixel_values
 
         # Encode images using CLIP
         with torch.no_grad():
-            image_features = self.model.encode_image(images)
+            image_features = self.model(
+                pixel_values=pixel_values).pooler_output
 
         return image_features
+
+
 # Semantic Space Interpolation
 
 
@@ -65,52 +72,38 @@ class SemanticSpaceInterpolation(nn.Module):
         self.block_num = block_num
         self.dimension_num = dimension_num
         # Introduce a linear layer to generate the alpha values dynamically for each frame
-        self.alpha_generator = nn.Linear(
-            self.dimension_num, self.dimension_num)
-        # Use ReLU activation function to ensure the alpha values are positive
-        self.relu = nn.ReLU()
+        self.alpha_generator = nn.Linear(dimension_num, 1)
         # Use Sigmoid activation function to constrain the alpha values between 0 and 1
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x1, x2):
-
-        # print(x1.shape)torch.Size([256, 1536, 1])
-
         batch_size, *_ = x1.shape
 
         # Stack x1 and x2 along a new dimension
-        # Shape: (2, batch_size, observation_dim)
+        # Shape: (2, batch_size, dimension_num)
         x_combined = torch.stack([x1, x2], dim=0)
 
-        # print(x_combined.shape)torch.Size([2, 256, 1536])
+        # Generate unique alpha values for each block
+        # Shape: (block_num, batch_size, 1)
+        alphas = []
+        for _ in range(self.block_num):
+            alpha = self.sigmoid(self.alpha_generator(
+                torch.ones(1, x_combined.shape[2]).to(x1.device)))
+            alphas.append(alpha)
+        alphas = torch.stack(alphas, dim=0)
 
-        # Generate an alpha matrix of shape (batch_size, dimension_num)
-        alpha_matrix = self.alpha_generator(
-            torch.ones(batch_size, self.dimension_num).to(x1.device))
+        # Expand alphas to match the dimensionality of the input
+        # Shape: (block_num, batch_size, dimension_num)
+        alphas = alphas.expand(self.block_num, -1, self.dimension_num)
 
-        # Ensure alpha values are positive
-        alpha_matrix = self.relu(alpha_matrix)
-        # Constrain alpha values between 0 and 1
-        alpha_matrix = self.sigmoid(alpha_matrix)
-
-        # Expand the alpha matrix to (batch_size, dimension_num)
-        alpha_matrix = alpha_matrix.view(batch_size, self.dimension_num)
-
-        # print(alpha_matrix.shape)torch.Size([256, 1536])
-        # Compute the interpolated frames
+        # Compute the interpolated frames using broadcasting
+        # Shape: (block_num, batch_size, dimension_num)
         interpolated_frames = (
-            1 - alpha_matrix) * x_combined[0].unsqueeze(0) + alpha_matrix * x_combined[1].unsqueeze(0)
+            1 - alphas) * x_combined[0].unsqueeze(0) + alphas * x_combined[1].unsqueeze(0)
 
-        # print(interpolated_frames.shape)torch.Size([1, 256, 1536])
-        interpolated_frames = interpolated_frames.repeat_interleave(
-            self.block_num, dim=0)
-
-        # print(interpolated_frames.shape)torch.Size([12, 256, 1536])
-        # Rearrange dimensions to (dimension_num, batch_size, observation_dim)
+        # Rearrange dimensions to (batch_size, block_num, dimension_num)
         interpolated_frames = interpolated_frames.permute(1, 0, 2)
 
-        # print(interpolated_frames.shape)torch.Size([256, 12, 1536])
-        # torch.Size([256, 12, 1536])
         return interpolated_frames
 
 # Transformer Block
@@ -131,19 +124,20 @@ class TransformerBlock(nn.Module):
 class MotionPredictor(nn.Module):
     def __init__(self, args, input_dim, output_dim, dimension_num, block_num, num_transformer_blocks=1):
         super(MotionPredictor, self).__init__()
+
         if args.debug == 0:
             self.encoder = ImageEncoder(input_dim, output_dim)
-        elif args.debug == 2:
-            self.encoder == ImageEncoderByCLIP(input_dim, output_dim)
         else:
-            print("ERROR!")
+            self.encoder = ImageEncoderByCLIP(input_dim, output_dim)
+
         self.interpolator = SemanticSpaceInterpolation(
             output_dim, block_num)
+
         self.transformer_blocks = nn.ModuleList([TransformerBlock(
             output_dim, num_heads=8, num_layers=args.transformer_num) for _ in range(num_transformer_blocks)])
 
-        self.residual_conv = nn.Conv1d(input_dim, output_dim, 1) \
-            if input_dim != output_dim else nn.Identity()
+        # self.residual_conv = nn.Conv1d(input_dim, output_dim, 1) \
+        #     if input_dim != output_dim else nn.Identity()
 
         # self.ffn = nn.Sequential(
         #     nn.Linear(output_dim, dimension_num * 4),

@@ -1,0 +1,355 @@
+nohup: ignoring input
+/home/zhouyufan/anaconda3/envs/ZYF/lib/python3.10/site-packages/torch/nn/modules/transformer.py:306: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
+Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log/log', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, pretrain_cnn_path='', momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='crosstask', action_dim=105, observation_dim=1536, class_dim=18, n_train_steps=200, root='/home/zhouyufan/Projects/PDPP/dataset/crosstask', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/train_list.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/test_list.json', json_path_val2='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json', start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', gpu=1, multiprocessing_distributed=False, name='new_interpolation', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, horizon=3, epochs=70, log_freq=500, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, debug=0, transformer_num=5)
+Loaded /home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/train_list.json
+Loaded /home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json
+logging outputs to  /home/zhouyufan/Projects/PDPP/log/log_new_interpolation_20240726095230_crosstask
+
+total train:   0%|          | 0/70 [00:00<?, ?it/s]lrs:
+4.2857142857142856e-05
+---------------------------------
+/home/zhouyufan/Projects/PDPP/utils/eval.py:88: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+
+total train:   1%|▏         | 1/70 [03:43<4:17:01, 223.50s/it]1.6801221370697021 0
+lrs:
+8.571428571428571e-05
+---------------------------------
+
+total train:   3%|▎         | 2/70 [07:24<4:11:50, 222.21s/it]0.0 1.6801221370697021
+lrs:
+0.00012857142857142855
+---------------------------------
+
+total train:   4%|▍         | 3/70 [11:05<4:07:25, 221.58s/it]0.0 1.6801221370697021
+lrs:
+0.00017142857142857143
+---------------------------------
+
+total train:   6%|▌         | 4/70 [14:45<4:02:56, 220.85s/it]0.0 1.6801221370697021
+lrs:
+0.00021428571428571427
+---------------------------------
+
+total train:   7%|▋         | 5/70 [18:25<3:58:54, 220.53s/it]0.0 1.6801221370697021
+lrs:
+0.0002571428571428571
+---------------------------------
+
+total train:   9%|▊         | 6/70 [22:06<3:55:25, 220.71s/it]0.0 1.6801221370697021
+lrs:
+0.0003
+---------------------------------
+
+total train:  10%|█         | 7/70 [25:49<3:52:35, 221.52s/it]0.0 1.6801221370697021
+lrs:
+0.00034285714285714285
+---------------------------------
+
+total train:  11%|█▏        | 8/70 [29:32<3:49:15, 221.86s/it]0.0 1.6801221370697021
+lrs:
+0.00038571428571428567
+---------------------------------
+
+total train:  13%|█▎        | 9/70 [33:12<3:45:06, 221.42s/it]0.0 1.6801221370697021
+/home/zhouyufan/Projects/PDPP/utils/training.py:275: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(losses.avg), acc1, acc5, torch.tensor(trajectory_success_rate), \
+
+total train:  14%|█▍        | 10/70 [37:00<3:43:30, 223.51s/it]0.0 1.6801221370697021
+lrs:
+0.0004714285714285714
+---------------------------------
+
+total train:  16%|█▌        | 11/70 [40:40<3:38:32, 222.25s/it]0.3709360659122467 1.6801221370697021
+lrs:
+0.0005
+---------------------------------
+
+total train:  17%|█▋        | 12/70 [44:19<3:33:59, 221.37s/it]0.3709360659122467 1.6801221370697021
+lrs:
+0.0005
+---------------------------------
+
+total train:  19%|█▊        | 13/70 [47:58<3:29:42, 220.74s/it]0.3709360659122467 1.6801221370697021
+lrs:
+0.0005
+---------------------------------
+
+total train:  20%|██        | 14/70 [51:38<3:25:46, 220.48s/it]0.5673139691352844 1.6801221370697021
+lrs:
+0.0005
+---------------------------------
+
+total train:  21%|██▏       | 15/70 [55:15<3:21:00, 219.28s/it]0.6327732801437378 1.6801221370697021
+lrs:
+0.0005
+---------------------------------
+
+total train:  23%|██▎       | 16/70 [58:54<3:17:28, 219.41s/it]1.1128082275390625 1.6801221370697021
+lrs:
+0.0005
+---------------------------------
+
+total train:  24%|██▍       | 17/70 [1:02:39<3:15:18, 221.11s/it]2.7929303646087646 1.6801221370697021
+lrs:
+0.0005
+---------------------------------
+
+total train:  26%|██▌       | 18/70 [1:06:21<3:11:45, 221.26s/it]4.822168827056885 2.7929303646087646
+lrs:
+0.0005
+---------------------------------
+
+total train:  27%|██▋       | 19/70 [1:10:02<3:07:53, 221.05s/it]7.9423956871032715 4.822168827056885
+
+total train:  29%|██▊       | 20/70 [1:13:55<3:07:15, 224.72s/it]11.629937171936035 7.9423956871032715
+lrs:
+0.0005
+---------------------------------
+
+total train:  30%|███       | 21/70 [1:17:37<3:02:47, 223.83s/it]16.03753089904785 11.629937171936035
+lrs:
+0.0005
+---------------------------------
+
+total train:  31%|███▏      | 22/70 [1:21:20<2:58:54, 223.64s/it]21.274274826049805 16.03753089904785
+lrs:
+0.0005
+---------------------------------
+
+total train:  33%|███▎      | 23/70 [1:25:01<2:54:31, 222.80s/it]23.652629852294922 21.274274826049805
+lrs:
+0.0005
+---------------------------------
+
+total train:  34%|███▍      | 24/70 [1:28:42<2:50:30, 222.40s/it]25.332752227783203 23.652629852294922
+lrs:
+0.0005
+---------------------------------
+
+total train:  36%|███▌      | 25/70 [1:32:26<2:47:05, 222.78s/it]27.121973037719727 25.332752227783203
+lrs:
+0.0005
+---------------------------------
+
+total train:  37%|███▋      | 26/70 [1:36:09<2:43:22, 222.77s/it]29.042112350463867 27.121973037719727
+lrs:
+0.0005
+---------------------------------
+
+total train:  39%|███▊      | 27/70 [1:39:54<2:40:08, 223.45s/it]30.569496154785156 29.042112350463867
+lrs:
+0.0005
+---------------------------------
+
+total train:  40%|████      | 28/70 [1:43:43<2:37:33, 225.09s/it]31.59502410888672 30.569496154785156
+lrs:
+0.0005
+---------------------------------
+
+total train:  41%|████▏     | 29/70 [1:47:25<2:33:11, 224.19s/it]32.79511260986328 31.59502410888672
+
+total train:  43%|████▎     | 30/70 [1:51:20<2:31:42, 227.55s/it]33.79882049560547 32.79511260986328
+lrs:
+0.00025
+---------------------------------
+
+total train:  44%|████▍     | 31/70 [1:55:04<2:27:15, 226.56s/it]34.78071212768555 33.79882049560547
+lrs:
+0.00025
+---------------------------------
+
+total train:  46%|████▌     | 32/70 [1:58:49<2:23:12, 226.11s/it]35.65350341796875 34.78071212768555
+lrs:
+0.00025
+---------------------------------
+
+total train:  47%|████▋     | 33/70 [2:02:36<2:19:33, 226.30s/it]35.697139739990234 35.65350341796875
+lrs:
+0.00025
+---------------------------------
+
+total train:  49%|████▊     | 34/70 [2:06:22<2:15:37, 226.05s/it]36.50447463989258 35.697139739990234
+lrs:
+0.00025
+---------------------------------
+
+total train:  50%|█████     | 35/70 [2:10:05<2:11:28, 225.40s/it]36.96268844604492 36.50447463989258
+lrs:
+0.00025
+---------------------------------
+
+total train:  51%|█████▏    | 36/70 [2:13:50<2:07:38, 225.25s/it]37.39908218383789 36.96268844604492
+lrs:
+0.00025
+---------------------------------
+
+total train:  53%|█████▎    | 37/70 [2:17:31<2:03:10, 223.96s/it]37.137245178222656 37.39908218383789
+lrs:
+0.00025
+---------------------------------
+
+total train:  54%|█████▍    | 38/70 [2:21:12<1:58:53, 222.93s/it]37.093605041503906 37.39908218383789
+lrs:
+0.00025
+---------------------------------
+
+total train:  56%|█████▌    | 39/70 [2:24:53<1:54:52, 222.32s/it]37.24634552001953 37.39908218383789
+
+total train:  57%|█████▋    | 40/70 [2:28:47<1:52:54, 225.81s/it]37.355445861816406 37.39908218383789
+lrs:
+0.00025
+---------------------------------
+
+total train:  59%|█████▊    | 41/70 [2:32:29<1:48:40, 224.86s/it]37.377262115478516 37.39908218383789
+lrs:
+0.00025
+---------------------------------
+
+total train:  60%|██████    | 42/70 [2:36:16<1:45:10, 225.38s/it]37.57364273071289 37.39908218383789
+lrs:
+0.00025
+---------------------------------
+
+total train:  61%|██████▏   | 43/70 [2:40:02<1:41:31, 225.61s/it]37.28998565673828 37.57364273071289
+lrs:
+0.00025
+---------------------------------
+
+total train:  63%|██████▎   | 44/70 [2:43:50<1:38:01, 226.23s/it]37.595462799072266 37.57364273071289
+lrs:
+0.00025
+---------------------------------
+
+total train:  64%|██████▍   | 45/70 [2:47:35<1:34:06, 225.85s/it]37.15906524658203 37.595462799072266
+lrs:
+0.00025
+---------------------------------
+
+total train:  66%|██████▌   | 46/70 [2:51:19<1:30:10, 225.45s/it]37.28998565673828 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  67%|██████▋   | 47/70 [2:55:03<1:26:16, 225.07s/it]37.137245178222656 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  69%|██████▊   | 48/70 [2:58:45<1:22:10, 224.13s/it]37.420902252197266 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  70%|███████   | 49/70 [3:02:26<1:18:05, 223.12s/it]37.44272232055664 37.595462799072266
+
+total train:  71%|███████▏  | 50/70 [3:06:20<1:15:29, 226.47s/it]37.44272232055664 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  73%|███████▎  | 51/70 [3:10:03<1:11:22, 225.40s/it]37.224525451660156 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  74%|███████▍  | 52/70 [3:13:46<1:07:20, 224.48s/it]37.0717887878418 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  76%|███████▌  | 53/70 [3:17:29<1:03:31, 224.23s/it]36.96268844604492 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  77%|███████▋  | 54/70 [3:21:11<59:36, 223.55s/it]  37.551822662353516 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  79%|███████▊  | 55/70 [3:24:51<55:36, 222.43s/it]37.02814865112305 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  80%|████████  | 56/70 [3:28:36<52:03, 223.09s/it]36.8972282409668 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  81%|████████▏ | 57/70 [3:32:18<48:18, 222.95s/it]36.67903137207031 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  83%|████████▎ | 58/70 [3:35:58<44:25, 222.11s/it]37.00632858276367 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  84%|████████▍ | 59/70 [3:39:40<40:40, 221.88s/it]37.02814865112305 37.595462799072266
+
+total train:  86%|████████▌ | 60/70 [3:43:35<37:37, 225.75s/it]36.8099479675293 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  87%|████████▋ | 61/70 [3:47:19<33:46, 225.21s/it]36.65721130371094 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  89%|████████▊ | 62/70 [3:51:02<29:57, 224.72s/it]36.8099479675293 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  90%|█████████ | 63/70 [3:54:44<26:08, 224.01s/it]36.43901443481445 37.595462799072266
+lrs:
+0.000125
+---------------------------------
+
+total train:  91%|█████████▏| 64/70 [3:58:28<22:22, 223.78s/it]36.43901443481445 37.595462799072266
+lrs:
+6.25e-05
+---------------------------------
+
+total train:  93%|█████████▎| 65/70 [4:02:11<18:37, 223.59s/it]36.80995178222656 37.595462799072266
+lrs:
+6.25e-05
+---------------------------------
+
+total train:  94%|█████████▍| 66/70 [4:05:52<14:51, 222.99s/it]36.28627395629883 37.595462799072266
+lrs:
+6.25e-05
+---------------------------------
+
+total train:  96%|█████████▌| 67/70 [4:09:35<11:08, 222.88s/it]36.50447463989258 37.595462799072266
+lrs:
+6.25e-05
+---------------------------------
+
+total train:  97%|█████████▋| 68/70 [4:13:17<07:24, 222.49s/it]36.32991409301758 37.595462799072266
+lrs:
+6.25e-05
+---------------------------------
+
+total train:  99%|█████████▊| 69/70 [4:16:59<03:42, 222.42s/it]36.32991409301758 37.595462799072266
+
+total train: 100%|██████████| 70/70 [4:20:49<00:00, 224.85s/it]
+total train: 100%|██████████| 70/70 [4:20:49<00:00, 223.57s/it]
+36.024436950683594 37.595462799072266
+=> loading checkpoint '/home/zhouyufan/Projects/PDPP/save_max/epoch_new_interpolation_0044_0.pth.tar' Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log/log', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, pretrain_cnn_path='', momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='crosstask', action_dim=105, observation_dim=1536, class_dim=18, n_train_steps=200, root='/home/zhouyufan/Projects/PDPP/dataset/crosstask', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/train_list.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/test_list.json', json_path_val2='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json', start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', gpu=1, multiprocessing_distributed=False, name='new_interpolation', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, horizon=3, epochs=70, log_freq=500, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, debug=0, transformer_num=5, distributed=False)
+/home/zhouyufan/Projects/PDPP/inference.py:133: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+time:  10.55312991142273
+-----------------Mean&Var-----------------------
+Val/EpochAcc@1 65.09564208984375
+Val/Traj_Success_Rate 37.61728286743164
+Val/MIoU1 58.61355972290039 0.0
+Val/MIoU2 66.77285766601562
+Val/acc_a0 72.6161880493164 0.0
+Val/acc_aT 71.48155975341797 0.0
+new_interpolation crosstask 3 44 37.61728286743164 65.09564208984375 66.77285766601562
