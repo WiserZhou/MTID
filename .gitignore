@@ -5,4 +5,12 @@ checkpoint_mlp/
 __pycache__
 nohup.out
 output.txt
-dataset/*
+dataset/coin
+dataset/NIV
+dataset/ViT-B-32__openai
+dataset/crosstask/crosstask_features
+dataset/crosstask/crosstask_release
+dataset/crosstask/processed_data
+dataset/crosstask/crosstask_features.zip
+dataset/crosstask/crosstask_release.zip
+dataset/crosstask/CrossTask_s3d.zip
