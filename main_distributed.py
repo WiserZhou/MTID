@@ -158,9 +158,9 @@ def main_worker(gpu, ngpus_per_node, args):
     )
 
     # create model
-    temporal_model = temporalPredictor.TemporalUnet(args,
-                                                    dim=256,
-                                                    dim_mults=(1, 2, 4), )
+    temporal_model = temporal.TemporalUnet(args,
+                                           dim=256,
+                                           dim_mults=(1, 2, 4), )
 
     diffusion_model = diffusion.GaussianDiffusion(
         args, temporal_model)
