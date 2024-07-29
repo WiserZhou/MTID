@@ -1,0 +1,56 @@
+nohup: ignoring input
+Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log/log_mlp', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, pretrain_cnn_path='', momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='crosstask_base', action_dim=105, observation_dim=9600, class_dim=18, root='/home/zhouyufan/Projects/PDPP/dataset/crosstask', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/train_list.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/test_list.json', json_path_val2='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/output.json', n_train_steps=200, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', gpu=1, multiprocessing_distributed=False, name='note6', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, horizon=3, epochs=70, log_freq=500, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, imageEncoder=0, transformer_num=5, base_model='base')
+crosstask_base
+feature_base
+is_valFalse
+Loaded /home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/train_list.json
+crosstask_base
+feature_base
+is_valTrue
+Loaded /home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/test_list.json
+logging outputs to  /home/zhouyufan/Projects/PDPP/log/log_mlp_note6_20240729182709_crosstask_base
+total_mlp:   0%|          | 0/70 [00:00<?, ?it/s]total_mlp:   1%|▏         | 1/70 [01:59<2:17:55, 119.94s/it]lrs:
+8.571428571428573e-06
+---------------------------------
+/home/zhouyufan/Projects/PDPP/train_mlp.py:473: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(losses.avg), torch.tensor(acc)
+total_mlp:   3%|▎         | 2/70 [04:15<2:26:29, 129.25s/it]total_mlp:   4%|▍         | 3/70 [06:04<2:13:53, 119.91s/it]lrs:
+2.5714285714285714e-05
+---------------------------------
+total_mlp:   6%|▌         | 4/70 [07:55<2:08:14, 116.59s/it]total_mlp:   7%|▋         | 5/70 [09:33<1:58:39, 109.53s/it]lrs:
+4.2857142857142856e-05
+---------------------------------
+total_mlp:   9%|▊         | 6/70 [11:30<1:59:44, 112.25s/it]total_mlp:  10%|█         | 7/70 [13:09<1:53:14, 107.85s/it]lrs:
+6e-05
+---------------------------------
+total_mlp:  11%|█▏        | 8/70 [14:56<1:51:06, 107.52s/it]total_mlp:  13%|█▎        | 9/70 [16:43<1:49:14, 107.45s/it]lrs:
+7.714285714285714e-05
+---------------------------------
+total_mlp:  14%|█▍        | 10/70 [18:36<1:49:04, 109.08s/it]total_mlp:  16%|█▌        | 11/70 [20:11<1:43:13, 104.97s/it]lrs:
+9.428571428571429e-05
+---------------------------------
+total_mlp:  17%|█▋        | 12/70 [21:58<1:41:57, 105.47s/it]total_mlp:  19%|█▊        | 13/70 [23:31<1:36:34, 101.66s/it]lrs:
+0.0001
+---------------------------------
+total_mlp:  20%|██        | 14/70 [25:25<1:38:31, 105.57s/it]total_mlp:  21%|██▏       | 15/70 [26:57<1:33:00, 101.47s/it]lrs:
+0.0001
+---------------------------------
+total_mlp:  23%|██▎       | 16/70 [28:38<1:31:05, 101.21s/it]total_mlp:  24%|██▍       | 17/70 [30:10<1:27:01, 98.52s/it] lrs:
+0.0001
+---------------------------------
+total_mlp:  26%|██▌       | 18/70 [31:53<1:26:31, 99.84s/it]total_mlp:  27%|██▋       | 19/70 [33:24<1:22:29, 97.05s/it]lrs:
+0.0001
+---------------------------------
+total_mlp:  29%|██▊       | 20/70 [35:06<1:22:12, 98.66s/it]total_mlp:  30%|███       | 21/70 [36:37<1:18:39, 96.32s/it]lrs:
+0.0001
+---------------------------------
+total_mlp:  31%|███▏      | 22/70 [38:24<1:19:36, 99.51s/it]total_mlp:  33%|███▎      | 23/70 [40:03<1:17:46, 99.28s/it]lrs:
+0.0001
+---------------------------------
+total_mlp:  34%|███▍      | 24/70 [41:49<1:17:45, 101.42s/it]total_mlp:  36%|███▌      | 25/70 [43:24<1:14:39, 99.54s/it] lrs:
+0.0001
+---------------------------------
+total_mlp:  37%|███▋      | 26/70 [45:00<1:12:07, 98.36s/it]total_mlp:  39%|███▊      | 27/70 [46:24<1:07:22, 94.01s/it]lrs:
+0.0001
+---------------------------------
+total_mlp:  40%|████      | 28/70 [48:01<1:06:34, 95.10s/it]
