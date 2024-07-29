@@ -468,7 +468,7 @@ class PlanningDataset(Dataset):
         else:
             task_class = folder_id['task_id']
 
-        if self.args.dataset == 'crosstask':
+        if 'crosstask' in self.args.dataset:
             if folder_id['vid'] != self.last_vid:
                 if self.crosstask_use_feature_how:
                     images_ = np.load(folder_id['feature'], allow_pickle=True)

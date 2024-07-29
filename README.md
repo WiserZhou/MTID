@@ -42,14 +42,6 @@ mv *.json crosstask_release
 mv actions_one_hot.npy crosstask_release
 ```
 
-```
-链接：https://pan.baidu.com/s/13g93fVk4eXAudoJmsrW3KQ?pwd=xkth 
-提取码：xkth
-```
-
-open this folder and put these files at crosstask_release/ and overwrite the previous files.
-Now we just need this.
-
 #### COIN
 
 1. Download datasets&features
