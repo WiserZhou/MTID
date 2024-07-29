@@ -71,10 +71,12 @@ def get_args(description='whl'):
                         type=int,
                         default=1,
                         help='')
+
+    # kind of dataset
     parser.add_argument('--dataset',
                         type=str,
-                        default='crosstask',
-                        help='dataset')
+                        default='crosstask_how',
+                        help='dataset:crosstask_how,crosstask_base,coin,NIV')
     parser.add_argument('--action_dim',
                         type=int,
                         default=105,
@@ -87,10 +89,6 @@ def get_args(description='whl'):
                         type=int,
                         default=18,
                         help='')
-    parser.add_argument('--n_train_steps',
-                        type=int,
-                        default=200,
-                        help='training_steps_per_epoch')
     parser.add_argument('--root',
                         type=str,
                         default='/home/zhouyufan/Projects/PDPP/dataset/crosstask',
@@ -107,6 +105,12 @@ def get_args(description='whl'):
                         type=str,
                         default='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json',
                         help='path of the generated json file for val train model')
+    ########################################################################################
+
+    parser.add_argument('--n_train_steps',
+                        type=int,
+                        default=200,
+                        help='training_steps_per_epoch')
     parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
     parser.add_argument('--resume', dest='resume', action='store_true',
@@ -125,7 +129,6 @@ def get_args(description='whl'):
                         help='url used to set up distributed training')
     parser.add_argument('--dist-backend', default='nccl', type=str,
                         help='distributed backend')
-
     parser.add_argument('--gpu', default=6, type=int,
                         help='GPU id to use.')
     parser.add_argument('--multiprocessing-distributed', default=False, action='store_true',
@@ -183,10 +186,12 @@ def get_args(description='whl'):
                         type=int,
                         default=10,
                         help='')
-
-    parser.add_argument('--debug', type=int, default=0, help='try')
+    parser.add_argument('--imageEncoder', type=int, default=0,
+                        help='try to change the image encoder')
     parser.add_argument('--transformer_num', type=int,
                         default=5, help='layer nums for transformer blocks')
+    parser.add_argument('--base_model', type=str,
+                        default='base', help='predictor')
 
     args = parser.parse_args()
     return args

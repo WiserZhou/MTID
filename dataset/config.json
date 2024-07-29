@@ -1,0 +1,25 @@
+{
+    "datasets": [
+        {
+            "name": "CrossTask",
+            "observation_dim": {
+                "how": 1536,
+                "base": 9600
+            },
+            "action_dim": 105,
+            "class_dim": 18
+        },
+        {
+            "name": "COIN",
+            "observation_dim": 1536,
+            "action_dim": 778,
+            "class_dim": 180
+        },
+        {
+            "name": "NIV",
+            "observation_dim": 1536,
+            "action_dim": 48,
+            "class_dim": 5
+        }
+    ]
+}

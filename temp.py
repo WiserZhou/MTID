@@ -95,27 +95,51 @@ def main_worker(gpu, ngpus_per_node, args):
 
     model.eval()
 
+    # Initialize an empty list to store the results
     json_ret = []
+
+    # Initialize a counter for correctly classified samples
     correct = 0
 
+    # Iterate over the length of the test dataset
     for i in range(len(test_dataset)):
+        # Load the frames, video names, and frame counts from the test dataset
         frames_t, vid_names, frame_cnts = test_dataset[i]
+
+        # Predict the event class using the model
         event_class = model(frames_t)
+
+        # Find the index of the maximum value in the predicted event class tensor
         event_class_id = torch.argmax(event_class)
+
+        # Check if the predicted event class matches the actual task ID
         if event_class_id == vid_names['task_id']:
             correct += 1
+
+        # Add the predicted event class ID to the video names dictionary
         vid_names['event_class'] = event_class_id.item()
+
+        # Initialize a new dictionary to store the current result
         json_current = {}
+
+        # Store the video names dictionary in the current result
         json_current['id'] = vid_names
+
+        # Store the instruction length (frame counts) in the current result
         json_current['instruction_len'] = frame_cnts
 
+        # Append the current result to the list of all results
         json_ret.append(json_current)
 
+    # Define the output filename
     data_name = "output.json"
 
+    # Open the file in write mode
     with open(data_name, 'w') as f:
+        # Write the list of results to the JSON file
         json.dump(json_ret, f)
 
+    # Print the accuracy of the model predictions
     print('acc: ', correct / len(test_dataset))
 
 

@@ -178,6 +178,16 @@ def main():
 def main_worker(gpu, ngpus_per_node, args):
     args.gpu = gpu
 
+    # deploy the specific dataset
+    env_dict = get_environment_shape(args.dataset)
+    args.action_dim = env_dict['action_dim']
+    args.observation_dim = env_dict['observation_dim']
+    args.class_dim = env_dict['class_dim']
+    args.root = env_dict['root']
+    args.json_path_train = env_dict['json_path_train']
+    args.json_path_val = env_dict['json_path_val']
+    args.json_path_val2 = env_dict['json_path_val2']
+
     if args.distributed:
         if args.multiprocessing_distributed:
             args.rank = args.rank * ngpus_per_node + gpu
@@ -210,6 +220,7 @@ def main_worker(gpu, ngpus_per_node, args):
         is_val=True,
         model=None,
     )
+
     if args.distributed:
         train_sampler = torch.utils.data.distributed.DistributedSampler(
             train_dataset)
@@ -426,7 +437,7 @@ def train(train_loader, n_train_steps, model, scheduler, args, optimizer, if_cal
         for i in range(args.gradient_accumulate_every):
             batch = next(train_loader_)
 
-            bs, T, dim = bath[0].shape  # [bs, (T+1), ob_dim]
+            bs, T, dim = batch[0].shape  # [bs, (T+1), ob_dim]
             with torch.set_grad_enabled(True):
                 task_class = batch[2].view(-1).cuda()  # [bs]
 

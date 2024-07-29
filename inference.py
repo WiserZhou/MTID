@@ -14,7 +14,7 @@ import utils
 
 from torch.distributed import ReduceOp
 from dataloader.data_load import PlanningDataset
-from model import diffusion, temporal, temporal2
+from model import diffusion, temporal
 from utils import *
 from utils.args import get_args
 

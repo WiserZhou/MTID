@@ -65,14 +65,13 @@ class ImageEncoderByCLIP(nn.Module):
 
 # Semantic Space Interpolation
 
-
 class SemanticSpaceInterpolation(nn.Module):
     def __init__(self, dimension_num, block_num):
         super(SemanticSpaceInterpolation, self).__init__()
         self.block_num = block_num
         self.dimension_num = dimension_num
         # Introduce a linear layer to generate the alpha values dynamically for each frame
-        self.alpha_generator = nn.Linear(dimension_num, 1)
+        self.alpha_generator = nn.Linear(dimension_num, block_num)
         # Use Sigmoid activation function to constrain the alpha values between 0 and 1
         self.sigmoid = nn.Sigmoid()
 
@@ -84,25 +83,18 @@ class SemanticSpaceInterpolation(nn.Module):
         x_combined = torch.stack([x1, x2], dim=0)
 
         # Generate unique alpha values for each block
-        # Shape: (block_num, batch_size, 1)
-        alphas = []
-        for _ in range(self.block_num):
-            alpha = self.sigmoid(self.alpha_generator(
-                torch.ones(1, x_combined.shape[2]).to(x1.device)))
-            alphas.append(alpha)
-        alphas = torch.stack(alphas, dim=0)
+        # Shape: (batch_size, block_num)
+        alphas = self.sigmoid(self.alpha_generator(
+            torch.ones(batch_size, self.dimension_num).to(x1.device)))
 
         # Expand alphas to match the dimensionality of the input
-        # Shape: (block_num, batch_size, dimension_num)
-        alphas = alphas.expand(self.block_num, -1, self.dimension_num)
+        # Shape: (batch_size, block_num, 1)
+        alphas = alphas.unsqueeze(-1)
 
         # Compute the interpolated frames using broadcasting
-        # Shape: (block_num, batch_size, dimension_num)
+        # Shape: (batch_size, block_num, dimension_num)
         interpolated_frames = (
-            1 - alphas) * x_combined[0].unsqueeze(0) + alphas * x_combined[1].unsqueeze(0)
-
-        # Rearrange dimensions to (batch_size, block_num, dimension_num)
-        interpolated_frames = interpolated_frames.permute(1, 0, 2)
+            1 - alphas) * x_combined[0].unsqueeze(1) + alphas * x_combined[1].unsqueeze(1)
 
         return interpolated_frames
 
@@ -125,7 +117,7 @@ class MotionPredictor(nn.Module):
     def __init__(self, args, input_dim, output_dim, dimension_num, block_num, num_transformer_blocks=1):
         super(MotionPredictor, self).__init__()
 
-        if args.debug == 0:
+        if args.imageEncoder == 0:
             self.encoder = ImageEncoder(input_dim, output_dim)
         else:
             self.encoder = ImageEncoderByCLIP(input_dim, output_dim)

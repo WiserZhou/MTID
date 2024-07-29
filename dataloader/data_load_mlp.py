@@ -214,11 +214,11 @@ class PlanningDataset(Dataset):
                     json.dump(json_data, f)
 
         elif args.dataset == 'coin':
-            coin_path = os.path.join(root, '../coin', 'full_npy')
+            coin_path = os.path.join(root, 'full_npy')
             val_csv_path = os.path.join(
-                root, '../coin', 'coin_test_30.json')
+                root, 'coin_test_30.json')
             video_csv_path = os.path.join(
-                root, '../coin', 'coin_train_70.json')
+                root, 'coin_train_70.json')
 
             # coin_data_name = "/data1/wanghanlin/diffusion_planning/jsons_coin/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
             #         is_val, self.max_traj_len)
@@ -291,9 +291,9 @@ class PlanningDataset(Dataset):
 
         elif args.dataset == 'NIV':
             val_csv_path = os.path.join(
-                root, '../NIV', 'test30.json')
+                root, 'test30.json')
             video_csv_path = os.path.join(
-                root, '../NIV', 'train70.json')
+                root, 'train70.json')
 
             # niv_data_name = "/data1/wanghanlin/diffusion_planning/jsons_niv/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
             #         is_val, self.max_traj_len)

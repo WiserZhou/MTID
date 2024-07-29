@@ -102,7 +102,9 @@ class ResidualTemporalBlock(nn.Module):
         out = self.blocks[0](x) + self.time_mlp(t)   # for diffusion
 
         # print(out.shape)  # torch.Size([256, 256, 3])
-        out = self.cross_attention(out, context)
+        out2 = self.cross_attention(out, context)
+
+        out = out2 + out
 
         out = self.blocks[1](out)
 

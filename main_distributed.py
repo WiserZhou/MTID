@@ -12,10 +12,11 @@ import torch.multiprocessing as mp
 import torch.utils.data
 import torch.utils.data.distributed
 from torch.distributed import ReduceOp
+from utils.load_dim import get_environment_shape
 
 import utils
 from dataloader.data_load import PlanningDataset
-from model import diffusion, temporal, temporal2, temporal_fourier, temporalPredictor
+from model import diffusion, temporal, temporal_fourier, temporalPredictor
 from model.helpers import get_lr_schedule_with_warmup
 
 from utils import *
@@ -98,6 +99,16 @@ def main():
 def main_worker(gpu, ngpus_per_node, args):
     args.gpu = gpu
 
+    # deploy the specific dataset
+    env_dict = get_environment_shape(args.dataset)
+    args.action_dim = env_dict['action_dim']
+    args.observation_dim = env_dict['observation_dim']
+    args.class_dim = env_dict['class_dim']
+    args.root = env_dict['root']
+    args.json_path_train = env_dict['json_path_train']
+    args.json_path_val = env_dict['json_path_val']
+    args.json_path_val2 = env_dict['json_path_val2']
+
     if args.distributed:
         if args.multiprocessing_distributed:
             args.rank = args.rank * ngpus_per_node + gpu
@@ -158,9 +169,14 @@ def main_worker(gpu, ngpus_per_node, args):
     )
 
     # create model
-    temporal_model = temporal.TemporalUnet(args,
-                                           dim=256,
-                                           dim_mults=(1, 2, 4), )
+    if args.base_model == 'base':
+        temporal_model = temporal.TemporalUnet(args,
+                                               dim=256,
+                                               dim_mults=(1, 2, 4), )
+    elif args.base_model == 'predictor':
+        temporal_model = temporalPredictor.TemporalUnet(args,
+                                                        dim=256,
+                                                        dim_mults=(1, 2, 4), )
 
     diffusion_model = diffusion.GaussianDiffusion(
         args, temporal_model)
