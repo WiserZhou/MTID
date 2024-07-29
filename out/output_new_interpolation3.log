@@ -225,3 +225,59 @@ lrs:
 lrs:
 0.000125
 ---------------------------------
+total train:  83%|████████▎ | 58/70 [3:17:33<40:23, 201.99s/it]38.18459701538086 39.842899322509766
+lrs:
+0.000125
+---------------------------------
+total train:  84%|████████▍ | 59/70 [3:20:53<36:55, 201.44s/it]38.359153747558594 39.842899322509766
+total train:  86%|████████▌ | 60/70 [3:24:22<33:56, 203.63s/it]38.075496673583984 39.842899322509766
+lrs:
+0.000125
+---------------------------------
+total train:  87%|████████▋ | 61/70 [3:27:42<30:23, 202.60s/it]37.988216400146484 39.842899322509766
+lrs:
+0.000125
+---------------------------------
+total train:  89%|████████▊ | 62/70 [3:31:02<26:54, 201.79s/it]37.8572998046875 39.842899322509766
+lrs:
+0.000125
+---------------------------------
+total train:  90%|█████████ | 63/70 [3:34:22<23:27, 201.11s/it]37.92275619506836 39.842899322509766
+lrs:
+0.000125
+---------------------------------
+total train:  91%|█████████▏| 64/70 [3:37:43<20:07, 201.27s/it]37.791839599609375 39.842899322509766
+lrs:
+6.25e-05
+---------------------------------
+total train:  93%|█████████▎| 65/70 [3:41:02<16:42, 200.55s/it]37.988216400146484 39.842899322509766
+lrs:
+6.25e-05
+---------------------------------
+total train:  94%|█████████▍| 66/70 [3:44:22<13:21, 200.26s/it]37.8572998046875 39.842899322509766
+lrs:
+6.25e-05
+---------------------------------
+total train:  96%|█████████▌| 67/70 [3:47:42<10:00, 200.28s/it]37.96639633178711 39.842899322509766
+lrs:
+6.25e-05
+---------------------------------
+total train:  97%|█████████▋| 68/70 [3:51:03<06:41, 200.56s/it]37.835479736328125 39.842899322509766
+lrs:
+6.25e-05
+---------------------------------
+total train:  99%|█████████▊| 69/70 [3:54:22<03:20, 200.08s/it]37.6827392578125 39.842899322509766
+total train: 100%|██████████| 70/70 [3:57:52<00:00, 202.95s/it]total train: 100%|██████████| 70/70 [3:57:52<00:00, 203.89s/it]
+37.420902252197266 39.842899322509766
+=> loading checkpoint '/home/zhouyufan/Projects/PDPP/save_max/epoch_new_interpolation3_0038_0.pth.tar' Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log/log', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, pretrain_cnn_path='', momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='crosstask', action_dim=105, observation_dim=1536, class_dim=18, n_train_steps=200, root='/home/zhouyufan/Projects/PDPP/dataset/crosstask', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/train_list.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/test_list.json', json_path_val2='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json', start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', gpu=3, multiprocessing_distributed=False, name='new_interpolation3', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, horizon=3, epochs=70, log_freq=500, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, imageEncoder=0, transformer_num=5, base_model='predictor', distributed=False)
+/home/zhouyufan/Projects/PDPP/inference.py:133: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+time:  9.245505332946777
+-----------------Mean&Var-----------------------
+Val/EpochAcc@1 66.40483093261719
+Val/Traj_Success_Rate 39.45014190673828
+Val/MIoU1 58.34873962402344 0.0
+Val/MIoU2 68.25587463378906
+Val/acc_a0 73.83809661865234 0.0
+Val/acc_aT 73.0525894165039 0.0
+new_interpolation3 crosstask 3 38 39.45014190673828 66.40483093261719 68.25587463378906

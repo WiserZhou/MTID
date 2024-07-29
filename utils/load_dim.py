@@ -1,6 +1,13 @@
 import os
 
 
+def get_current_file_absolute_path():
+    current_file_path = os.path.abspath(__file__)
+    path_parts = current_file_path.split('/')
+    before_utils = '/'.join(path_parts[:-2])
+    return before_utils
+
+
 class EnvironmentInfo:
     def __init__(self, name, observation_dim, action_dim, class_dim, json_path_train='', json_path_val='', json_path_val2=''):
         self.name = name
@@ -21,17 +28,13 @@ environments = [
                     '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/train_list.json',
                     '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/test_list.json',
                     '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json'),
-    EnvironmentInfo("crosstask_base",  9600, 105, 18),
+    EnvironmentInfo("crosstask_base",  9600, 105, 18,
+                    '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/train_list.json',
+                    '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/test_list.json',
+                    '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/output.json'),
     EnvironmentInfo("coin", 1536, 778, 180),
     EnvironmentInfo("NIV", 1536, 48, 5)
 ]
-
-
-def get_current_file_absolute_path():
-    current_file_path = os.path.abspath(__file__)
-    path_parts = current_file_path.split('/')
-    before_utils = '/'.join(path_parts[:-1])
-    return before_utils
 
 
 def get_environment_shape(name):

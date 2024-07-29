@@ -21,6 +21,7 @@ from logging import log
 from utils.args import get_args
 import numpy as np
 from tqdm import tqdm
+from utils.load_dim import *
 
 
 def cycle(dl):
@@ -128,14 +129,28 @@ class ResMLP(nn.Module):
 
 
 def reduce_tensor(tensor):
-    rt = tensor.clone()
-    torch.distributed.all_reduce(rt, op=ReduceOp.SUM)
-    rt /= dist.get_world_size()
-    return rt
+    if dist.is_initialized():
+        rt = tensor.clone()
+        torch.distributed.all_reduce(rt, op=ReduceOp.SUM)
+        rt /= dist.get_world_size()
+        return rt
+    else:
+        return tensor
 
 
 def main():
     args = get_args()
+
+    # deploy the specific dataset
+    env_dict = get_environment_shape(args.dataset)
+    args.action_dim = env_dict['action_dim']
+    args.observation_dim = env_dict['observation_dim']
+    args.class_dim = env_dict['class_dim']
+    args.root = env_dict['root']
+    args.json_path_train = env_dict['json_path_train']
+    args.json_path_val = env_dict['json_path_val']
+    args.json_path_val2 = env_dict['json_path_val2']
+
     os.environ['PYTHONHASHSEED'] = str(args.seed)
     if os.path.exists(args.json_path_val):
         pass
@@ -177,16 +192,6 @@ def main():
 
 def main_worker(gpu, ngpus_per_node, args):
     args.gpu = gpu
-
-    # deploy the specific dataset
-    env_dict = get_environment_shape(args.dataset)
-    args.action_dim = env_dict['action_dim']
-    args.observation_dim = env_dict['observation_dim']
-    args.class_dim = env_dict['class_dim']
-    args.root = env_dict['root']
-    args.json_path_train = env_dict['json_path_train']
-    args.json_path_val = env_dict['json_path_val']
-    args.json_path_val2 = env_dict['json_path_val2']
 
     if args.distributed:
         if args.multiprocessing_distributed:

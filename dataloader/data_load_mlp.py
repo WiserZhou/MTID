@@ -9,13 +9,23 @@ from collections import namedtuple
 Batch = namedtuple('Batch', 'Observations Actions Class')
 
 
+def valid_raw_file(file):
+    with open(file, 'r') as f:
+        json_data = json.load(f)
+
+    if 'vid' in json_data[0]:
+        return False
+    else:
+        return True
+
+
 def get_vids_from_json(path):
     task_vids = {}
     with open(path, 'r') as f:
         json_data = json.load(f)
 
     for i in json_data:
-        print(i)
+        # print(i)
         task = i['task']
         vid = i['vid']
         if task not in task_vids:
@@ -69,9 +79,15 @@ class PlanningDataset(Dataset):
         self.frame_cnts = None
         self.images = None
         self.last_vid = ''
-        self.crosstask_use_feature_how = crosstask_use_feature_how
 
-        if args.dataset == 'crosstask':
+        print(args.dataset)
+
+        if 'crosstask' in args.dataset:
+            self.crosstask_use_feature_how = True
+            crosstask_use_feature_how = True
+            if args.dataset == 'crosstask_base':
+                self.crosstask_use_feature_how = False
+                crosstask_use_feature_how = False
             """
             .
             └── crosstask
@@ -81,15 +97,16 @@ class PlanningDataset(Dataset):
                     ├── videos.csv or json
                     └── videos_val.csv or json
             """
-            val_csv_path = os.path.join(
-                root, 'crosstask_release', 'test_list.json')  # 'videos_val.csv')
-            video_csv_path = os.path.join(
-                root, 'crosstask_release', 'train_list.json')  # 'videos.csv')
+
+            val_csv_path = '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/raw/test_list.json'
+            video_csv_path = '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/raw/train_list.json'  # 'videos.csv')
 
             if crosstask_use_feature_how:
                 self.features_path = os.path.join(root, 'processed_data')
+                print('feature_how')
             else:
                 self.features_path = os.path.join(root, 'crosstask_features')
+                print('feature_base')
 
             self.constraints_path = os.path.join(
                 root, 'crosstask_release', 'annotations')
@@ -119,19 +136,18 @@ class PlanningDataset(Dataset):
                 '91515': 17
             }
 
-            # cross_task_data_name = "/data1/wanghanlin/diffusion_planning/jsons_crosstask105/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
-            #     is_val, self.max_traj_len)
-
             if is_val:
                 cross_task_data_name = args.json_path_val
             else:
                 cross_task_data_name = args.json_path_train
 
-            if os.path.exists(cross_task_data_name):
+            if os.path.exists(cross_task_data_name) and valid_raw_file(cross_task_data_name):
+                print('is_val'+str(is_val))
                 with open(cross_task_data_name, 'r') as f:
                     self.json_data = json.load(f)
                 print('Loaded {}'.format(cross_task_data_name))
             else:
+                print('handling raw json------------------')
                 file_type = val_csv_path.split('.')[-1]
                 # Determine the file type (either JSON or CSV) based on the extension of val_csv_path
 
