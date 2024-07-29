@@ -31,9 +31,15 @@ environments = [
     EnvironmentInfo("crosstask_base",  9600, 105, 18,
                     '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/train_list.json',
                     '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/test_list.json',
-                    '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/output.json'),
-    EnvironmentInfo("coin", 1536, 778, 180),
-    EnvironmentInfo("NIV", 1536, 48, 5)
+                    ''),
+    EnvironmentInfo("coin", 1536, 778, 180,
+                    '/home/zhouyufan/Projects/PDPP/dataset/coin/coin_train_70.json',
+                    '/home/zhouyufan/Projects/PDPP/dataset/coin/coin_test_30.json',
+                    ''),
+    EnvironmentInfo("NIV", 1536, 48, 5,
+                    '/home/zhouyufan/Projects/PDPP/dataset/NIV/train70.json',
+                    '/home/zhouyufan/Projects/PDPP/dataset/NIV/test30.json',
+                    '')
 ]
 
 

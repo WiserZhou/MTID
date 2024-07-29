@@ -13,10 +13,10 @@ def valid_raw_file(file):
     with open(file, 'r') as f:
         json_data = json.load(f)
 
-    if 'vid' in json_data[0]:
-        return False
-    else:
+    if 'id' in json_data[0]:
         return True
+    else:
+        return False
 
 
 def get_vids_from_json(path):
@@ -232,22 +232,21 @@ class PlanningDataset(Dataset):
         elif args.dataset == 'coin':
             coin_path = os.path.join(root, 'full_npy')
             val_csv_path = os.path.join(
-                root, 'coin_test_30.json')
+                root, 'raw', 'coin_test_30.json')
             video_csv_path = os.path.join(
-                root, 'coin_train_70.json')
+                root, 'raw', 'coin_train_70.json')
 
-            # coin_data_name = "/data1/wanghanlin/diffusion_planning/jsons_coin/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
-            #         is_val, self.max_traj_len)
             if is_val:
                 coin_data_name = args.json_path_val
             else:
                 coin_data_name = args.json_path_train
 
-            if os.path.exists(coin_data_name):
+            if os.path.exists(coin_data_name) and valid_raw_file(coin_data_name):
                 with open(coin_data_name, 'r') as f:
                     self.json_data = json.load(f)
                 print('Loaded {}'.format(coin_data_name))
             else:
+
                 json_data = []
                 num = 0
                 if is_val:
@@ -260,7 +259,7 @@ class PlanningDataset(Dataset):
                     for (k, v) in i.items():
                         file_name = v['class'] + '_' + \
                             str(v['recipe_type']) + '_' + k + '.npy'
-                        file_path = coin_path + file_name
+                        file_path = coin_path + '/' + file_name
                         images_ = np.load(file_path, allow_pickle=True)
                         images = images_['frames_features']
                         legal_range = []
@@ -268,7 +267,7 @@ class PlanningDataset(Dataset):
                         last_action = v['annotation'][-1]['segment'][1]
                         last_action = math.ceil(last_action)
                         if last_action > len(images):
-                            print(k, last_action, len(images))
+                            # print(k, last_action, len(images))
                             num += 1
                             continue
 
@@ -300,25 +299,23 @@ class PlanningDataset(Dataset):
                             json_data.append({'id': {'vid': k, 'feature': file_path,
                                                      'legal_range': legal_range_current, 'task_id': v['recipe_type']},
                                               'instruction_len': 0})
-                print(num)
+                # print(num)
                 self.json_data = json_data
                 with open(coin_data_name, 'w') as f:
                     json.dump(json_data, f)
 
         elif args.dataset == 'NIV':
             val_csv_path = os.path.join(
-                root, 'test30.json')
+                root, 'raw', 'test30.json')
             video_csv_path = os.path.join(
-                root, 'train70.json')
+                root, 'raw', 'train70.json')
 
-            # niv_data_name = "/data1/wanghanlin/diffusion_planning/jsons_niv/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
-            #         is_val, self.max_traj_len)
             if is_val:
                 niv_data_name = args.json_path_val
             else:
                 niv_data_name = args.json_path_train
 
-            if os.path.exists(niv_data_name):
+            if os.path.exists(niv_data_name) and valid_raw_file(niv_data_name):
                 with open(niv_data_name, 'r') as f:
                     self.json_data = json.load(f)
                 print('Loaded {}'.format(niv_data_name))
@@ -373,7 +370,7 @@ class PlanningDataset(Dataset):
                 self.json_data = json_data
                 with open(niv_data_name, 'w') as f:
                     json.dump(json_data, f)
-                    print(len(json_data))
+                    # print(len(json_data))
         else:
             raise NotImplementedError(
                 'Dataset {} is not implemented'.format(args.dataset))

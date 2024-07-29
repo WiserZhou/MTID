@@ -8,3 +8,7 @@ nohup python train_mlp.py --name=note5 --dataset=crosstask_base --gpu=3 > out/ou
 nohup python train_mlp.py --name=note6 --dataset=crosstask_base --gpu=1 > out/output_note6.log 2>&1 &
 nohup python train_mlp.py --name=note7 --dataset=crosstask_base --gpu=2 > out/output_note7.log 2>&1 &
 nohup python train_mlp.py --name=note8 --dataset=crosstask_base --gpu=3 > out/output_note8.log 2>&1 &
+
+nohup python train_mlp.py --name=note9 --dataset=coin --gpu=7 > out/output_note9.log 2>&1 &
+
+nohup python train_mlp.py --name=note10 --dataset=NIV --gpu=7 > out/output_note10.log 2>&1 &
