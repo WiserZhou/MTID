@@ -1,7 +1,7 @@
 save_max/*
 save_max_mlp/*
-checkpoint/*
-checkpoint_mlp/*
+checkpoint/whl/*
+checkpoint_mlp/whl/*
 __pycache__
 nohup.out
 output.txt

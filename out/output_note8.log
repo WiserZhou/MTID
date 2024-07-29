@@ -56,3 +56,4 @@ logging outputs to  /home/zhouyufan/Projects/PDPP/log/log_mlp_note8_202407291827
 total_mlp:  40%|████      | 28/70 [46:39<1:05:24, 93.43s/it]total_mlp:  41%|████▏     | 29/70 [48:04<1:02:12, 91.03s/it]lrs:
 0.0001
 ---------------------------------
+total_mlp:  43%|████▎     | 30/70 [49:42<1:01:57, 92.93s/it]
