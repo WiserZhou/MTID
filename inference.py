@@ -14,7 +14,7 @@ import utils
 
 from torch.distributed import ReduceOp
 from dataloader.data_load import PlanningDataset
-from model import diffusion, temporal
+from model import diffusion, temporal, temporalPredictor
 from utils import *
 from utils.args import get_args
 
@@ -214,22 +214,19 @@ def main_worker(gpu, ngpus_per_node, args):
     )
 
     # create model
-    if args.layer_num == 4:
-        temporal_model = temporal2.TemporalUnet(
-            args.action_dim + args.observation_dim + args.class_dim,
-            dim=256,
-            dim_mults=(1, 2, 4), )
-    else:
-        temporal_model = temporal.TemporalUnet(
-            args.action_dim + args.observation_dim + args.class_dim,
-            dim=256,
-            dim_mults=(1, 2, 4), )
+    if args.base_model == 'base':
+        temporal_model = temporal.TemporalUnet(args,
+                                               dim=256,
+                                               dim_mults=(1, 2, 4), )
+    elif args.base_model == 'predictor':
+        temporal_model = temporalPredictor.TemporalUnet(args,
+                                                        dim=256,
+                                                        dim_mults=(1, 2, 4), )
 
-    diffusion_model = diffusion.GaussianDiffusion(args, temporal_model, args.horizon, args.observation_dim,
-                                                  args.action_dim, args.class_dim, args.n_diffusion_steps, loss_type=args.loss_kind, clip_denoised=True,)
+    diffusion_model = diffusion.GaussianDiffusion(
+        args, temporal_model)
 
-    model = utils.Trainer(diffusion_model, None, args.ema_decay, args.lr, args.gradient_accumulate_every,
-                          args.step_start_ema, args.update_ema_every, args.log_freq)
+    model = utils.Trainer(args, diffusion_model, None)
 
     if args.pretrain_cnn_path:
         net_data = torch.load(args.pretrain_cnn_path)
@@ -263,7 +260,7 @@ def main_worker(gpu, ngpus_per_node, args):
         if checkpoint_path:
             print("=> loading checkpoint '{}'".format(checkpoint_path), args)
             checkpoint = torch.load(
-                checkpoint_path, map_location='cuda:{}'.format(args.rank))
+                checkpoint_path, map_location='cuda:{}'.format(args.gpu))
             args.start_epoch = checkpoint["epoch"]
             model.model.load_state_dict(checkpoint["model"], strict=True)
             model.ema_model.load_state_dict(checkpoint["ema"], strict=True)

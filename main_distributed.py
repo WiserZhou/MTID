@@ -224,14 +224,12 @@ def main_worker(gpu, ngpus_per_node, args):
         if checkpoint_path:
             log("=> loading checkpoint '{}'".format(checkpoint_path), args)
             checkpoint = torch.load(
-                checkpoint_path, map_location='cuda:{}'.format(args.rank))
+                checkpoint_path, map_location='cuda:{}'.format(args.gpu))
             args.start_epoch = checkpoint["epoch"]
             model.model.load_state_dict(checkpoint["model"])
             model.ema_model.load_state_dict(checkpoint["ema"])
             model.optimizer.load_state_dict(checkpoint["optimizer"])
             model.step = checkpoint["step"]
-            # for p in model.optimizer.param_groups:
-            #     p['lr'] = 1e-5
             scheduler.load_state_dict(checkpoint["scheduler"])
             tb_logdir = checkpoint["tb_logdir"]
             if args.rank == 0:
@@ -391,7 +389,7 @@ def main_worker(gpu, ngpus_per_node, args):
     if ckpt_max_path:
         print("=> loading checkpoint '{}'".format(ckpt_max_path), args)
         checkpoint = torch.load(
-            ckpt_max_path, map_location='cuda:{}'.format(args.rank))
+            ckpt_max_path, map_location='cuda:{}'.format(args.gpu))
         args.start_epoch = checkpoint["epoch"]
         model.model.load_state_dict(checkpoint["model"], strict=True)
         model.ema_model.load_state_dict(checkpoint["ema"], strict=True)

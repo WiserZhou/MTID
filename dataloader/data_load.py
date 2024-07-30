@@ -29,7 +29,7 @@ class PlanningDataset(Dataset):
         self.images = None
         self.last_vid = ''
 
-        if args.dataset == 'crosstask':
+        if 'crosstask' in args.dataset:
             if is_val:
                 cross_task_data_name = args.json_path_val2
             else:

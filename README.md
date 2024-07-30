@@ -126,7 +126,7 @@ nohup python main_distributed.py --name=your_note --gpu=1 > out/output_note.log 
 ​	  Modify the checkpoint path(L244) as the evaluated model in `inference.py` and run:
 
 ```
-python inference.py --resume --ckpt_path=/path > output.txt
+python inference.py --resume --base_model=predictor --gpu=5 --ckpt_path=/path > output.txt
 ```
 
 ​	  **Results** of given checkpoints:

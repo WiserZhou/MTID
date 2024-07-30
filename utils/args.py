@@ -129,8 +129,6 @@ def get_args(description='whl'):
                         help='url used to set up distributed training')
     parser.add_argument('--dist-backend', default='nccl', type=str,
                         help='distributed backend')
-    parser.add_argument('--gpu', default=6, type=int,
-                        help='GPU id to use.')
     parser.add_argument('--multiprocessing-distributed', default=False, action='store_true',
                         help='Use multi-processing distributed training to launch '
                              'N processes per node, which has N GPUs. This is the '
@@ -154,6 +152,8 @@ def get_args(description='whl'):
                         type=int,
                         default=500,
                         help='how many steps do we log once')
+    parser.add_argument('--gpu', default=6, type=int,
+                        help='GPU id to use.')
 
     # parameters that need to be modified
     parser.add_argument('--seed', default=217, type=int,

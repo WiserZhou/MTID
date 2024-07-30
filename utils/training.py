@@ -160,10 +160,12 @@ class Trainer(object):
                 # set the start and end observation feature
                 img_tensors = torch.zeros(
                     (bs, T, args.class_dim + args.action_dim + args.observation_dim))
+
                 img_tensors[:, 0, args.class_dim +
                             args.action_dim:] = global_img_tensors[:, 0, :]
                 img_tensors[:, -1, args.class_dim +
                             args.action_dim:] = global_img_tensors[:, -1, :]
+
                 img_tensors = img_tensors.cuda()
 
                 # Prepare labels and one-hot task encodings
@@ -185,7 +187,6 @@ class Trainer(object):
 
                 # Create an index tensor with values ranging from 0 to the length of video_label.
                 ind = torch.arange(0, len(video_label))
-
                 # Set the appropriate positions in the one-hot tensor to 1.
                 # This creates one-hot encoded vectors for the action labels.
                 # Fancy Indexing
