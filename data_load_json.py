@@ -27,6 +27,8 @@ class PlanningDataset(Dataset):
         self.frame_cnts = None
         self.images = None
         self.last_vid = ''
+        self.device = torch.device(
+            f"cuda:{self.args.gpu}" if torch.cuda.is_available() else "cpu")
 
         if 'crosstask' in args.dataset:
             cross_task_data_name = args.json_path_val
@@ -105,12 +107,16 @@ class PlanningDataset(Dataset):
 
     def sample_single(self, index):
         folder_id = self.vid_names[index]
-        if self.args.dataset == 'crosstask':
+        if 'crosstask' in self.args.dataset:
             if folder_id['vid'] != self.last_vid:
                 images_ = np.load(folder_id['feature'], allow_pickle=True)
-                self.images = images_['frames_features']
+                if self.args.dataset == 'crosstask_base':
+                    self.images = images_
+                else:
+                    self.images = images_['frames_features']
                 self.last_vid = folder_id['vid']
         else:
+            # print(self.args.dataset)
             images_ = np.load(folder_id['feature'], allow_pickle=True)
             self.images = images_['frames_features']
         images, labels_matrix, idx_list = self.curate_dataset(
@@ -119,13 +125,16 @@ class PlanningDataset(Dataset):
         return frames
 
     def __getitem__(self, index):
+
         frames = self.sample_single(index)
-        frames_t = torch.zeros(2, self.args.observation_dim)
-        frames_t[0, :] = frames[0, :]
-        frames_t[1, :] = frames[-1, :]
+        frames_t = torch.zeros(
+            2, self.args.observation_dim, device=self.device)
+        frames_t[0, :] = frames[0, :].to(self.device)
+        frames_t[1, :] = frames[-1, :].to(self.device)
         frames_t = frames_t.view(1, 2, -1)
 
         batch = Batch(frames_t, self.vid_names[index], self.frame_cnts[index])
+
         return batch
 
     def __len__(self):

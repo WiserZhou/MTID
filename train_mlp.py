@@ -52,6 +52,9 @@ class head(nn.Module):
         self.dropout = nn.Dropout(0.)
 
     def forward(self, x):
+
+        # print(x.device)
+
         x = self.fc1(x)
         x = self.fc2(x)
         x = torch.nn.functional.relu(x)
@@ -255,6 +258,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     # create model
     # model = ResMLP(input=args.observation_dim, dim=args.observation_dim, class_num=args.class_dim)
+
     model = head(args.observation_dim, args.class_dim)
 
     if args.pretrain_cnn_path:
@@ -290,7 +294,7 @@ def main_worker(gpu, ngpus_per_node, args):
         if checkpoint_path:
             log("=> loading checkpoint '{}'".format(checkpoint_path), args)
             checkpoint = torch.load(
-                checkpoint_path, map_location='cuda:{}'.format(args.rank))
+                checkpoint_path, map_location='cuda:{}'.format(args.gpu))
             args.start_epoch = checkpoint["epoch"]
             model.load_state_dict(checkpoint["model"])
             scheduler.load_state_dict(checkpoint["scheduler"])

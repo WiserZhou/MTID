@@ -14,11 +14,22 @@ from data_load_json import PlanningDataset
 from utils import *
 from utils.args import get_args
 from train_mlp import ResMLP, head
+from utils.load_dim import get_environment_shape
 
 
 def main():
     args = get_args()
     os.environ['PYTHONHASHSEED'] = str(args.seed)
+
+    # deploy the specific dataset
+    env_dict = get_environment_shape(args.dataset)
+    args.action_dim = env_dict['action_dim']
+    args.observation_dim = env_dict['observation_dim']
+    args.class_dim = env_dict['class_dim']
+    args.root = env_dict['root']
+    args.json_path_train = env_dict['json_path_train']
+    args.json_path_val = env_dict['json_path_val']
+    args.json_path_val2 = env_dict['json_path_val2']
 
     if args.verbose:
         print(args)
@@ -86,8 +97,8 @@ def main_worker(gpu, ngpus_per_node, args):
     else:
         model = torch.nn.DataParallel(model).cuda()
 
-    checkpoint_ = torch.load("/home/zhouyufan/Projects/PDPP/save_max_mlp/epoch_note2_0012.pth.tar",
-                             map_location='cuda:{}'.format(args.rank))
+    checkpoint_ = torch.load(args.ckpt_path,
+                             map_location='cuda:{}'.format(args.gpu))
     model.load_state_dict(checkpoint_["model"])
 
     if args.cudnn_benchmark:

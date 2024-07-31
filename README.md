@@ -87,7 +87,7 @@ nohup python train_mlp.py --name=note > out/output_note.log 2>&1 &
 ​	  Modify the checkpoint path(L86) and json file path(L111) in `temp.py` and run:
 
 ```
-CUDA_VISIBLE_DEVICES=0 python temp.py --num_thread_reader=1 --resume --batch_size=32 --batch_size_val=32
+CUDA_VISIBLE_DEVICES=0 python temp.py --num_thread_reader=1 --resume --batch_size=32 --batch_size_val=32 --ckpt_path=/path
 ```
 
 

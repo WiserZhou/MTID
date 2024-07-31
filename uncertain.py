@@ -320,7 +320,7 @@ def main_worker(gpu, ngpus_per_node, args):
         checkpoint_path = ""
         if checkpoint_path:
             checkpoint = torch.load(
-                checkpoint_path, map_location='cuda:{}'.format(args.rank))
+                checkpoint_path, map_location='cuda:{}'.format(args.gpu))
             args.start_epoch = checkpoint["epoch"]
             model.model.load_state_dict(checkpoint["model"])
             model.ema_model.load_state_dict(checkpoint["ema"])
