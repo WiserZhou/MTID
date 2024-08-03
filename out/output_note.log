@@ -1,86 +1,0 @@
-nohup: ignoring input
-Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log/log_mlp', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, pretrain_cnn_path='', momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='crosstask_base', action_dim=105, observation_dim=9600, class_dim=18, root='/home/zhouyufan/Projects/PDPP/dataset/crosstask', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/train_list.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/test_list.json', json_path_val2='', n_train_steps=200, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='note', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, horizon=3, epochs=70, log_freq=500, gpu=1, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, imageEncoder=0, transformer_num=5, base_model='base')
-crosstask_base
-feature_base
-handling raw json------------------
-crosstask_base
-feature_base
-handling raw json------------------
-logging outputs to  /home/zhouyufan/Projects/PDPP/log/log_mlp_note_20240731110424_crosstask_base
-total_mlp:   0%|          | 0/70 [00:00<?, ?it/s]total_mlp:   1%|▏         | 1/70 [00:44<51:38, 44.90s/it]lrs:
-8.571428571428573e-06
----------------------------------
-/home/zhouyufan/Projects/PDPP/train_mlp.py:477: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  return torch.tensor(losses.avg), torch.tensor(acc)
-total_mlp:   3%|▎         | 2/70 [01:50<1:04:35, 57.00s/it]total_mlp:   4%|▍         | 3/70 [02:56<1:08:25, 61.27s/it]lrs:
-2.5714285714285714e-05
----------------------------------
-total_mlp:   6%|▌         | 4/70 [04:27<1:20:07, 72.85s/it]total_mlp:   7%|▋         | 5/70 [05:38<1:18:11, 72.17s/it]lrs:
-4.2857142857142856e-05
----------------------------------
-total_mlp:   9%|▊         | 6/70 [07:12<1:24:57, 79.64s/it]total_mlp:  10%|█         | 7/70 [08:48<1:29:24, 85.15s/it]lrs:
-6e-05
----------------------------------
-total_mlp:  11%|█▏        | 8/70 [10:14<1:28:06, 85.27s/it]total_mlp:  13%|█▎        | 9/70 [11:30<1:23:40, 82.31s/it]lrs:
-7.714285714285714e-05
----------------------------------
-total_mlp:  14%|█▍        | 10/70 [12:58<1:24:05, 84.09s/it]total_mlp:  16%|█▌        | 11/70 [14:11<1:19:31, 80.87s/it]lrs:
-9.428571428571429e-05
----------------------------------
-total_mlp:  17%|█▋        | 12/70 [15:28<1:16:54, 79.57s/it]total_mlp:  19%|█▊        | 13/70 [16:24<1:08:48, 72.44s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  20%|██        | 14/70 [17:21<1:03:19, 67.85s/it]total_mlp:  21%|██▏       | 15/70 [18:11<57:10, 62.37s/it]  lrs:
-0.0001
----------------------------------
-total_mlp:  23%|██▎       | 16/70 [19:01<52:48, 58.68s/it]total_mlp:  24%|██▍       | 17/70 [19:40<46:35, 52.74s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  26%|██▌       | 18/70 [20:23<43:04, 49.71s/it]total_mlp:  27%|██▋       | 19/70 [21:03<39:50, 46.87s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  29%|██▊       | 20/70 [21:46<38:09, 45.79s/it]total_mlp:  30%|███       | 21/70 [22:26<35:54, 43.97s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  31%|███▏      | 22/70 [23:09<34:56, 43.67s/it]total_mlp:  33%|███▎      | 23/70 [23:48<33:09, 42.33s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  34%|███▍      | 24/70 [24:45<35:47, 46.68s/it]total_mlp:  36%|███▌      | 25/70 [25:50<39:14, 52.33s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  37%|███▋      | 26/70 [27:03<42:54, 58.50s/it]total_mlp:  39%|███▊      | 27/70 [28:00<41:30, 57.92s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  40%|████      | 28/70 [29:02<41:25, 59.18s/it]total_mlp:  41%|████▏     | 29/70 [29:58<39:50, 58.30s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  43%|████▎     | 30/70 [30:57<39:03, 58.58s/it]total_mlp:  44%|████▍     | 31/70 [31:47<36:15, 55.79s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  46%|████▌     | 32/70 [32:39<34:37, 54.68s/it]total_mlp:  47%|████▋     | 33/70 [33:24<31:56, 51.79s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  49%|████▊     | 34/70 [34:08<29:46, 49.63s/it]total_mlp:  50%|█████     | 35/70 [34:51<27:40, 47.45s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  51%|█████▏    | 36/70 [35:32<25:50, 45.61s/it]total_mlp:  53%|█████▎    | 37/70 [36:11<23:55, 43.49s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  54%|█████▍    | 38/70 [36:52<22:46, 42.70s/it]total_mlp:  56%|█████▌    | 39/70 [37:31<21:30, 41.62s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  57%|█████▋    | 40/70 [38:13<20:52, 41.76s/it]total_mlp:  59%|█████▊    | 41/70 [38:52<19:49, 41.02s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  60%|██████    | 42/70 [39:34<19:19, 41.40s/it]total_mlp:  61%|██████▏   | 43/70 [40:14<18:27, 41.03s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  63%|██████▎   | 44/70 [41:13<20:03, 46.30s/it]total_mlp:  64%|██████▍   | 45/70 [42:07<20:12, 48.49s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  66%|██████▌   | 46/70 [43:06<20:45, 51.88s/it]total_mlp:  67%|██████▋   | 47/70 [44:02<20:18, 52.97s/it]lrs:
-2.5e-05
----------------------------------
-total_mlp:  69%|██████▊   | 48/70 [45:24<22:34, 61.57s/it]total_mlp:  70%|███████   | 49/70 [46:36<22:42, 64.87s/it]lrs:
-2.5e-05
----------------------------------

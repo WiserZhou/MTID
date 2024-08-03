@@ -35,10 +35,6 @@ def get_args(description='whl'):
                         type=int,
                         default=256,
                         help='batch size eval')
-    parser.add_argument('--pretrain_cnn_path',
-                        type=str,
-                        default='',
-                        help='')
     parser.add_argument('--momemtum',
                         type=float,
                         default=0.9,

@@ -183,11 +183,6 @@ def main_worker(gpu, ngpus_per_node, args):
 
     model = utils.Trainer(args, diffusion_model, train_loader)
 
-    if args.pretrain_cnn_path:
-        net_data = torch.load(args.pretrain_cnn_path)
-        model.model.load_state_dict(net_data)
-        model.ema_model.load_state_dict(net_data)
-
     if args.distributed:
         if args.gpu is not None:
             model.model.cuda(args.gpu)

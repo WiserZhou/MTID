@@ -1,172 +1,0 @@
-nohup: ignoring input
-Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log/log_mlp', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, pretrain_cnn_path='', momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='coin', action_dim=778, observation_dim=1536, class_dim=180, root='/home/zhouyufan/Projects/PDPP/dataset/coin', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_train_70.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_test_30.json', json_path_val2='', n_train_steps=200, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', gpu=7, multiprocessing_distributed=False, name='note9', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, horizon=3, epochs=70, log_freq=500, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, imageEncoder=0, transformer_num=5, base_model='base')
-coin
-Nz9bLFj__fM 152 75
-ifBjbjIm_EM 99 75
-OUdgMe8K_rc 130 75
-kfi_XGII_p4 163 75
-SSfrCLjs_7U 87 75
-426-24xn_2U 148 75
-IUCoh0Uu_qk 140 75
-HXDkcfu9_EI 114 75
-yEVLI6Be_qU 180 75
-r4q_QOot_Po 157 75
-vCUT9I6O_wE 162 75
-0x6dSjkl_Ks 227 75
-JU9jpUDW_-s 179 75
-7TA4Whui_xA 92 75
-l4MSNXYQ_LU 83 75
-yAUaZcTf_Ec 196 75
-8-gzB7-__LE 83 75
-25BNq0Q1_QM 82 75
-Pnff1HZC_08 93 75
-USXgYvgo_P8 103 75
-fVUjgavW_Ao 154 75
-B68Y4hjY_d0 185 75
-pb8J6-B__HE 155 75
-wlir0MfV_yo 81 75
-RrSQdTus_Hw 135 75
-TcR_ykZN_jE 78 75
-ibWi5YDn_3c 251 75
-0viw7hvm_0A 145 75
-54v0IRwl_uw 150 75
-JJaJy2F_YEw 69 55
-vs1REPP9_qI 132 75
-g3ZkbG44_f4 91 75
--Kw5jzhp_S0 122 75
-uJg2GyBe_uY 97 75
-7diYD0yw_94 170 75
-n0yr9qRPKZE 133 124
-hAwBapWn_x8 133 75
-Cd7a7I-R_D8 101 75
-1hCYcL2E_ds 201 75
-YIa7_Abh_tg 124 75
-XsoVSDpD_7o 232 75
-0bPRS5XB_fk 174 75
-6Jgw2ZcW_60 130 75
-g2Y6N8pt_Yo 185 75
-knnu5JyM_6U 130 75
-yg-desBb_FQ 153 75
-coin
-tc5P8Wfr_2s 120 75
-37PY5qvO_tQ 118 75
-OaTttCmD_RM 89 75
-wDLKxXpF_sE 165 75
-v78nl9Pd_3s 91 75
-MG86IFZi_XM 190 75
-8oDdmpfe_fE 125 75
-mswTaeB4_Rg 81 75
-kQCn-uR5_Pg 104 75
-yIGcW4nt_Vw 142 75
-eVKEH-yV_rI 123 75
-j1f7wotR_CQ 140 75
-0c-37ReL_cE 78 75
-logging outputs to  /home/zhouyufan/Projects/PDPP/log/log_mlp_note9_20240729201419_coin
-total_mlp:   0%|          | 0/70 [00:00<?, ?it/s]total_mlp:   1%|▏         | 1/70 [00:03<03:46,  3.29s/it]lrs:
-8.571428571428573e-06
----------------------------------
-/home/zhouyufan/Projects/PDPP/train_mlp.py:473: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  return torch.tensor(losses.avg), torch.tensor(acc)
-total_mlp:   3%|▎         | 2/70 [00:06<03:51,  3.41s/it]total_mlp:   4%|▍         | 3/70 [00:09<03:40,  3.29s/it]lrs:
-2.5714285714285714e-05
----------------------------------
-total_mlp:   6%|▌         | 4/70 [00:13<03:53,  3.54s/it]total_mlp:   7%|▋         | 5/70 [00:17<03:41,  3.40s/it]lrs:
-4.2857142857142856e-05
----------------------------------
-total_mlp:   9%|▊         | 6/70 [00:20<03:35,  3.37s/it]total_mlp:  10%|█         | 7/70 [00:23<03:25,  3.26s/it]lrs:
-6e-05
----------------------------------
-total_mlp:  11%|█▏        | 8/70 [00:27<03:38,  3.53s/it]total_mlp:  13%|█▎        | 9/70 [00:30<03:31,  3.47s/it]lrs:
-7.714285714285714e-05
----------------------------------
-total_mlp:  14%|█▍        | 10/70 [00:34<03:27,  3.45s/it]total_mlp:  16%|█▌        | 11/70 [00:36<03:09,  3.21s/it]lrs:
-9.428571428571429e-05
----------------------------------
-total_mlp:  17%|█▋        | 12/70 [00:40<03:19,  3.43s/it]total_mlp:  19%|█▊        | 13/70 [00:44<03:15,  3.43s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  20%|██        | 14/70 [00:48<03:23,  3.63s/it]total_mlp:  21%|██▏       | 15/70 [00:51<03:06,  3.38s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  23%|██▎       | 16/70 [00:54<03:02,  3.38s/it]total_mlp:  24%|██▍       | 17/70 [00:57<02:58,  3.36s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  26%|██▌       | 18/70 [01:01<03:05,  3.56s/it]total_mlp:  27%|██▋       | 19/70 [01:04<02:55,  3.43s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  29%|██▊       | 20/70 [01:08<02:50,  3.41s/it]total_mlp:  30%|███       | 21/70 [01:11<02:42,  3.32s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  31%|███▏      | 22/70 [01:15<02:51,  3.58s/it]total_mlp:  33%|███▎      | 23/70 [01:19<02:44,  3.51s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  34%|███▍      | 24/70 [01:22<02:42,  3.53s/it]total_mlp:  36%|███▌      | 25/70 [01:25<02:29,  3.32s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  37%|███▋      | 26/70 [01:29<02:33,  3.49s/it]total_mlp:  39%|███▊      | 27/70 [01:32<02:28,  3.46s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  40%|████      | 28/70 [01:36<02:28,  3.53s/it]total_mlp:  41%|████▏     | 29/70 [01:39<02:17,  3.36s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  43%|████▎     | 30/70 [01:42<02:14,  3.35s/it]total_mlp:  44%|████▍     | 31/70 [01:46<02:12,  3.39s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  46%|████▌     | 32/70 [01:50<02:15,  3.56s/it]total_mlp:  47%|████▋     | 33/70 [01:52<02:04,  3.36s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  49%|████▊     | 34/70 [01:56<02:00,  3.35s/it]total_mlp:  50%|█████     | 35/70 [01:59<01:53,  3.23s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  51%|█████▏    | 36/70 [02:03<01:56,  3.42s/it]total_mlp:  53%|█████▎    | 37/70 [02:06<01:48,  3.30s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  54%|█████▍    | 38/70 [02:09<01:45,  3.28s/it]total_mlp:  56%|█████▌    | 39/70 [02:12<01:40,  3.23s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  57%|█████▋    | 40/70 [02:16<01:40,  3.34s/it]total_mlp:  59%|█████▊    | 41/70 [02:19<01:36,  3.31s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  60%|██████    | 42/70 [02:22<01:32,  3.29s/it]total_mlp:  61%|██████▏   | 43/70 [02:25<01:24,  3.13s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  63%|██████▎   | 44/70 [02:28<01:23,  3.23s/it]total_mlp:  64%|██████▍   | 45/70 [02:32<01:20,  3.22s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  66%|██████▌   | 46/70 [02:35<01:20,  3.36s/it]total_mlp:  67%|██████▋   | 47/70 [02:38<01:14,  3.22s/it]lrs:
-2.5e-05
----------------------------------
-total_mlp:  69%|██████▊   | 48/70 [02:41<01:11,  3.24s/it]total_mlp:  70%|███████   | 49/70 [02:44<01:05,  3.12s/it]lrs:
-2.5e-05
----------------------------------
-total_mlp:  71%|███████▏  | 50/70 [02:48<01:06,  3.34s/it]total_mlp:  73%|███████▎  | 51/70 [02:51<01:01,  3.25s/it]lrs:
-2.5e-05
----------------------------------
-total_mlp:  74%|███████▍  | 52/70 [02:54<00:59,  3.29s/it]total_mlp:  76%|███████▌  | 53/70 [02:57<00:54,  3.20s/it]lrs:
-2.5e-05
----------------------------------
-total_mlp:  77%|███████▋  | 54/70 [03:01<00:51,  3.21s/it]total_mlp:  79%|███████▊  | 55/70 [03:04<00:50,  3.34s/it]lrs:
-2.5e-05
----------------------------------
-total_mlp:  80%|████████  | 56/70 [03:08<00:47,  3.42s/it]total_mlp:  81%|████████▏ | 57/70 [03:11<00:42,  3.28s/it]lrs:
-2.5e-05
----------------------------------
-total_mlp:  83%|████████▎ | 58/70 [03:15<00:42,  3.56s/it]total_mlp:  84%|████████▍ | 59/70 [03:19<00:38,  3.55s/it]lrs:
-2.5e-05
----------------------------------
-total_mlp:  86%|████████▌ | 60/70 [03:23<00:38,  3.83s/it]total_mlp:  87%|████████▋ | 61/70 [03:27<00:34,  3.80s/it]lrs:
-2.5e-05
----------------------------------
-total_mlp:  89%|████████▊ | 62/70 [03:31<00:31,  3.97s/it]total_mlp:  90%|█████████ | 63/70 [03:35<00:27,  3.87s/it]lrs:
-2.5e-05
----------------------------------
-total_mlp:  91%|█████████▏| 64/70 [03:39<00:23,  3.96s/it]total_mlp:  93%|█████████▎| 65/70 [03:43<00:19,  3.86s/it]lrs:
-1.25e-05
----------------------------------
-total_mlp:  94%|█████████▍| 66/70 [03:47<00:16,  4.01s/it]total_mlp:  96%|█████████▌| 67/70 [03:51<00:11,  3.91s/it]lrs:
-1.25e-05
----------------------------------
-total_mlp:  97%|█████████▋| 68/70 [03:55<00:08,  4.02s/it]total_mlp:  99%|█████████▊| 69/70 [03:59<00:03,  3.90s/it]lrs:
-1.25e-05
----------------------------------
-total_mlp: 100%|██████████| 70/70 [04:03<00:00,  4.01s/it]total_mlp: 100%|██████████| 70/70 [04:03<00:00,  3.48s/it]
