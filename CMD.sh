@@ -13,7 +13,8 @@ nohup python train_mlp.py --name=note10 --dataset=NIV --gpu=7 > out/output_note1
 
 python temp.py --num_thread_reader=1 --resume --dataset=crosstask_base \
        --batch_size=32 --batch_size_val=32 \
-       --ckpt_path=/home/zhouyufan/Projects/PDPP/save_max_mlp/epoch_test_new_mlp_0068.pth.tar --gpu=6
+       --ckpt_path=/home/zhouyufan/Projects/PDPP/save_max_mlp/epoch_test_new_mlp_0092.pth.tar --gpu=6
 
 
-nohup python train_mlp.py --name=test_new_mlp --dataset=crosstask_base --gpu=4 > out/output_test_new_mlp.log 2>&1 &
+nohup python train_mlp.py --name=test_new_mlp --dataset=crosstask_base \
+      --epochs=140 --gpu=4 > out/output_test_new_mlp.log 2>&1 &

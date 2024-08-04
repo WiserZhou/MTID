@@ -31,56 +31,56 @@ def cycle(dl):
             yield data
 
 
-class head(nn.Module):
-    def __init__(self, input_dim, output_dim):
-        super(head, self).__init__()
+# class head(nn.Module):
+#     def __init__(self, input_dim, output_dim):
+#         super(head, self).__init__()
 
-        # Define the CNN layers with Batch Normalization
-        self.conv1 = nn.Conv1d(
-            in_channels=2, out_channels=64, kernel_size=3, stride=1, padding=1)
-        self.bn1 = nn.BatchNorm1d(64)
-        self.conv2 = nn.Conv1d(
-            in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1)
-        self.bn2 = nn.BatchNorm1d(128)
-        self.conv3 = nn.Conv1d(
-            in_channels=128, out_channels=256, kernel_size=3, stride=1, padding=1)
-        self.bn3 = nn.BatchNorm1d(256)
-        self.conv4 = nn.Conv1d(
-            in_channels=256, out_channels=512, kernel_size=3, stride=1, padding=1)
-        self.bn4 = nn.BatchNorm1d(512)
+#         # Define the CNN layers with Batch Normalization
+#         self.conv1 = nn.Conv1d(
+#             in_channels=2, out_channels=64, kernel_size=3, stride=1, padding=1)
+#         self.bn1 = nn.BatchNorm1d(64)
+#         self.conv2 = nn.Conv1d(
+#             in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1)
+#         self.bn2 = nn.BatchNorm1d(128)
+#         self.conv3 = nn.Conv1d(
+#             in_channels=128, out_channels=256, kernel_size=3, stride=1, padding=1)
+#         self.bn3 = nn.BatchNorm1d(256)
+#         self.conv4 = nn.Conv1d(
+#             in_channels=256, out_channels=512, kernel_size=3, stride=1, padding=1)
+#         self.bn4 = nn.BatchNorm1d(512)
 
-        self.pool = nn.MaxPool1d(kernel_size=2, stride=2, padding=0)
+#         self.pool = nn.MaxPool1d(kernel_size=2, stride=2, padding=0)
 
-        # Calculate the size of the flattened feature map after the final pooling layer
-        self.feature_map_dim = 512 * (input_dim // (2**4))
+#         # Calculate the size of the flattened feature map after the final pooling layer
+#         self.feature_map_dim = 512 * (input_dim // (2**4))
 
-        # Define the fully connected layers
-        self.fc1 = nn.Linear(self.feature_map_dim, 1024)
-        self.fc2 = nn.Linear(1024, 512)
-        self.fc3 = nn.Linear(512, output_dim)
+#         # Define the fully connected layers
+#         self.fc1 = nn.Linear(self.feature_map_dim, 1024)
+#         self.fc2 = nn.Linear(1024, 512)
+#         self.fc3 = nn.Linear(512, output_dim)
 
-        # Define dropout layer to avoid overfitting
-        self.dropout = nn.Dropout(0.5)
+#         # Define dropout layer to avoid overfitting
+#         self.dropout = nn.Dropout(0.5)
 
-    def forward(self, x):
-        # Apply CNN layers with ReLU, BatchNorm and MaxPooling
-        x = self.pool(F.relu(self.bn1(self.conv1(x))))
-        x = self.pool(F.relu(self.bn2(self.conv2(x))))
-        x = self.pool(F.relu(self.bn3(self.conv3(x))))
-        x = self.pool(F.relu(self.bn4(self.conv4(x))))
+#     def forward(self, x):
+#         # Apply CNN layers with ReLU, BatchNorm and MaxPooling
+#         x = self.pool(F.relu(self.bn1(self.conv1(x))))
+#         x = self.pool(F.relu(self.bn2(self.conv2(x))))
+#         x = self.pool(F.relu(self.bn3(self.conv3(x))))
+#         x = self.pool(F.relu(self.bn4(self.conv4(x))))
 
-        # Flatten the output from CNN layers
-        x = x.view(x.size(0), -1)
+#         # Flatten the output from CNN layers
+#         x = x.view(x.size(0), -1)
 
-        # Apply fully connected layers with ReLU and Dropout
-        x = F.relu(self.fc1(x))
-        x = self.dropout(x)
-        x = F.relu(self.fc2(x))
-        x = self.dropout(x)
+#         # Apply fully connected layers with ReLU and Dropout
+#         x = F.relu(self.fc1(x))
+#         x = self.dropout(x)
+#         x = F.relu(self.fc2(x))
+#         x = self.dropout(x)
 
-        # Final output layer
-        x = self.fc3(x)
-        return x
+#         # Final output layer
+#         x = self.fc3(x)
+#         return x
 
 # class head(nn.Module):
 #     def __init__(self, input_dim, output_dim):
@@ -124,6 +124,41 @@ class head(nn.Module):
 #         # print(x.shape)  # torch.Size([256, 18])
 #         # print('-----------end-----------------')
 #         return x
+
+class head(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(head, self).__init__()
+        middle_dim1 = input_dim // 3
+        middle_dim2 = input_dim
+
+        self.fc1 = nn.Linear(input_dim, middle_dim1)
+        self.fc2 = nn.Linear(middle_dim1, middle_dim2)
+        self.fc3 = nn.Linear(middle_dim2, middle_dim1)
+        self.fc4 = nn.Linear(middle_dim1, output_dim)
+
+        self.init_weights()
+        self.dropout = nn.Dropout(0.5)
+        self.relu = nn.ReLU()
+
+    def init_weights(self):
+        nn.init.kaiming_normal_(self.fc1.weight, mode='fan_in')
+        nn.init.constant_(self.fc1.bias, 0.0)
+        nn.init.kaiming_normal_(self.fc2.weight, mode='fan_in')
+        nn.init.constant_(self.fc2.bias, 0.0)
+        nn.init.kaiming_normal_(self.fc3.weight, mode='fan_in')
+        nn.init.constant_(self.fc3.bias, 0.0)
+        nn.init.kaiming_normal_(self.fc4.weight, mode='fan_in')
+        nn.init.constant_(self.fc4.bias, 0.0)
+
+    def forward(self, x):
+        x = self.relu(self.fc1(x))
+        x = self.dropout(x)
+        x = self.relu(self.fc2(x))
+        x = self.dropout(x)
+        x = self.relu(self.fc3(x))
+        x = torch.mean(x, dim=1)
+        x = self.fc4(x)
+        return x
 
 
 class Affine(nn.Module):
@@ -232,6 +267,7 @@ def main():
             is_val=True,
             model=None,
         )
+    args.log_root = '/home/zhouyufan/Projects/PDPP/log_mlp/log'
     args.log_root += '_mlp'
     if args.verbose:
         print(args)
@@ -538,7 +574,8 @@ def train(train_loader, n_train_steps, model, scheduler, args, optimizer, if_cal
 
 
 def log(output, args):
-    with open(os.path.join(os.path.dirname(__file__), args.log_root, args.checkpoint_dir + '.txt'), "a") as f:
+    # print(args.log_root)
+    with open(os.path.join(os.path.dirname(__file__), args.checkpoint_dir + '.txt'), "a") as f:
         f.write(output + '\n')
 
 

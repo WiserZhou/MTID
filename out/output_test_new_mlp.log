@@ -1,5 +1,5 @@
 nohup: ignoring input
-Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log/log_mlp', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='crosstask_base', action_dim=105, observation_dim=9600, class_dim=18, root='/home/zhouyufan/Projects/PDPP/dataset/crosstask', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/train_list.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/test_list.json', json_path_val2='', n_train_steps=200, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='test_new_mlp', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, horizon=3, epochs=70, log_freq=500, gpu=4, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, imageEncoder=0, transformer_num=5, base_model='base')
+Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log_mlp/log_mlp', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='crosstask_base', action_dim=105, observation_dim=9600, class_dim=18, root='/home/zhouyufan/Projects/PDPP/dataset/crosstask', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/train_list.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/test_list.json', json_path_val2='', n_train_steps=200, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='test_new_mlp', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, horizon=3, epochs=140, log_freq=500, gpu=4, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, imageEncoder=0, transformer_num=5, base_model='base')
 crosstask_base
 feature_base
 is_valFalse
@@ -8,60 +8,21 @@ crosstask_base
 feature_base
 is_valTrue
 Loaded /home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/test_list.json
-logging outputs to  /home/zhouyufan/Projects/PDPP/log/log_mlp_test_new_mlp_20240803142614_crosstask_base
-total_mlp:   0%|          | 0/70 [00:00<?, ?it/s]total_mlp:   1%|▏         | 1/70 [01:26<1:39:56, 86.91s/it]lrs:
-8.571428571428573e-06
+logging outputs to  /home/zhouyufan/Projects/PDPP/log_mlp/log_mlp_test_new_mlp_20240804123909_crosstask_base
+total_mlp:   0%|          | 0/140 [00:00<?, ?it/s]total_mlp:   1%|          | 1/140 [00:48<1:52:45, 48.68s/it]lrs:
+4.285714285714286e-06
 ---------------------------------
-/home/zhouyufan/Projects/PDPP/train_mlp.py:534: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+/home/zhouyufan/Projects/PDPP/train_mlp.py:570: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
   return torch.tensor(losses.avg), torch.tensor(acc)
-total_mlp:   3%|▎         | 2/70 [03:17<1:54:09, 100.73s/it]total_mlp:   4%|▍         | 3/70 [04:45<1:46:03, 94.98s/it] lrs:
-2.5714285714285714e-05
+total_mlp:   1%|▏         | 2/140 [01:38<1:53:19, 49.27s/it]total_mlp:   2%|▏         | 3/140 [02:21<1:45:35, 46.25s/it]lrs:
+1.2857142857142857e-05
 ---------------------------------
-total_mlp:   6%|▌         | 4/70 [06:33<1:50:07, 100.11s/it]total_mlp:   7%|▋         | 5/70 [07:50<1:39:34, 91.91s/it] lrs:
-4.2857142857142856e-05
+total_mlp:   3%|▎         | 4/140 [03:11<1:48:11, 47.74s/it]total_mlp:   4%|▎         | 5/140 [03:53<1:42:53, 45.73s/it]lrs:
+2.1428571428571428e-05
 ---------------------------------
-total_mlp:   9%|▊         | 6/70 [09:24<1:38:37, 92.46s/it]total_mlp:  10%|█         | 7/70 [10:49<1:34:33, 90.05s/it]lrs:
-6e-05
+total_mlp:   4%|▍         | 6/140 [04:43<1:45:37, 47.30s/it]total_mlp:   5%|▌         | 7/140 [05:24<1:40:16, 45.24s/it]lrs:
+3e-05
 ---------------------------------
-total_mlp:  11%|█▏        | 8/70 [12:19<1:33:08, 90.13s/it]total_mlp:  13%|█▎        | 9/70 [13:41<1:28:50, 87.39s/it]lrs:
-7.714285714285714e-05
----------------------------------
-total_mlp:  14%|█▍        | 10/70 [15:11<1:28:14, 88.23s/it]total_mlp:  16%|█▌        | 11/70 [16:31<1:24:14, 85.67s/it]lrs:
-9.428571428571429e-05
----------------------------------
-total_mlp:  17%|█▋        | 12/70 [18:08<1:26:21, 89.33s/it]total_mlp:  19%|█▊        | 13/70 [19:26<1:21:25, 85.71s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  20%|██        | 14/70 [20:29<1:13:36, 78.87s/it]total_mlp:  21%|██▏       | 15/70 [21:44<1:11:16, 77.75s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  23%|██▎       | 16/70 [23:10<1:12:22, 80.41s/it]total_mlp:  24%|██▍       | 17/70 [24:28<1:10:12, 79.49s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  26%|██▌       | 18/70 [26:08<1:14:10, 85.58s/it]total_mlp:  27%|██▋       | 19/70 [27:33<1:12:36, 85.42s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  29%|██▊       | 20/70 [29:01<1:11:55, 86.30s/it]total_mlp:  30%|███       | 21/70 [30:25<1:10:00, 85.72s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  31%|███▏      | 22/70 [31:40<1:06:01, 82.52s/it]total_mlp:  33%|███▎      | 23/70 [33:01<1:04:09, 81.91s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  34%|███▍      | 24/70 [34:40<1:06:51, 87.22s/it]total_mlp:  36%|███▌      | 25/70 [36:02<1:04:03, 85.41s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  37%|███▋      | 26/70 [37:42<1:05:58, 89.96s/it]total_mlp:  39%|███▊      | 27/70 [39:05<1:02:54, 87.78s/it]lrs:
-0.0001
----------------------------------
-total_mlp:  40%|████      | 28/70 [40:33<1:01:25, 87.76s/it]total_mlp:  41%|████▏     | 29/70 [41:57<59:18, 86.80s/it]  lrs:
-0.0001
----------------------------------
-total_mlp:  43%|████▎     | 30/70 [43:25<58:09, 87.24s/it]total_mlp:  44%|████▍     | 31/70 [44:35<53:11, 81.83s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  46%|████▌     | 32/70 [46:01<52:38, 83.12s/it]total_mlp:  47%|████▋     | 33/70 [47:20<50:35, 82.05s/it]lrs:
-5e-05
----------------------------------
-total_mlp:  49%|████▊     | 34/70 [48:49<50:22, 83.96s/it]total_mlp:  50%|█████     | 35/70 [50:05<47:39, 81.71s/it]lrs:
-5e-05
+total_mlp:   6%|▌         | 8/140 [06:13<1:41:50, 46.29s/it]total_mlp:   6%|▋         | 9/140 [06:55<1:38:22, 45.06s/it]lrs:
+3.857142857142857e-05
 ---------------------------------
