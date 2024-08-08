@@ -199,7 +199,7 @@ def l2_regularization(model, l2_alpha):
 
 
 class ResMLP(nn.Module):
-    def __init__(self, input=9600, dim=3200, expansion_factor=4, depth=2, class_num=18):
+    def __init__(self, input=9600, dim=3200, expansion_factor=1, depth=2, class_num=18):
         super().__init__()
         def wrapper(i, fn): return PreAffinePostLayerScale(
             dim, i + 1, fn)  # 封装
@@ -354,19 +354,20 @@ def main_worker(gpu, ngpus_per_node, args):
     )
 
     # create model
-    # model = ResMLP(input=args.observation_dim, dim=args.observation_dim, class_num=args.class_dim)
+    model = ResMLP(input=args.observation_dim,
+                   dim=args.observation_dim, class_num=args.class_dim)
 
-    model = head(args.observation_dim, args.class_dim)
+    # model = head(args.observation_dim, args.class_dim)
 
     if args.distributed:
         if args.gpu is not None:
             model.cuda(args.gpu)
             model = torch.nn.parallel.DistributedDataParallel(
-                model, device_ids=[args.gpu], find_unused_parameters=True)
+                model, device_ids=[args.gpu], find_unused_parameters=False)
         else:
             model.cuda()
             model = torch.nn.parallel.DistributedDataParallel(
-                model, find_unused_parameters=True)
+                model, find_unused_parameters=False)
     elif args.gpu is not None:
         model = model.cuda(args.gpu)
     else:

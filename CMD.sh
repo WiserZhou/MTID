@@ -13,8 +13,23 @@ nohup python train_mlp.py --name=note10 --dataset=NIV --gpu=7 > out/output_note1
 
 python temp.py --num_thread_reader=1 --resume --dataset=crosstask_base \
        --batch_size=32 --batch_size_val=32 \
-       --ckpt_path=/home/zhouyufan/Projects/PDPP/save_max_mlp/epoch_test_new_mlp_0092.pth.tar --gpu=6
+       --ckpt_path=/home/zhouyufan/Projects/PDPP/save_max_mlp/epoch_test_new_mlp_0140.pth.tar --gpu=6
 
 
 nohup python train_mlp.py --name=test_new_mlp --dataset=crosstask_base \
+      --batch_size=8 --batch_size_val=8 \
       --epochs=140 --gpu=4 > out/output_test_new_mlp.log 2>&1 &
+
+
+nohup python train_mlp.py --multiprocessing-distributed --batch_size=8 \
+      --batch_size_val=8 --name=test_new_mlp --dataset=crosstask_base \
+      --epochs=140 > out/output_test_new_mlp.log 2>&1 &
+      
+nohup sshpass -p zhoumou123 scp -r raw zhouyufan@10.0.3.227:/home/shenhaoyu/dataset/pytorch_datasets > output_scp.log 2>&1 &
+
+du -sh */
+
+nohup tar -xvf ILSVRC2012_img_val.tar -C val/ > out2.log 2>&1 &
+
+
+
