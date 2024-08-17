@@ -31,133 +31,41 @@ def cycle(dl):
             yield data
 
 
-# class head(nn.Module):
-#     def __init__(self, input_dim, output_dim):
-#         super(head, self).__init__()
+class TransformerHead(nn.Module):
+    def __init__(self, input_dim, output_dim, num_heads=4, num_layers=3, dim_feedforward=1024, dropout=0.3):
+        super(TransformerHead, self).__init__()
 
-#         # Define the CNN layers with Batch Normalization
-#         self.conv1 = nn.Conv1d(
-#             in_channels=2, out_channels=64, kernel_size=3, stride=1, padding=1)
-#         self.bn1 = nn.BatchNorm1d(64)
-#         self.conv2 = nn.Conv1d(
-#             in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1)
-#         self.bn2 = nn.BatchNorm1d(128)
-#         self.conv3 = nn.Conv1d(
-#             in_channels=128, out_channels=256, kernel_size=3, stride=1, padding=1)
-#         self.bn3 = nn.BatchNorm1d(256)
-#         self.conv4 = nn.Conv1d(
-#             in_channels=256, out_channels=512, kernel_size=3, stride=1, padding=1)
-#         self.bn4 = nn.BatchNorm1d(512)
+        self.embedding = nn.Linear(input_dim, dim_feedforward)
 
-#         self.pool = nn.MaxPool1d(kernel_size=2, stride=2, padding=0)
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=dim_feedforward,  # 这里 `d_model` 和 `dim_feedforward` 都设置为同一个值
+            nhead=num_heads,          # 注意力头的数量
+            dim_feedforward=dim_feedforward,  # 前馈网络内部的维度
+            dropout=dropout           # Dropout 概率
+        )
+        self.transformer = nn.TransformerEncoder(
+            encoder_layer, num_layers=num_layers)
 
-#         # Calculate the size of the flattened feature map after the final pooling layer
-#         self.feature_map_dim = 512 * (input_dim // (2**4))
+        self.fc1 = nn.Linear(dim_feedforward, dim_feedforward // 2)
+        self.fc2 = nn.Linear(dim_feedforward // 2, output_dim)
 
-#         # Define the fully connected layers
-#         self.fc1 = nn.Linear(self.feature_map_dim, 1024)
-#         self.fc2 = nn.Linear(1024, 512)
-#         self.fc3 = nn.Linear(512, output_dim)
-
-#         # Define dropout layer to avoid overfitting
-#         self.dropout = nn.Dropout(0.5)
-
-#     def forward(self, x):
-#         # Apply CNN layers with ReLU, BatchNorm and MaxPooling
-#         x = self.pool(F.relu(self.bn1(self.conv1(x))))
-#         x = self.pool(F.relu(self.bn2(self.conv2(x))))
-#         x = self.pool(F.relu(self.bn3(self.conv3(x))))
-#         x = self.pool(F.relu(self.bn4(self.conv4(x))))
-
-#         # Flatten the output from CNN layers
-#         x = x.view(x.size(0), -1)
-
-#         # Apply fully connected layers with ReLU and Dropout
-#         x = F.relu(self.fc1(x))
-#         x = self.dropout(x)
-#         x = F.relu(self.fc2(x))
-#         x = self.dropout(x)
-
-#         # Final output layer
-#         x = self.fc3(x)
-#         return x
-
-# class head(nn.Module):
-#     def __init__(self, input_dim, output_dim):
-#         super(head, self).__init__()
-#         middle_dim1 = input_dim // 3
-#         middle_dim2 = input_dim * 4
-#         self.fc1 = nn.Linear(input_dim, middle_dim1)
-#         self.fc2 = nn.Linear(middle_dim1, middle_dim2)
-#         self.fc3 = nn.Linear(middle_dim2, middle_dim1)
-#         self.fc4 = nn.Linear(middle_dim1, output_dim)
-
-#         # # nn.init.xavier_normal_(self.fc.weight)
-#         torch.nn.init.kaiming_normal_(self.fc1.weight, mode='fan_in')
-#         torch.nn.init.constant_(self.fc1.bias, 0.0)
-#         torch.nn.init.kaiming_normal_(self.fc2.weight, mode='fan_in')
-#         torch.nn.init.constant_(self.fc2.bias, 0.0)
-#         torch.nn.init.kaiming_normal_(self.fc3.weight, mode='fan_in')
-#         torch.nn.init.constant_(self.fc3.bias, 0.0)
-#         torch.nn.init.kaiming_normal_(self.fc4.weight, mode='fan_in')
-#         torch.nn.init.constant_(self.fc4.bias, 0.0)
-#         self.dropout = nn.Dropout(0.)
-
-#     def forward(self, x):
-
-#         # print(x.device)
-#         # print('-----------start--------------')
-#         # print(x.shape)  # torch.Size([256, 2, 9600])
-#         x = self.fc1(x)
-#         # print(x.shape)  # torch.Size([256, 2, 3200])
-#         x = self.fc2(x)
-#         # print(x.shape)  # torch.Size([256, 2, 38400])
-#         x = torch.nn.functional.relu(x)
-#         # print(x.shape)  # torch.Size([256, 2, 38400])
-#         x = self.fc3(x)
-#         # print(x.shape)  # torch.Size([256, 2, 3200])
-#         x = torch.nn.functional.relu(x)
-#         # print(x.shape)  # torch.Size([256, 2, 3200])
-#         x = torch.mean(x, dim=1)
-#         # print(x.shape)  # torch.Size([256, 3200])
-#         x = self.fc4(x)
-#         # print(x.shape)  # torch.Size([256, 18])
-#         # print('-----------end-----------------')
-#         return x
-
-class head(nn.Module):
-    def __init__(self, input_dim, output_dim):
-        super(head, self).__init__()
-        middle_dim1 = input_dim // 3
-        middle_dim2 = input_dim
-
-        self.fc1 = nn.Linear(input_dim, middle_dim1)
-        self.fc2 = nn.Linear(middle_dim1, middle_dim2)
-        self.fc3 = nn.Linear(middle_dim2, middle_dim1)
-        self.fc4 = nn.Linear(middle_dim1, output_dim)
-
-        self.init_weights()
-        self.dropout = nn.Dropout(0.5)
+        self.dropout = nn.Dropout(dropout)
         self.relu = nn.ReLU()
 
-    def init_weights(self):
-        nn.init.kaiming_normal_(self.fc1.weight, mode='fan_in')
-        nn.init.constant_(self.fc1.bias, 0.0)
-        nn.init.kaiming_normal_(self.fc2.weight, mode='fan_in')
-        nn.init.constant_(self.fc2.bias, 0.0)
-        nn.init.kaiming_normal_(self.fc3.weight, mode='fan_in')
-        nn.init.constant_(self.fc3.bias, 0.0)
-        nn.init.kaiming_normal_(self.fc4.weight, mode='fan_in')
-        nn.init.constant_(self.fc4.bias, 0.0)
-
     def forward(self, x):
-        x = self.relu(self.fc1(x))
+        x = self.embedding(x)
+        x = self.relu(x)
         x = self.dropout(x)
-        x = self.relu(self.fc2(x))
+
+        x = x.permute(1, 0, 2)
+        x = self.transformer(x)
+        x = torch.mean(x, dim=0)
+
+        x = self.fc1(x)
+        x = self.relu(x)
         x = self.dropout(x)
-        x = self.relu(self.fc3(x))
-        x = torch.mean(x, dim=1)
-        x = self.fc4(x)
+
+        x = self.fc2(x)
         return x
 
 
@@ -354,8 +262,10 @@ def main_worker(gpu, ngpus_per_node, args):
     )
 
     # create model
-    model = ResMLP(input=args.observation_dim,
-                   dim=args.observation_dim, class_num=args.class_dim)
+    # input_dim, output_dim, num_heads=4, num_layers=2, dim_feedforward=2048, dropout=0.5
+    model = TransformerHead(
+        input_dim=args.observation_dim, output_dim=args.class_dim, num_heads=args.num_heads,
+        num_layers=args.num_layers, dim_feedforward=args.dim_feedforward, dropout=args.dropout)
 
     # model = head(args.observation_dim, args.class_dim)
 
@@ -549,8 +459,12 @@ def train(train_loader, n_train_steps, model, scheduler, args, optimizer, if_cal
                 observations[:, 0, :] = global_img_tensors[:, 0, :]
                 observations[:, 1, :] = global_img_tensors[:, -1, :]
 
-                task_s = model(observations.cuda())  # [bs, 18]
-                task_class_one_hot = task_class
+                # [bs, 18] #[ 0.1, 0.3, , ,, , , ,,, , ....]
+                task_s = model(observations.cuda())
+                task_class_one_hot = task_class  # [1,0,0,0,0,0,0]\
+                # [1,0,0,0,0,0,0]``
+                # [1,0,0,0,0,0,0]
+                # [1,0,0,0,0,0,0]
 
                 # loss = F.mse_loss(task_s, task_class_one_hot.cuda())
                 loss = F.cross_entropy(task_s, task_class_one_hot.cuda())

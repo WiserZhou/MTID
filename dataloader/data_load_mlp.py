@@ -30,6 +30,7 @@ def get_vids_from_json(path):
         vid = i['vid']
         if task not in task_vids:
             task_vids[task] = []
+        # task->vid
         task_vids[task].append(vid)
     return task_vids
 
@@ -51,7 +52,7 @@ def read_task_info(path):
     n_steps = {}
     steps = {}
     with open(path, 'r') as f:
-        idx = f.readline()
+        idx = f.readline()  # this idx is task_class id
         while idx != '':
             idx = idx.strip()
             titles[idx] = f.readline().strip()
@@ -192,7 +193,8 @@ class PlanningDataset(Dataset):
                 for idx in range(len(all_vids)):
                     task, vid = all_vids[idx]
 
-                    # Determine the path to the video features based on whether the crosstask_use_feature_how flag is set
+                    # Determine the path to the video features based on whether the
+                    # crosstask_use_feature_how flag is set
                     if self.crosstask_use_feature_how:
                         video_path = os.path.join(
                             self.features_path, str(task) + '_' + str(vid) + '.npy')
@@ -201,6 +203,7 @@ class PlanningDataset(Dataset):
                             self.features_path, str(vid) + '.npy')
 
                     # Process the video to get the legal range of frames
+                    # (start_idx, end_idx, action_label)
                     legal_range = self.process_single(task, vid)
                     if not legal_range:
                         # If there is no valid legal range, skip this video
@@ -380,43 +383,71 @@ class PlanningDataset(Dataset):
         self.M = 3
 
     def process_single(self, task, vid):
+        # Check if cross-task feature usage is enabled
         if self.crosstask_use_feature_how:
-            if not os.path.exists(os.path.join(self.features_path, str(task) + '_' + str(vid) + '.npy')):
+            # Construct the file path for the specific task and video combination
+            feature_file = os.path.join(
+                self.features_path, str(task) + '_' + str(vid) + '.npy')
+            # Check if the feature file exists; if not, return False
+            if not os.path.exists(feature_file):
                 return False
-            images_ = np.load(os.path.join(self.features_path, str(
-                task) + '_' + str(vid) + '.npy'), allow_pickle=True)
+            # Load the features from the .npy file
+            images_ = np.load(feature_file, allow_pickle=True)
+            # Extract the 'frames_features' data from the loaded array
             images = images_['frames_features']
         else:
-            if not os.path.exists(os.path.join(self.features_path, vid + '.npy')):
+            # Construct the file path for the video without the task identifier
+            feature_file = os.path.join(self.features_path, vid + '.npy')
+            # Check if the feature file exists; if not, return False
+            if not os.path.exists(feature_file):
                 return False
-            images = np.load(os.path.join(self.features_path, vid + '.npy'))
+            # Load the features from the .npy file
+            images = np.load(feature_file)
 
+        # Construct the path to the constraints file associated with the task and video
         cnst_path = os.path.join(
             self.constraints_path, task + '_' + vid + '.csv')
+        # Read the legal range of assignments from the constraints file
         legal_range = self.read_assignment(task, cnst_path)
         legal_range_ret = []
+
+        # Iterate over each tuple of start index, end index, and action label in the legal range
         for (start_idx, end_idx, action_label) in legal_range:
+            # Check if the start index is within the bounds of the image array
             if not start_idx < images.shape[0]:
+                # If not, print debug information and return False
                 print(task, vid, end_idx, images.shape[0])
                 return False
+            # If the end index is within bounds, append the full range to the results
             if end_idx < images.shape[0]:
                 legal_range_ret.append((start_idx, end_idx, action_label))
             else:
+                # Otherwise, adjust the end index to the last available frame and append
                 legal_range_ret.append(
                     (start_idx, images.shape[0] - 1, action_label))
 
+        # Return the list of adjusted legal ranges
         return legal_range_ret
 
     def read_assignment(self, task_id, path):
+        # Initialize an empty list to store the legal ranges
         legal_range = []
+
+        # Open the constraints file for reading
         with open(path, 'r') as f:
+            # Iterate over each line in the file
             for line in f:
+                # Split the line into components: step, start, and end
                 step, start, end = line.strip().split(',')
+                # Convert start and end to integers after flooring and ceiling the float values, respectively
                 start = int(math.floor(float(start)))
                 end = int(math.ceil(float(end)))
+                # Retrieve the action label index from the one-hot encoded labels using the task_id and step
                 action_label_ind = self.action_one_hot[task_id + '_' + step]
+                # Append a tuple of (start, end, action_label_ind) to the legal_range list
                 legal_range.append((start, end, action_label_ind))
 
+        # Return the list of legal ranges with their corresponding action labels
         return legal_range
 
     def prepare_data(self):

@@ -1,0 +1,23 @@
+nohup: ignoring input
+/home/zhouyufan/anaconda3/envs/ZYF/lib/python3.10/site-packages/torch/nn/modules/transformer.py:306: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
+Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log_mlp/log_mlp', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='NIV', action_dim=48, observation_dim=1536, class_dim=5, root='/home/zhouyufan/Projects/PDPP/dataset/NIV', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/NIV/train70.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/NIV/test30.json', json_path_val2='', n_train_steps=200, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='note3', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, horizon=3, epochs=160, log_freq=500, gpu=4, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, imageEncoder=0, transformer_num=5, base_model='base', num_heads=4, num_layers=2, dim_feedforward=1024, dropout=0.4)
+NIV
+Loaded /home/zhouyufan/Projects/PDPP/dataset/NIV/train70.json
+NIV
+Loaded /home/zhouyufan/Projects/PDPP/dataset/NIV/test30.json
+logging outputs to  /home/zhouyufan/Projects/PDPP/log_mlp/log_mlp_note3_20240817142336_NIV
+total_mlp:   0%|          | 0/160 [00:00<?, ?it/s]total_mlp:   1%|          | 1/160 [00:26<1:11:31, 26.99s/it]lrs:
+3.750000000000001e-06
+---------------------------------
+/home/zhouyufan/Projects/PDPP/train_mlp.py:485: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(losses.avg), torch.tensor(acc)
+total_mlp:   1%|▏         | 2/160 [00:54<1:12:14, 27.43s/it]total_mlp:   2%|▏         | 3/160 [01:17<1:06:42, 25.49s/it]lrs:
+1.125e-05
+---------------------------------
+total_mlp:   2%|▎         | 4/160 [01:41<1:04:23, 24.77s/it]total_mlp:   3%|▎         | 5/160 [02:05<1:03:38, 24.64s/it]lrs:
+1.8750000000000002e-05
+---------------------------------
+total_mlp:   4%|▍         | 6/160 [02:32<1:04:37, 25.18s/it]total_mlp:   4%|▍         | 7/160 [02:57<1:04:05, 25.14s/it]lrs:
+2.625e-05
+---------------------------------

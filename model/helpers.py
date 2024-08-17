@@ -230,6 +230,11 @@ def condition_projection(x, conditions, action_dim, class_dim):
         if t != 'task':
             x[:, t, class_dim + action_dim:] = val.clone()
 
+    # def mask(x[:, :, :class_dim], x[:, :, class_dim:class_dim+action_dim]):
+    #     task_class = find(x[:, :, :class_dim])
+    #     action_one_hot = transform_find(task_class)
+    #     x[:, :, class_dim:class_dim+action_dim][action_one_hot] = 0
+
     # set the observation to zero except for start and end
     x[:, 1:-1, class_dim + action_dim:] = 0.
     x[:, :, :class_dim] = conditions['task']

@@ -162,16 +162,16 @@ class Trainer(object):
                     (bs, T, args.class_dim + args.action_dim + args.observation_dim))
 
                 img_tensors[:, 0, args.class_dim +
-                            args.action_dim:] = global_img_tensors[:, 0, :]
+                            args.action_dim:] = global_img_tensors[:, 0, :]  # Os
                 img_tensors[:, -1, args.class_dim +
-                            args.action_dim:] = global_img_tensors[:, -1, :]
+                            args.action_dim:] = global_img_tensors[:, -1, :]  # Og
 
                 img_tensors = img_tensors.cuda()
 
                 # Prepare labels and one-hot task encodings
 
                 # Flatten video labels to a 1D tensor and move it to GPU. Shape: [batch_size * T]
-                video_label = batch[1].view(-1).cuda()
+                video_label = batch[1].view(-1).cuda()  # action label
 
                 # Flatten task class labels to a 1D tensor and move it to GPU. Shape: [batch_size]
                 task_class = batch[2].view(-1).cuda()

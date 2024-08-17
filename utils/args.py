@@ -189,5 +189,19 @@ def get_args(description='whl'):
     parser.add_argument('--base_model', type=str,
                         default='base', help='predictor')
 
+    # train_mlp
+    # d_model: 必须大于 0。
+    # nhead: 必须大于 0，并且能够整除 d_model。这是因为每个注意力头的维度是 d_model / nhead，所以 d_model 必须能够被 nhead 整除。
+    # dim_feedforward: 必须大于 0。通常情况下，dim_feedforward 的值会比 d_model 大。
+    # dropout: 必须在 0 到 1 之间。
+    #  d_model=dim_feedforward,  # 这里 `d_model` 和 `dim_feedforward` 都设置为同一个值
+    #         nhead=num_heads,          # 注意力头的数量
+    #         dim_feedforward=dim_feedforward,  # 前馈网络内部的维度
+    #         dropout=dropout           # Dropout 概率
+    parser.add_argument('--num_heads', type=int, default=4)
+    parser.add_argument('--num_layers', type=int, default=2)
+    parser.add_argument('--dim_feedforward', type=int, default=1024)
+    parser.add_argument('--dropout', type=float, default=0.4)
+
     args = parser.parse_args()
     return args

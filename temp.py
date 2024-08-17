@@ -13,8 +13,9 @@ import numpy as np
 from data_load_json import PlanningDataset
 from utils import *
 from utils.args import get_args
-from train_mlp import ResMLP, head
+from train_mlp import ResMLP, TransformerHead
 from utils.load_dim import get_environment_shape
+from tqdm import tqdm
 
 
 def main():
@@ -79,8 +80,9 @@ def main_worker(gpu, ngpus_per_node, args):
     )
 
     # create model
-    model = ResMLP(input=args.observation_dim,
-                   dim=args.observation_dim, class_num=args.class_dim)
+    model = TransformerHead(
+        input_dim=args.observation_dim, output_dim=args.class_dim, num_heads=args.num_heads,
+        num_layers=args.num_layers, dim_feedforward=args.dim_feedforward, dropout=args.dropout)
     # model = head(args.observation_dim, args.class_dim)
 
     if args.distributed:
@@ -114,7 +116,7 @@ def main_worker(gpu, ngpus_per_node, args):
     correct = 0
 
     # Iterate over the length of the test dataset
-    for i in range(len(test_dataset)):
+    for i in tqdm(range(len(test_dataset)), desc='inference'):
         # Load the frames, video names, and frame counts from the test dataset
         frames_t, vid_names, frame_cnts = test_dataset[i]
 
