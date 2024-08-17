@@ -100,7 +100,7 @@ def main_worker(gpu, ngpus_per_node, args):
     args.gpu = gpu
 
     # deploy the specific dataset
-    env_dict = get_environment_shape(args.dataset)
+    env_dict = get_environment_shape(args.dataset, args.horizon)
     args.action_dim = env_dict['action_dim']
     args.observation_dim = env_dict['observation_dim']
     args.class_dim = env_dict['class_dim']

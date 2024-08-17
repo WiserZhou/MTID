@@ -138,12 +138,6 @@ def get_args(description='whl'):
                         help='checkpoint path for max')
     parser.add_argument('--dist_port', default=21712, type=int,
                         help='port used to set up distributed training')
-    parser.add_argument('--horizon',
-                        type=int,
-                        default=3,
-                        help='')
-    parser.add_argument('--epochs', default=70, type=int, metavar='N',
-                        help='number of total epochs to run')
     parser.add_argument('--log_freq',
                         type=int,
                         default=500,
@@ -203,5 +197,11 @@ def get_args(description='whl'):
     parser.add_argument('--dim_feedforward', type=int, default=1024)
     parser.add_argument('--dropout', type=float, default=0.4)
 
+    parser.add_argument('--horizon',
+                        type=int,
+                        default=3,
+                        help='')
+    parser.add_argument('--epochs', default=70, type=int, metavar='N',
+                        help='number of total epochs to run')
     args = parser.parse_args()
     return args

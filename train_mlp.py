@@ -149,7 +149,7 @@ def main():
     args = get_args()
 
     # deploy the specific dataset
-    env_dict = get_environment_shape(args.dataset)
+    env_dict = get_environment_shape(args.dataset,args.horizon)
     args.action_dim = env_dict['action_dim']
     args.observation_dim = env_dict['observation_dim']
     args.class_dim = env_dict['class_dim']
@@ -189,6 +189,8 @@ def main():
 
     args.distributed = args.world_size > 1 or args.multiprocessing_distributed
     ngpus_per_node = torch.cuda.device_count()
+
+    print(args)
 
     if args.multiprocessing_distributed:
         args.world_size = ngpus_per_node * args.world_size
@@ -334,11 +336,16 @@ def main_worker(gpu, ngpus_per_node, args):
     old_max_epoch = 0
     save_max = os.path.join(os.path.dirname(__file__), 'save_max_mlp')
 
+    max_train_acc = 0
+    max_test_acc = 0
+
     for epoch in tqdm(range(args.start_epoch, args.epochs), desc='total_mlp'):
         if args.distributed:
             train_sampler.set_epoch(epoch)
         if (epoch + 1) % 2 == 0 and args.evaluate:
             losses, acc = test(test_loader, model)
+
+            max_test_acc = max(max_test_acc, acc)
 
             losses_reduced = reduce_tensor(losses.cuda()).item()
             acc_reduced = reduce_tensor(acc.cuda()).item()
@@ -369,6 +376,9 @@ def main_worker(gpu, ngpus_per_node, args):
         if (epoch + 1) % 2 == 0:  # calculate on training set
             losses, acc_top1 = train(
                 train_loader, args.n_train_steps, model, scheduler, args, optimizer, True)
+
+            max_train_acc = max(max_train_acc, acc_top1)
+
             losses_reduced = reduce_tensor(losses.cuda()).item()
             acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
 
@@ -408,6 +418,8 @@ def main_worker(gpu, ngpus_per_node, args):
                                     "scheduler": scheduler.state_dict(),
                                 }, checkpoint_dir, epoch + 1
                                 )
+    print(f'max_train_acc:{max_train_acc}')
+    print(f'max_test_acc:{max_test_acc}')
 
 
 def test(val_loader, model):

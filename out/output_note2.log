@@ -1,36 +1,22 @@
 nohup: ignoring input
 /home/zhouyufan/anaconda3/envs/ZYF/lib/python3.10/site-packages/torch/nn/modules/transformer.py:306: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
   warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
-Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log_mlp/log_mlp', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='coin', action_dim=778, observation_dim=1536, class_dim=180, root='/home/zhouyufan/Projects/PDPP/dataset/coin', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_train_70.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_test_30.json', json_path_val2='', n_train_steps=200, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='note2', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, horizon=3, epochs=160, log_freq=500, gpu=6, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, imageEncoder=0, transformer_num=5, base_model='base', num_heads=4, num_layers=2, dim_feedforward=1024, dropout=0.4)
+Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log_mlp/log_mlp', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='coin', action_dim=778, observation_dim=1536, class_dim=180, root='/home/zhouyufan/Projects/PDPP/dataset/coin', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_train_70.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_test_30.json', json_path_val2='/home/zhouyufan/Projects/PDPP/dataset/coin/output3.json', n_train_steps=200, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='note2', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, log_freq=500, gpu=2, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, imageEncoder=0, transformer_num=5, base_model='base', num_heads=4, num_layers=2, dim_feedforward=1024, dropout=0.2, horizon=3, epochs=260)
+Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log_mlp/log_mlp', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='coin', action_dim=778, observation_dim=1536, class_dim=180, root='/home/zhouyufan/Projects/PDPP/dataset/coin', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_train_70.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_test_30.json', json_path_val2='/home/zhouyufan/Projects/PDPP/dataset/coin/output3.json', n_train_steps=200, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='note2', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, log_freq=500, gpu=2, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, imageEncoder=0, transformer_num=5, base_model='base', num_heads=4, num_layers=2, dim_feedforward=1024, dropout=0.2, horizon=3, epochs=260, distributed=False)
 coin
 Loaded /home/zhouyufan/Projects/PDPP/dataset/coin/coin_train_70.json
 coin
 Loaded /home/zhouyufan/Projects/PDPP/dataset/coin/coin_test_30.json
-logging outputs to  /home/zhouyufan/Projects/PDPP/log_mlp/log_mlp_note2_20240817142337_coin
-total_mlp:   0%|          | 0/160 [00:00<?, ?it/s]total_mlp:   1%|          | 1/160 [01:53<5:00:31, 113.41s/it]lrs:
-3.750000000000001e-06
+logging outputs to  /home/zhouyufan/Projects/PDPP/log_mlp/log_mlp_note2_20240817164908_coin
+total_mlp:   0%|          | 0/260 [00:00<?, ?it/s]total_mlp:   0%|          | 1/260 [00:45<3:15:37, 45.32s/it]lrs:
+2.307692307692308e-06
 ---------------------------------
-/home/zhouyufan/Projects/PDPP/train_mlp.py:485: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+/home/zhouyufan/Projects/PDPP/train_mlp.py:497: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
   return torch.tensor(losses.avg), torch.tensor(acc)
-total_mlp:   1%|▏         | 2/160 [02:13<2:33:40, 58.36s/it] total_mlp:   2%|▏         | 3/160 [02:16<1:27:15, 33.35s/it]lrs:
-1.125e-05
+total_mlp:   1%|          | 2/260 [01:39<3:36:54, 50.44s/it]total_mlp:   1%|          | 3/260 [02:29<3:35:33, 50.32s/it]lrs:
+6.923076923076923e-06
 ---------------------------------
-total_mlp:   2%|▎         | 4/160 [02:21<56:54, 21.89s/it]  total_mlp:   3%|▎         | 5/160 [02:24<39:37, 15.34s/it]lrs:
-1.8750000000000002e-05
+total_mlp:   2%|▏         | 4/260 [03:24<3:43:16, 52.33s/it]total_mlp:   2%|▏         | 5/260 [04:14<3:37:56, 51.28s/it]lrs:
+1.153846153846154e-05
 ---------------------------------
-total_mlp:   4%|▍         | 6/160 [02:29<29:48, 11.61s/it]total_mlp:   4%|▍         | 7/160 [02:32<22:44,  8.92s/it]lrs:
-2.625e-05
----------------------------------
-total_mlp:   5%|▌         | 8/160 [02:36<18:53,  7.46s/it]total_mlp:   6%|▌         | 9/160 [02:40<15:38,  6.22s/it]lrs:
-3.375000000000001e-05
----------------------------------
-total_mlp:   6%|▋         | 10/160 [02:44<13:52,  5.55s/it]total_mlp:   7%|▋         | 11/160 [02:48<12:17,  4.95s/it]lrs:
-4.1250000000000007e-05
----------------------------------
-total_mlp:   8%|▊         | 12/160 [02:53<12:48,  5.19s/it]total_mlp:   8%|▊         | 13/160 [02:58<12:39,  5.16s/it]lrs:
-4.8750000000000006e-05
----------------------------------
-total_mlp:   9%|▉         | 14/160 [03:05<13:48,  5.68s/it]total_mlp:   9%|▉         | 15/160 [03:11<13:48,  5.71s/it]lrs:
-5.6250000000000005e-05
----------------------------------
-total_mlp:  10%|█         | 16/160 [03:16<13:21,  5.57s/it]
+total_mlp:   2%|▏         | 6/260 [05:10<3:43:32, 52.81s/it]
