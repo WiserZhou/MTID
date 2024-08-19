@@ -1124,3 +1124,43 @@ Starting training loop for rank: 0, total batch size: 256
 Starting training loop for rank: 0, total batch size: 256
 => no checkpoint found at 'False'
 Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 128
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 64
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 64
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 32
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 16
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 8
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 1
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 1

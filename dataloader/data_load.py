@@ -165,11 +165,16 @@ class PlanningDataset(Dataset):
             task_class = folder_id['task_id']
 
         # Load video frames based on the dataset type
-        if self.args.dataset == 'crosstask':
+        if 'crosstask' in self.args.dataset:
             # If the video ID is different from the last one loaded, load new frames
             if folder_id['vid'] != self.last_vid:
                 images_ = np.load(folder_id['feature'], allow_pickle=True)
-                self.images = images_['frames_features']
+
+                if self.args.dataset == 'crosstask_base':
+                    self.images = np.array(images_, dtype=np.float32)
+                else:
+                    self.images = images_['frames_features']
+
                 self.last_vid = folder_id['vid']
         else:
             # Load video frames for other datasets

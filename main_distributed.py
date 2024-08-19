@@ -65,11 +65,14 @@ def main():
     # Set the PYTHONHASHSEED environment variable to ensure reproducibility.
     # This is important when using hash-based operations which might be non-deterministic.
     os.environ['PYTHONHASHSEED'] = str(args.seed)
-
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6'
     # Print the parsed arguments if verbose mode is enabled.
     if args.verbose:
         print(args)
 
+  # 打印环境变量以确认设置
+    # print(f"CUDA_VISIBLE_DEVICES: {os.environ.get('CUDA_VISIBLE_DEVICES')}")
+    # print(f"Number of GPUs visible to PyTorch: {torch.cuda.device_count()}")
     # Set seeds for various random number generators to ensure reproducibility.
     if args.seed is not None:
         random.seed(args.seed)
@@ -77,10 +80,15 @@ def main():
         torch.manual_seed(args.seed)
         torch.cuda.manual_seed_all(args.seed)
 
+    # print(f"CUDA_VISIBLE_DEVICES: {os.environ.get('CUDA_VISIBLE_DEVICES')}")
+    # print(f"Number of GPUs visible to PyTorch: {torch.cuda.device_count()}")
+
     # Determine if the script is running in a distributed setup.
     # This is true if there is more than one GPU available or if multiprocessing is requested.
     args.distributed = args.world_size > 1 or args.multiprocessing_distributed
-    ngpus_per_node = torch.cuda.device_count()
+    ngpus_per_node = 7  # torch.cuda.device_count()
+
+    # print(ngpus_per_node)
 
     # If multiprocessing is requested, adjust the world size accordingly.
     # Spawn multiple processes to handle each GPU, effectively parallelizing the workload.

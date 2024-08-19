@@ -142,7 +142,7 @@ def get_args(description='whl'):
                         type=int,
                         default=500,
                         help='how many steps do we log once')
-    parser.add_argument('--gpu', default=6, type=int,
+    parser.add_argument('--gpu', default=None, type=int,
                         help='GPU id to use.')
 
     # parameters that need to be modified

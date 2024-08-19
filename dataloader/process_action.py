@@ -80,21 +80,30 @@ def get_value_by_key(processed_data, key):
 
 if __name__ == "__main__":
     # 定义路径
-    task_map_path = "/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/actions_one_hot.npy"
-    task_info_path = "/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/tasks_primary.txt"
-    output_path = "/home/zhouyufan/Projects/PDPP/dataloader/processed_data.npy"
+    # task_map_path = "/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/actions_one_hot.npy"
+    # task_info_path = "/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/tasks_primary.txt"
+    # output_path = "/home/zhouyufan/Projects/PDPP/dataloader/processed_data.npy"
 
-    # 处理并保存数据
-    process_and_save(task_map_path, task_info_path, output_path)
+    # # 处理并保存数据
+    # process_and_save(task_map_path, task_info_path, output_path)
 
-    # 加载并查询处理后的数据
-    processed_data = load_processed_data(output_path)
+    # # 加载并查询处理后的数据
+    # processed_data = load_processed_data(output_path)
 
-    specific_key = 5  # 例如查询索引为 5 的数据
-    result = get_value_by_key(processed_data, specific_key)
+    # specific_key = 5  # 例如查询索引为 5 的数据
+    # result = get_value_by_key(processed_data, specific_key)
 
-    if result:
-        print(
-            f"Key: {specific_key}, Title: {result['title']}, Step: {result['step']}")
-    else:
-        print(f"Key {specific_key} not found.")
+    # if result:
+    #     print(
+    #         f"Key: {specific_key}, Title: {result['title']}, Step: {result['step']}")
+    # else:
+    #     print(f"Key {specific_key} not found.")
+    data = np.load(
+        '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_features/_2uFcneXTkc.npy', allow_pickle=True)
+    print(np.array(data, dtype=np.float32))
+
+    print('-------------------------------------------------------')
+
+    data2 = np.load(
+        '/home/zhouyufan/Projects/PDPP/dataset/coin/full_npy/ArcWeld_41_0UcBldDI0RA.npy', allow_pickle=True)
+    print(data2['frames_features'])
