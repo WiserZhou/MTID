@@ -245,6 +245,8 @@ class GaussianDiffusion(nn.Module):
 
         x_recon = self.model(x_noisy, t)  # Reconstruct from noisy input
 
+        # x_recon = x_noisy - x_recon
+
         x_recon = condition_projection(
             x_recon, cond, self.action_dim, self.class_dim)
 

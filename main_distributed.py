@@ -260,6 +260,9 @@ def main_worker(gpu, ngpus_per_node, args):
 
     ckpt_max_path = ''
 
+    max_train_acc = 0
+    max_test_acc = 0
+
     # Main training loop across epochs
     for epoch in tqdm(range(args.start_epoch, args.epochs), desc='total train'):
 
@@ -272,6 +275,9 @@ def main_worker(gpu, ngpus_per_node, args):
             losses, acc_top1, acc_top5, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
                 acc_a0, acc_aT = model.train(
                     args.n_train_steps, True, args, scheduler)
+
+            max_train_acc = max(max_train_acc, trajectory_success_rate_meter)
+
             losses_reduced = reduce_tensor(losses.cuda()).item()
             acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
             acc_top5_reduced = reduce_tensor(acc_top5.cuda()).item()
@@ -318,6 +324,8 @@ def main_worker(gpu, ngpus_per_node, args):
             losses, acc_top1, acc_top5, \
                 trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
                 acc_a0, acc_aT = validate(test_loader, model.ema_model, args)
+
+            max_test_acc = max(max_test_acc, trajectory_success_rate_meter)
 
             losses_reduced = reduce_tensor(losses.cuda()).item()
             acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
@@ -378,6 +386,8 @@ def main_worker(gpu, ngpus_per_node, args):
                                     "scheduler": scheduler.state_dict(),
                                 }, checkpoint_dir, epoch + 1
                                 )
+    print(f'max_train_acc:{max_train_acc}')
+    print(f'max_test_acc:{max_test_acc}')
 
     # add inference
     ckpt_max_path = os.path.join(args.checkpoint_max_root, ckpt_max_path)

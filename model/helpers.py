@@ -242,9 +242,69 @@ def condition_projection(x, conditions, action_dim, class_dim):
     return x
 
 
+def condition_projection_mask(x, conditions, action_dim, class_dim):
+    task_class = {
+        "0": 23521,
+        "1": 59684,
+        "2": 71781,
+        "3": 113766,
+        "4": 105222,
+        "5": 94276,
+        "6": 53193,
+        "7": 105253,
+        "8": 44047,
+        "9": 76400,
+        "10": 16815,
+        "11": 95603,
+        "12": 109972,
+        "13": 44789,
+        "14": 40567,
+        "15": 77721,
+        "16": 87706,
+        "17": 91515,
+    }
+    # clone the observation dim at the start and end
+    for t, val in conditions.items():
+        if t != "task":
+            x[:, t, class_dim + action_dim:] = val.clone()
+
+    task_ids = torch.argmax(conditions["task"], axis=-1)  # (256*3)
+    task_ids = task_ids[:, 0]
+    action_one_hot = np.load(
+        os.path.join(
+            "/home/zhouyufan/Projects/PDPP/dataset/crosstask",
+            "crosstask_release",
+            "actions_one_hot.npy",
+        ),
+        allow_pickle=True,
+    ).item()
+
+    def find_action_index(task_id, action_one_hot):
+        action_indices = []
+        for key, value in action_one_hot.items():
+            # 检查键是否以 task_id 开头
+            if key.startswith(str(task_id) + "_"):
+                action_index = value
+                action_indices.append(action_index)
+        return action_indices
+
+    # set the observation to zero except for start and end
+    x[:, 1:-1, class_dim + action_dim:] = 0.0
+    x[:, :, :class_dim] = conditions["task"]
+    for i in range(len(task_ids)):
+        task_id = str(task_ids[i].item())
+        action_indices = find_action_index(task_class[task_id], action_one_hot)
+        mask = torch.zeros(action_dim)
+        for j in action_indices:
+            mask[j] = 1.0
+        x[i, :, class_dim: class_dim + action_dim] *= mask.cuda()
+
+    return x
+
 # -----------------------------------------------------------------------------#
 # ---------------------------------- Loss -------------------------------------#
 # -----------------------------------------------------------------------------#
+
 
 class Weighted_MSE(nn.Module):
 

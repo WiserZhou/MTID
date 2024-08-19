@@ -1,22 +1,0 @@
-nohup: ignoring input
-/home/zhouyufan/anaconda3/envs/ZYF/lib/python3.10/site-packages/torch/nn/modules/transformer.py:306: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
-  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
-Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log_mlp/log_mlp', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='coin', action_dim=778, observation_dim=1536, class_dim=180, root='/home/zhouyufan/Projects/PDPP/dataset/coin', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_train_70.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_test_30.json', json_path_val2='/home/zhouyufan/Projects/PDPP/dataset/coin/output3.json', n_train_steps=200, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='note4', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, log_freq=500, gpu=4, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, imageEncoder=0, transformer_num=5, base_model='base', num_heads=4, num_layers=2, dim_feedforward=1024, dropout=0.4, horizon=3, epochs=260)
-Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log_mlp/log_mlp', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='coin', action_dim=778, observation_dim=1536, class_dim=180, root='/home/zhouyufan/Projects/PDPP/dataset/coin', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_train_70.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_test_30.json', json_path_val2='/home/zhouyufan/Projects/PDPP/dataset/coin/output3.json', n_train_steps=200, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='note4', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, log_freq=500, gpu=4, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, imageEncoder=0, transformer_num=5, base_model='base', num_heads=4, num_layers=2, dim_feedforward=1024, dropout=0.4, horizon=3, epochs=260, distributed=False)
-coin
-Loaded /home/zhouyufan/Projects/PDPP/dataset/coin/coin_train_70.json
-coin
-Loaded /home/zhouyufan/Projects/PDPP/dataset/coin/coin_test_30.json
-logging outputs to  /home/zhouyufan/Projects/PDPP/log_mlp/log_mlp_note4_20240817164908_coin
-total_mlp:   0%|          | 0/260 [00:00<?, ?it/s]total_mlp:   0%|          | 1/260 [00:45<3:16:05, 45.43s/it]lrs:
-2.307692307692308e-06
----------------------------------
-/home/zhouyufan/Projects/PDPP/train_mlp.py:497: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  return torch.tensor(losses.avg), torch.tensor(acc)
-total_mlp:   1%|          | 2/260 [01:39<3:37:06, 50.49s/it]total_mlp:   1%|          | 3/260 [02:29<3:34:55, 50.18s/it]lrs:
-6.923076923076923e-06
----------------------------------
-total_mlp:   2%|▏         | 4/260 [03:24<3:42:55, 52.25s/it]total_mlp:   2%|▏         | 5/260 [04:13<3:36:34, 50.96s/it]lrs:
-1.153846153846154e-05
----------------------------------
-total_mlp:   2%|▏         | 6/260 [05:08<3:42:20, 52.52s/it]
