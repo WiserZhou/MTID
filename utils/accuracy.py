@@ -34,8 +34,10 @@ def accuracy(output, target, topk=(1,), max_traj_len=0):
         correct_1 = correct[:1]  # (1, bs*T)
 
         # Success Rate: Consider a trajectory successful if all its actions are correct
-        trajectory_success = torch.all(correct_1.view(correct_1.shape[1] // max_traj_len, -1), dim=1)
-        trajectory_success_rate = trajectory_success.sum() * 100.0 / trajectory_success.shape[0]
+        trajectory_success = torch.all(correct_1.view(
+            correct_1.shape[1] // max_traj_len, -1), dim=1)
+        trajectory_success_rate = trajectory_success.sum() * 100.0 / \
+            trajectory_success.shape[0]
 
         # Mean Intersection over Union (MIoU)
         # Get the top-1 predictions for each output in the batch
@@ -50,7 +52,8 @@ def accuracy(output, target, topk=(1,), max_traj_len=0):
             pred_inst_set.add(tuple(pred_inst[i].tolist()))
             target_inst_set.add(tuple(target_inst[i].tolist()))
         # Calculate IoU for all actions
-        MIoU1 = 100.0 * len(pred_inst_set.intersection(target_inst_set)) / len(pred_inst_set.union(target_inst_set))
+        MIoU1 = 100.0 * len(pred_inst_set.intersection(target_inst_set)
+                            ) / len(pred_inst_set.union(target_inst_set))
 
         # Reshape to consider each trajectory separately
         batch_size = batch_size // max_traj_len
@@ -73,6 +76,6 @@ def accuracy(output, target, topk=(1,), max_traj_len=0):
 
         # Average IoU over all trajectories
         MIoU2 = MIoU_sum / batch_size
-        
+
         # Return results including accuracy at top-k, success rate, and MIoU
         return res, trajectory_success_rate, MIoU1, MIoU2, correct_a0, correct_aT

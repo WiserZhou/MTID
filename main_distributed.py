@@ -12,7 +12,7 @@ import torch.multiprocessing as mp
 import torch.utils.data
 import torch.utils.data.distributed
 from torch.distributed import ReduceOp
-from utils.load_dim import get_environment_shape
+from utils.env_args import get_environment_shape
 
 import utils
 from dataloader.data_load import PlanningDataset
@@ -65,10 +65,8 @@ def main():
     # Set the PYTHONHASHSEED environment variable to ensure reproducibility.
     # This is important when using hash-based operations which might be non-deterministic.
     os.environ['PYTHONHASHSEED'] = str(args.seed)
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6'
+    # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6'
     # Print the parsed arguments if verbose mode is enabled.
-    if args.verbose:
-        print(args)
 
   # 打印环境变量以确认设置
     # print(f"CUDA_VISIBLE_DEVICES: {os.environ.get('CUDA_VISIBLE_DEVICES')}")
@@ -86,7 +84,7 @@ def main():
     # Determine if the script is running in a distributed setup.
     # This is true if there is more than one GPU available or if multiprocessing is requested.
     args.distributed = args.world_size > 1 or args.multiprocessing_distributed
-    ngpus_per_node = 7  # torch.cuda.device_count()
+    ngpus_per_node = torch.cuda.device_count()
 
     # print(ngpus_per_node)
 
@@ -116,6 +114,13 @@ def main_worker(gpu, ngpus_per_node, args):
     args.json_path_train = env_dict['json_path_train']
     args.json_path_val = env_dict['json_path_val']
     args.json_path_val2 = env_dict['json_path_val2']
+    args.n_diffusion_steps = env_dict['n_diffusion_steps']
+    args.n_train_steps = env_dict['n_train_steps']
+    args.epochs = env_dict['epochs']
+    args.lr = env_dict['lr']
+
+    if args.verbose:
+        print(args)
 
     if args.distributed:
         if args.multiprocessing_distributed:

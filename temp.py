@@ -14,7 +14,7 @@ from data_load_json import PlanningDataset
 from utils import *
 from utils.args import get_args
 from train_mlp import ResMLP, TransformerHead
-from utils.load_dim import get_environment_shape
+from utils.env_args import get_environment_shape
 from tqdm import tqdm
 
 
@@ -31,6 +31,10 @@ def main():
     args.json_path_train = env_dict['json_path_train']
     args.json_path_val = env_dict['json_path_val']
     args.json_path_val2 = env_dict['json_path_val2']
+    args.n_diffusion_steps = env_dict['n_diffusion_steps']
+    args.n_train_steps = env_dict['n_train_steps']
+    args.epochs = env_dict['epochs']
+    args.lr = env_dict['lr']
 
     if args.verbose:
         print(args)

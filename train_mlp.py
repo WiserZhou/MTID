@@ -22,7 +22,7 @@ from logging import log
 from utils.args import get_args
 import numpy as np
 from tqdm import tqdm
-from utils.load_dim import *
+from utils.env_args import *
 
 
 def cycle(dl):
@@ -149,7 +149,7 @@ def main():
     args = get_args()
 
     # deploy the specific dataset
-    env_dict = get_environment_shape(args.dataset,args.horizon)
+    env_dict = get_environment_shape(args.dataset, args.horizon)
     args.action_dim = env_dict['action_dim']
     args.observation_dim = env_dict['observation_dim']
     args.class_dim = env_dict['class_dim']
@@ -157,6 +157,10 @@ def main():
     args.json_path_train = env_dict['json_path_train']
     args.json_path_val = env_dict['json_path_val']
     args.json_path_val2 = env_dict['json_path_val2']
+    args.n_diffusion_steps = env_dict['n_diffusion_steps']
+    args.n_train_steps = env_dict['n_train_steps']
+    args.epochs = env_dict['epochs']
+    args.lr = env_dict['lr']
 
     os.environ['PYTHONHASHSEED'] = str(args.seed)
     if os.path.exists(args.json_path_val):

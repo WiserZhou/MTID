@@ -121,11 +121,11 @@ class TemporalUnet(nn.Module):
             nn.Conv1d(dim, transition_dim, 1),
         )
 
-        num_transformer_blocks = 1
+        # num_transformer_blocks = 1
 
-        self.transformer_blocks = nn.ModuleList([TransformerBlock(
-            args.observation_dim + args.class_dim+args.action_dim, num_heads=7,
-            num_layers=args.transformer_num) for _ in range(num_transformer_blocks)])
+        # self.transformer_blocks = nn.ModuleList([TransformerBlock(
+        #     args.observation_dim + args.class_dim+args.action_dim, num_heads=7,
+        #     num_layers=args.transformer_num) for _ in range(num_transformer_blocks)])
 
     def forward(self, x, time):
         # Rearrange input tensor dimensions
@@ -177,12 +177,13 @@ class TemporalUnet(nn.Module):
         x = einops.rearrange(x, 'b t h -> b h t')
         # print(x.shape) # torch.Size([256, 3, 1659])
 
-        transformer_input = x
+        # transformer_input = x
 
-        for transformer_block in self.transformer_blocks:
-            transformer_input = transformer_block(transformer_input)
+        # for transformer_block in self.transformer_blocks:
+        #     transformer_input = transformer_block(transformer_input)
 
-        return x + transformer_input
+        # return x + transformer_input
+        return x
 
 
 class TransformerBlock(nn.Module):

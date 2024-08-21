@@ -76,7 +76,7 @@ def ask_model(title_list, old_action):
         f"For example, if there is a task about frying eggs with three actions, "
         f"which are \nstir fry eggs,beat eggs,put eggs in the pan\nthen you should give me the correct order, "
         f"which is: \nbeat eggs,put eggs in the pan,stir fry eggs\nThis task is related to the {title}. \n"
-        f"I am now giving you a sequence of actions: {true_action_list}\n, but I am not sure if it is correct. "
+        f"I am now giving you a sequence of actions: {old_action}\n, but I am not sure if it is correct. "
         f"Please provide me with the sequence of actions that you think conforms to the chronological and logical order. "
         f"Do not give me actions that are not within the actions I provide to you! \n"
         f"Let's think step by step and give me the correct sequence, separated with commas in the middle, "
@@ -100,7 +100,7 @@ def ask_model(title_list, old_action):
         result = split_string_to_list(response_last)
         result = [strr.strip().lower() for strr in result]
 
-        if valid(result, true_action_list):
+        if valid(result, old_action):
             return result, True
 
     return old_action, False
@@ -146,3 +146,5 @@ if __name__ == "__main__":
     print('answer:\n'+response)
 
     print('last line:'+get_last_line(response))
+
+

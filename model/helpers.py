@@ -204,8 +204,19 @@ class Conv1dBlock(nn.Module):
 
 # self.sqrt_alphas_cumprod, t, x_start.shape
 def extract(a, t, x_shape):
+    # Extract values from tensor `a` based on the indices provided in tensor `t`.
+    # Reshape the output to match the dimensions required for broadcasting with `x_shape`.
+
+    # Get the batch size from the shape of tensor `t`.
+    # The batch size is the first dimension of `t`.
     batch_size, *_ = t.shape
+
+    # Gather values from `a` using the indices from `t`.
+    # The -1 in the gather method indicates gathering along the last dimension of `a`.
     out = a.gather(-1, t)
+
+    # Reshape the gathered output to ensure it is compatible with the target shape `x_shape`.
+    # The reshaping step is critical for broadcasting in further operations.
     return out.reshape(batch_size, *((1,) * (len(x_shape) - 1)))
 
 
