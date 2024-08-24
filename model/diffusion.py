@@ -10,12 +10,6 @@ from .helpers import (
     Losses,
 )
 
-# Define the GaussianDiffusion class inheriting from nn.Module
-
-# diffusion_model = diffusion.GaussianDiffusion(args, temporal_model,  args.horizon, args.observation_dim,
-#                                                   args.action_dim, args.class_dim, args.n_diffusion_steps,
-#                                                   loss_type=args.loss_kind, clip_denoised=True,)
-
 
 class GaussianDiffusion(nn.Module):
     def __init__(self, args, model, ddim_discr_method='uniform'):
@@ -28,15 +22,15 @@ class GaussianDiffusion(nn.Module):
         self.weight = args.weight  # Set the weight for the loss function
 
         # Set the number of timesteps for diffusion
-        self.n_timesteps = args.n_diffusion_steps
-        self.clip_denoised = args.clip_denoised  # Whether to clip the denoised output
+        self.n_timesteps = args.n_diffusion_steps # default=200
+        self.clip_denoised = args.clip_denoised  # Whether to clip the denoised output, default=True
         self.eta = 0.0  # Eta parameter for DDIM sampling
         self.random_ratio = 1.0  # Ratio of random noise
 
         # Calculate the beta schedule using a cosine function
         betas = cosine_beta_schedule(self.n_timesteps)
         alphas = 1. - betas
-        alphas_cumprod = torch.cumprod(alphas, dim=0)
+        alphas_cumprod = torch.cumprod(alphas, dim=0) # 计算dim=0上的累积乘积
         alphas_cumprod_prev = torch.cat([torch.ones(1), alphas_cumprod[:-1]])
 
         # ---------------------------ddim (Denoising Diffusion Implicit Models)--------------------------------
@@ -157,9 +151,17 @@ class GaussianDiffusion(nn.Module):
     @torch.no_grad()
     def p_sample(self, x, cond, t):
         b, *_, device = *x.shape, x.device
+        # t是当前的时间步，一个标量或一维张量，指示我们处于去噪过程中的哪个阶段
+        # model_mean 模型预测的均值
+        # 模型预测的对数方差
         model_mean, _, model_log_variance = self.p_mean_variance(
-            x=x, cond=cond, t=t)
+            x=x, cond=cond, t=t) 
         noise = torch.randn_like(x) * self.random_ratio
+        # (t == 0): 返回一个布尔张量，其中 ：
+        # t 为 0 的位置为 True，否则为 False。
+        # (1 - (t == 0).float()): 将布尔张量转换为浮点张量，并将 True 变为 0.0，False 变为 1.0。
+        # reshape(b, *((1,) * (len(x.shape) - 1))): 重塑为与 x 形状匹配的张量，其中第一个维度为 b，其他维度为 1。
+        # nonzero_mask: 创建一个掩码张量，其中 t 非 0 的位置为 1.0，其他位置为 0.0。
         nonzero_mask = (1 - (t == 0).float()).reshape(b,
                                                       *((1,) * (len(x.shape) - 1)))
         return model_mean + nonzero_mask * (0.5 * model_log_variance).exp() * noise
@@ -172,7 +174,6 @@ class GaussianDiffusion(nn.Module):
         horizon = self.horizon
         shape = (batch_size, horizon, self.class_dim +
                  self.action_dim + self.observation_dim)
-        # print('p_sample_loop=======>start')
 
         x = torch.randn(shape, device=device) * \
             self.random_ratio  # Initialize xt for Noise and diffusion
@@ -184,9 +185,8 @@ class GaussianDiffusion(nn.Module):
         '''
         if not if_jump:
             for i in reversed(range(0, self.n_timesteps)):
-                # print(f'p_sample_loop ---- {i}')
                 timesteps = torch.full(
-                    (batch_size,), i, device=device, dtype=torch.long)
+                    (batch_size,), i, device=device, dtype=torch.long) # 用于创建一个给定形状的张量，并填充指定的值
                 x = self.p_sample(x, cond, timesteps)
                 x = condition_projection(
                     x, cond, self.action_dim, self.class_dim)
@@ -236,8 +236,6 @@ class GaussianDiffusion(nn.Module):
         # print("p_loss")
         # Generate noise for Noise and diffusion
         noise = torch.randn_like(x_start) * self.random_ratio
-
-        # print('p_losses')
         # noise = torch.zeros_like(x_start)   # for Deterministic
         # x_noisy = noise   # for Noise and Deterministic
 
@@ -269,5 +267,4 @@ class GaussianDiffusion(nn.Module):
 
     # Forward pass of the model
     def forward(self, cond, if_jump=False):
-        # print('forward')
         return self.p_sample_loop(cond, if_jump)

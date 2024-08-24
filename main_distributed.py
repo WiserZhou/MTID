@@ -100,6 +100,7 @@ def main():
     else:
         # If not in a multiprocessing or distributed setup, just run the main_worker function directly.
         # This is typically for single-GPU or non-distributed runs.
+        torch.multiprocessing.set_start_method('spawn')# good solution !!!!
         main_worker(args.gpu, ngpus_per_node, args)
 
 
@@ -275,7 +276,9 @@ def main_worker(gpu, ngpus_per_node, args):
     ckpt_max_path = ''
 
     max_train_acc = 0
+    max_train_epoch = 0
     max_test_acc = 0
+    max_test_epoch = 0
 
     # Main training loop across epochs
     for epoch in tqdm(range(args.start_epoch, args.epochs), desc='total train'):
@@ -290,7 +293,10 @@ def main_worker(gpu, ngpus_per_node, args):
                 acc_a0, acc_aT = model.train(
                     args.n_train_steps, True, args, scheduler)
 
-            max_train_acc = max(max_train_acc, trajectory_success_rate_meter)
+            # max_train_acc = max(max_train_acc, trajectory_success_rate_meter)
+            if trajectory_success_rate_meter > max_train_acc:
+                max_train_acc = trajectory_success_rate_meter
+                max_train_epoch = epoch + 1
 
             losses_reduced = reduce_tensor(losses.cuda()).item()
             acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
@@ -339,7 +345,10 @@ def main_worker(gpu, ngpus_per_node, args):
                 trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
                 acc_a0, acc_aT = validate(test_loader, model.ema_model, args)
 
-            max_test_acc = max(max_test_acc, trajectory_success_rate_meter)
+            # max_test_acc = max(max_test_acc, trajectory_success_rate_meter)
+            if trajectory_success_rate_meter > max_test_acc:
+                max_test_acc = trajectory_success_rate_meter
+                max_test_epoch = epoch + 1
 
             losses_reduced = reduce_tensor(losses.cuda()).item()
             acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
@@ -369,22 +378,22 @@ def main_worker(gpu, ngpus_per_node, args):
                 print(trajectory_success_rate_meter_reduced, max_eva)
 
             # Save checkpoint if the new trajectory success rate is better
-            if trajectory_success_rate_meter_reduced >= max_eva:
-                if not (trajectory_success_rate_meter_reduced == max_eva and acc_top1_reduced < max_acc):
-                    ckpt_max_path = save_checkpoint_max(args.name,
-                                                        {
-                                                            "epoch": epoch + 1,
-                                                            "model": model.model.state_dict(),
-                                                            "ema": model.ema_model.state_dict(),
-                                                            "optimizer": model.optimizer.state_dict(),
-                                                            "step": model.step,
-                                                            "tb_logdir": tb_logdir,
-                                                            "scheduler": scheduler.state_dict(),
-                                                        }, save_max, old_max_epoch, epoch + 1, args.rank
-                                                        )
-                    max_eva = trajectory_success_rate_meter_reduced
-                    max_acc = acc_top1_reduced
-                    old_max_epoch = epoch + 1
+            if trajectory_success_rate_meter_reduced > max_eva and acc_top1_reduced >= max_acc:
+                # if not (trajectory_success_rate_meter_reduced == max_eva and acc_top1_reduced < max_acc):
+                ckpt_max_path = save_checkpoint_max(args.name,
+                                                    {
+                                                        "epoch": epoch + 1,
+                                                        "model": model.model.state_dict(),
+                                                        "ema": model.ema_model.state_dict(),
+                                                        "optimizer": model.optimizer.state_dict(),
+                                                        "step": model.step,
+                                                        "tb_logdir": tb_logdir,
+                                                        "scheduler": scheduler.state_dict(),
+                                                    }, save_max, old_max_epoch, epoch + 1, args.rank
+                                                    )
+                max_eva = trajectory_success_rate_meter_reduced
+                max_acc = acc_top1_reduced
+                old_max_epoch = epoch + 1
 
         # Save checkpoint periodically based on the save frequency
         if (epoch + 1) % args.save_freq == 0:
@@ -400,8 +409,8 @@ def main_worker(gpu, ngpus_per_node, args):
                                     "scheduler": scheduler.state_dict(),
                                 }, checkpoint_dir, epoch + 1
                                 )
-    print(f'max_train_acc:{max_train_acc}')
-    print(f'max_test_acc:{max_test_acc}')
+    print(f'max_train_acc:{max_train_acc} max_train_epoch:{max_train_epoch}')
+    print(f'max_test_acc:{max_test_acc} max_test_epoch:{max_test_epoch}')
 
     # add inference
     ckpt_max_path = os.path.join(args.checkpoint_max_root, ckpt_max_path)
@@ -471,8 +480,7 @@ def main_worker(gpu, ngpus_per_node, args):
               test_times, np.var(acc_aT_reduced_sum))
 
         # print experiment results
-        print(
-            f"{args.name} {args.dataset} {args.horizon} {old_max_epoch} {Traj_Success_Rate} {EpochAcc1} {MIoU2}")
+        print(f"{args.name} {args.dataset} {args.horizon} {old_max_epoch} {Traj_Success_Rate} {EpochAcc1} {MIoU2}")
 
 
 def log(output, args):

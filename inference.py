@@ -244,8 +244,11 @@ def test_inference(val_loader, model, args):
 
             # flatten the video labels
             video_label_reshaped = video_label.view(-1)
-
+            
+            # if args.if_jump == 1:
             output = model(cond, if_jump=True)
+            # else:
+            #     output = model(cond, if_jump=False)
             # print('output')
             # print(output.size())  # torch.Size([256, 3, 1659])
             # print(output)

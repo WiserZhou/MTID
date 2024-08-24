@@ -159,7 +159,7 @@ def main():
     args.json_path_val2 = env_dict['json_path_val2']
     args.n_diffusion_steps = env_dict['n_diffusion_steps']
     args.n_train_steps = env_dict['n_train_steps']
-    # args.epochs = env_dict['epochs']
+    args.epochs = env_dict['epochs']
     args.lr = env_dict['lr']
 
     os.environ['PYTHONHASHSEED'] = str(args.seed)
@@ -180,7 +180,7 @@ def main():
             is_val=True,
             model=None,
         )
-    args.log_root = '/home/zhouyufan/Projects/PDPP/log_mlp/log'
+    args.log_root = '/data1/qzhb/codes/zhouyufan/PDPP-Optimize/log_mlp/log'
     args.log_root += '_mlp'
     if args.verbose:
         print(args)
@@ -194,8 +194,6 @@ def main():
 
     args.distributed = args.world_size > 1 or args.multiprocessing_distributed
     ngpus_per_node = torch.cuda.device_count()
-
-    print(args)
 
     if args.multiprocessing_distributed:
         args.world_size = ngpus_per_node * args.world_size
@@ -478,8 +476,9 @@ def train(train_loader, n_train_steps, model, scheduler, args, optimizer, if_cal
 
                 # [bs, 18] #[ 0.1, 0.3, , ,, , , ,,, , ....]
                 task_s = model(observations.cuda())
-                task_class_one_hot = task_class  # [1,0,0,0,0,0,0]\
-                # [1,0,0,0,0,0,0]``
+                task_class_one_hot = task_class
+                # [1,0,0,0,0,0,0]
+                # [1,0,0,0,0,0,0]
                 # [1,0,0,0,0,0,0]
                 # [1,0,0,0,0,0,0]
 
