@@ -48,7 +48,7 @@ python main_distributed.py --dataset=crosstask_how --name=how1 --gpu=4 \
       --base_model=base
 
 
-nohup python main_distributed.py --dataset=NIV --name=NIV1 --gpu=6 \
+nohup python main_distributed.py --dataset=NIV --name=NIV1 --gpu=4 \
       --base_model=base > out/output_NIV1.log 2>&1 &
 nohup python main_distributed.py --dataset=NIV --name=NIV2 --gpu=3 \
       --base_model=base --epochs=400 > out/output_NIV2.log 2>&1 &
@@ -56,3 +56,7 @@ nohup python main_distributed.py --dataset=NIV --name=NIV3 --gpu=4 \
       --base_model=base --epochs=400 > out/output_NIV3.log 2>&1 &
 nohup python main_distributed.py --dataset=NIV --name=NIV4 --gpu=5 \
       --base_model=base --epochs=400 > out/output_NIV4.log 2>&1 &
+
+
+nohup python main_distributed.py --dataset=NIV --name=NIV1 --gpu=4 \
+      --base_model=predictor --horizon=4 > out/output_NIV1.log 2>&1 &

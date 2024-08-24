@@ -195,7 +195,7 @@ def get_args(description='whl'):
     parser.add_argument('--num_heads', type=int, default=4)
     parser.add_argument('--num_layers', type=int, default=2)
     parser.add_argument('--dim_feedforward', type=int, default=1024)
-    parser.add_argument('--dropout', type=float, default=0.4)
+    parser.add_argument('--dropout', type=float, default=0.4,help='coin:0.7,others:0.4')
 
     parser.add_argument('--horizon',
                         type=int,

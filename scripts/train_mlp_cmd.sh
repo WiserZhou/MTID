@@ -26,3 +26,5 @@ python temp.py --num_thread_reader=1 --resume --dataset=coin \
        --batch_size=32 --batch_size_val=32 --horizon=3 \
        --num_heads=4 --num_layers=2 --dim_feedforward=2048 --dropout=0.7 \
        --ckpt_path=/home/zhouyufan/Projects/PDPP/save_max_mlp/epoch_note6_0420.pth.tar --gpu=4
+
+

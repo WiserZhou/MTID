@@ -195,11 +195,7 @@ class TemporalUnet(nn.Module):
                                                )
 
     # x shape (batch_size,horizon,dimension)
-        # num_transformer_blocks = 1
 
-        # self.transformer_blocks = nn.ModuleList([TransformerBlock(
-        #     args.observation_dim + args.class_dim+args.action_dim, num_heads=7,
-        #     num_layers=args.transformer_num) for _ in range(num_transformer_blocks)])
 
     def forward(self, x, time):
 
@@ -261,6 +257,7 @@ class TemporalUnet(nn.Module):
 
         x = einops.rearrange(x, 'b t h -> b h t')
         
+
 
         return x 
         # return x

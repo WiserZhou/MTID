@@ -42,7 +42,7 @@ environments = [
                     '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output6.json',
                     200,
                     200,
-                    120,
+                    70,
                     5e-4),
     EnvironmentInfo("crosstask_base",  9600, 105, 18,
                     '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/base/train_list.json',
@@ -64,7 +64,7 @@ environments = [
                     '/home/zhouyufan/Projects/PDPP/dataset/coin/output6.json',
                     200,
                     200,
-                    800,
+                    400,
                     1e-5),
     EnvironmentInfo("NIV", 1536, 48, 5,
                     '/home/zhouyufan/Projects/PDPP/dataset/NIV/train70.json',
@@ -75,7 +75,7 @@ environments = [
                     '/home/zhouyufan/Projects/PDPP/dataset/NIV/output6.json',
                     50,
                     50,
-                    130,
+                    70,
                     3e-4)
 ]
 
