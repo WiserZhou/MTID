@@ -65,6 +65,7 @@ def main():
     # Set the PYTHONHASHSEED environment variable to ensure reproducibility.
     # This is important when using hash-based operations which might be non-deterministic.
     os.environ['PYTHONHASHSEED'] = str(args.seed)
+    torch.set_num_threads(20)
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6'
     # Print the parsed arguments if verbose mode is enabled.
 

@@ -159,10 +159,11 @@ def main():
     args.json_path_val2 = env_dict['json_path_val2']
     args.n_diffusion_steps = env_dict['n_diffusion_steps']
     args.n_train_steps = env_dict['n_train_steps']
-    args.epochs = env_dict['epochs']
+    # args.epochs = env_dict['epochs']
     args.lr = env_dict['lr']
 
     os.environ['PYTHONHASHSEED'] = str(args.seed)
+    torch.set_num_threads(20)
     if os.path.exists(args.json_path_val):
         pass
     else:

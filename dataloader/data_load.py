@@ -33,7 +33,8 @@ class PlanningDataset(Dataset):
             if is_val:
                 cross_task_data_name = args.json_path_val2
             else:
-                cross_task_data_name = args.json_path_train
+                cross_task_data_name = args.json_path_train.replace(
+                    ".json", f"_{args.horizon}.json")
 
             if os.path.exists(cross_task_data_name):
                 with open(cross_task_data_name, 'r') as f:
@@ -45,7 +46,8 @@ class PlanningDataset(Dataset):
             if is_val:
                 coin_data_name = args.json_path_val2
             else:
-                coin_data_name = args.json_path_train
+                coin_data_name = args.json_path_train.replace(
+                    ".json", f"_{args.horizon}.json")
 
             if os.path.exists(coin_data_name):
                 with open(coin_data_name, 'r') as f:
@@ -57,7 +59,9 @@ class PlanningDataset(Dataset):
             if is_val:
                 niv_data_name = args.json_path_val2
             else:
-                niv_data_name = args.json_path_train
+                niv_data_name = args.json_path_train.replace(
+                    ".json", f"_{args.horizon}.json")
+            print(niv_data_name)
 
             if os.path.exists(niv_data_name):
                 with open(niv_data_name, 'r') as f:

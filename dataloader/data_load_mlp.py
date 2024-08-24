@@ -9,11 +9,11 @@ from collections import namedtuple
 Batch = namedtuple('Batch', 'Observations Actions Class')
 
 
-def valid_raw_file(file):
+def valid_raw_file(file, horizon):
     with open(file, 'r') as f:
         json_data = json.load(f)
 
-    if 'id' in json_data[0]:
+    if 'id' in json_data[0] and horizon == len(json_data[0]['id']['legal_range']):
         return True
     else:
         return False
@@ -138,11 +138,13 @@ class PlanningDataset(Dataset):
             }
 
             if is_val:
-                cross_task_data_name = args.json_path_val
+                cross_task_data_name = args.json_path_val.replace(
+                    ".json", f"_{args.horizon}.json")
             else:
-                cross_task_data_name = args.json_path_train
+                cross_task_data_name = args.json_path_train.replace(
+                    ".json", f"_{args.horizon}.json")
 
-            if os.path.exists(cross_task_data_name) and valid_raw_file(cross_task_data_name):
+            if os.path.exists(cross_task_data_name) and valid_raw_file(cross_task_data_name, self.args.horizon):
                 print('is_val'+str(is_val))
                 with open(cross_task_data_name, 'r') as f:
                     self.json_data = json.load(f)
@@ -240,11 +242,13 @@ class PlanningDataset(Dataset):
                 root, 'raw', 'coin_train_70.json')
 
             if is_val:
-                coin_data_name = args.json_path_val
+                coin_data_name = args.json_path_val.replace(
+                    ".json", f"_{args.horizon}.json")
             else:
-                coin_data_name = args.json_path_train
+                coin_data_name = args.json_path_train.replace(
+                    ".json", f"_{args.horizon}.json")
 
-            if os.path.exists(coin_data_name) and valid_raw_file(coin_data_name):
+            if os.path.exists(coin_data_name) and valid_raw_file(coin_data_name, self.args.horizon):
                 with open(coin_data_name, 'r') as f:
                     self.json_data = json.load(f)
                 print('Loaded {}'.format(coin_data_name))
@@ -314,11 +318,13 @@ class PlanningDataset(Dataset):
                 root, 'raw', 'train70.json')
 
             if is_val:
-                niv_data_name = args.json_path_val
+                niv_data_name = args.json_path_val.replace(
+                    ".json", f"_{args.horizon}.json")
             else:
-                niv_data_name = args.json_path_train
+                niv_data_name = args.json_path_train.replace(
+                    ".json", f"_{args.horizon}.json")
 
-            if os.path.exists(niv_data_name) and valid_raw_file(niv_data_name):
+            if os.path.exists(niv_data_name) and valid_raw_file(niv_data_name, self.args.horizon):
                 with open(niv_data_name, 'r') as f:
                     self.json_data = json.load(f)
                 print('Loaded {}'.format(niv_data_name))

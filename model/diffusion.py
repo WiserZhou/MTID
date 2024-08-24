@@ -172,6 +172,7 @@ class GaussianDiffusion(nn.Module):
         horizon = self.horizon
         shape = (batch_size, horizon, self.class_dim +
                  self.action_dim + self.observation_dim)
+        # print('p_sample_loop=======>start')
 
         x = torch.randn(shape, device=device) * \
             self.random_ratio  # Initialize xt for Noise and diffusion
@@ -183,6 +184,7 @@ class GaussianDiffusion(nn.Module):
         '''
         if not if_jump:
             for i in reversed(range(0, self.n_timesteps)):
+                # print(f'p_sample_loop ---- {i}')
                 timesteps = torch.full(
                     (batch_size,), i, device=device, dtype=torch.long)
                 x = self.p_sample(x, cond, timesteps)
@@ -234,6 +236,8 @@ class GaussianDiffusion(nn.Module):
         # print("p_loss")
         # Generate noise for Noise and diffusion
         noise = torch.randn_like(x_start) * self.random_ratio
+
+        # print('p_losses')
         # noise = torch.zeros_like(x_start)   # for Deterministic
         # x_noisy = noise   # for Noise and Deterministic
 
@@ -265,4 +269,5 @@ class GaussianDiffusion(nn.Module):
 
     # Forward pass of the model
     def forward(self, cond, if_jump=False):
+        # print('forward')
         return self.p_sample_loop(cond, if_jump)

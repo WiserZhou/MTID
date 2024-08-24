@@ -1,0 +1,174 @@
+nohup: ignoring input
+/home/zhouyufan/anaconda3/envs/ZYF/lib/python3.10/site-packages/torch/nn/modules/transformer.py:306: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
+Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log_mlp/log_mlp', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='coin', action_dim=778, observation_dim=1536, class_dim=180, root='/home/zhouyufan/Projects/PDPP/dataset/coin', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_train_70.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_test_30.json', json_path_val2='/home/zhouyufan/Projects/PDPP/dataset/coin/output3.json', n_train_steps=200, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='note1', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, log_freq=500, gpu=4, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=1e-05, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, imageEncoder=0, transformer_num=5, base_model='base', num_heads=4, num_layers=2, dim_feedforward=2048, dropout=0.8, horizon=3, epochs=800)
+Namespace(checkpoint_root='/home/zhouyufan/Projects/PDPP/checkpoint', checkpoint_max_root='/home/zhouyufan/Projects/PDPP/save_max', log_root='/home/zhouyufan/Projects/PDPP/log_mlp/log_mlp', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='coin', action_dim=778, observation_dim=1536, class_dim=180, root='/home/zhouyufan/Projects/PDPP/dataset/coin', json_path_train='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_train_70.json', json_path_val='/home/zhouyufan/Projects/PDPP/dataset/coin/coin_test_30.json', json_path_val2='/home/zhouyufan/Projects/PDPP/dataset/coin/output3.json', n_train_steps=200, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='note1', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, log_freq=500, gpu=4, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=1e-05, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, imageEncoder=0, transformer_num=5, base_model='base', num_heads=4, num_layers=2, dim_feedforward=2048, dropout=0.8, horizon=3, epochs=800, distributed=False)
+coin
+Loaded /home/zhouyufan/Projects/PDPP/dataset/coin/coin_train_70.json
+coin
+Loaded /home/zhouyufan/Projects/PDPP/dataset/coin/coin_test_30.json
+logging outputs to  /home/zhouyufan/Projects/PDPP/log_mlp/log_mlp_note1_20240824102623_coin
+total_mlp:   0%|          | 0/800 [00:00<?, ?it/s]total_mlp:   0%|          | 1/800 [00:08<1:50:06,  8.27s/it]lrs:
+7.5e-07
+---------------------------------
+/home/zhouyufan/Projects/PDPP/train_mlp.py:502: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(losses.avg), torch.tensor(acc)
+total_mlp:   0%|          | 2/800 [00:15<1:42:35,  7.71s/it]total_mlp:   0%|          | 3/800 [00:21<1:30:48,  6.84s/it]lrs:
+2.25e-06
+---------------------------------
+total_mlp:   0%|          | 4/800 [00:28<1:31:49,  6.92s/it]total_mlp:   1%|          | 5/800 [00:34<1:27:11,  6.58s/it]lrs:
+3.75e-06
+---------------------------------
+total_mlp:   1%|          | 6/800 [00:41<1:29:04,  6.73s/it]total_mlp:   1%|          | 7/800 [00:47<1:25:28,  6.47s/it]lrs:
+5.25e-06
+---------------------------------
+total_mlp:   1%|          | 8/800 [00:54<1:27:37,  6.64s/it]total_mlp:   1%|          | 9/800 [01:00<1:24:21,  6.40s/it]lrs:
+6.75e-06
+---------------------------------
+total_mlp:   1%|▏         | 10/800 [01:07<1:26:50,  6.60s/it]total_mlp:   1%|▏         | 11/800 [01:13<1:24:03,  6.39s/it]lrs:
+8.249999999999999e-06
+---------------------------------
+total_mlp:   2%|▏         | 12/800 [01:20<1:28:01,  6.70s/it]total_mlp:   2%|▏         | 13/800 [01:26<1:24:08,  6.41s/it]lrs:
+9.75e-06
+---------------------------------
+total_mlp:   2%|▏         | 14/800 [01:33<1:25:31,  6.53s/it]total_mlp:   2%|▏         | 15/800 [01:38<1:22:39,  6.32s/it]lrs:
+1.1249999999999999e-05
+---------------------------------
+total_mlp:   2%|▏         | 16/800 [01:45<1:24:40,  6.48s/it]total_mlp:   2%|▏         | 17/800 [01:51<1:22:40,  6.34s/it]lrs:
+1.2750000000000002e-05
+---------------------------------
+total_mlp:   2%|▏         | 18/800 [01:58<1:25:23,  6.55s/it]total_mlp:   2%|▏         | 19/800 [02:05<1:24:31,  6.49s/it]lrs:
+1.4249999999999999e-05
+---------------------------------
+total_mlp:   2%|▎         | 20/800 [02:12<1:26:19,  6.64s/it]total_mlp:   3%|▎         | 21/800 [02:18<1:24:43,  6.53s/it]lrs:
+1.575e-05
+---------------------------------
+total_mlp:   3%|▎         | 22/800 [02:28<1:37:49,  7.54s/it]total_mlp:   3%|▎         | 23/800 [02:37<1:45:08,  8.12s/it]lrs:
+1.725e-05
+---------------------------------
+total_mlp:   3%|▎         | 24/800 [02:48<1:52:55,  8.73s/it]total_mlp:   3%|▎         | 25/800 [02:58<1:57:59,  9.13s/it]lrs:
+1.8750000000000002e-05
+---------------------------------
+total_mlp:   3%|▎         | 26/800 [03:09<2:05:48,  9.75s/it]total_mlp:   3%|▎         | 27/800 [03:18<2:04:05,  9.63s/it]lrs:
+2.025e-05
+---------------------------------
+total_mlp:   4%|▎         | 28/800 [03:29<2:07:38,  9.92s/it]total_mlp:   4%|▎         | 29/800 [03:38<2:05:32,  9.77s/it]lrs:
+2.175e-05
+---------------------------------
+total_mlp:   4%|▍         | 30/800 [03:47<2:00:06,  9.36s/it]total_mlp:   4%|▍         | 31/800 [03:53<1:48:44,  8.48s/it]lrs:
+2.325e-05
+---------------------------------
+total_mlp:   4%|▍         | 32/800 [04:02<1:51:00,  8.67s/it]total_mlp:   4%|▍         | 33/800 [04:12<1:56:04,  9.08s/it]lrs:
+2.4750000000000002e-05
+---------------------------------
+total_mlp:   4%|▍         | 34/800 [04:23<2:03:50,  9.70s/it]total_mlp:   4%|▍         | 35/800 [04:33<2:02:33,  9.61s/it]lrs:
+2.625e-05
+---------------------------------
+total_mlp:   4%|▍         | 36/800 [04:45<2:10:45, 10.27s/it]total_mlp:   5%|▍         | 37/800 [04:53<2:03:07,  9.68s/it]lrs:
+2.7749999999999997e-05
+---------------------------------
+total_mlp:   5%|▍         | 38/800 [05:04<2:10:30, 10.28s/it]total_mlp:   5%|▍         | 39/800 [05:15<2:10:25, 10.28s/it]lrs:
+2.925e-05
+---------------------------------
+total_mlp:   5%|▌         | 40/800 [05:25<2:09:04, 10.19s/it]total_mlp:   5%|▌         | 41/800 [05:35<2:08:01, 10.12s/it]lrs:
+3.075e-05
+---------------------------------
+total_mlp:   5%|▌         | 42/800 [05:45<2:10:10, 10.30s/it]total_mlp:   5%|▌         | 43/800 [05:57<2:16:13, 10.80s/it]lrs:
+3.2250000000000005e-05
+---------------------------------
+total_mlp:   6%|▌         | 44/800 [06:14<2:39:32, 12.66s/it]total_mlp:   6%|▌         | 45/800 [06:28<2:43:21, 12.98s/it]lrs:
+3.375e-05
+---------------------------------
+total_mlp:   6%|▌         | 46/800 [06:44<2:52:18, 13.71s/it]total_mlp:   6%|▌         | 47/800 [06:56<2:47:28, 13.34s/it]lrs:
+3.525e-05
+---------------------------------
+total_mlp:   6%|▌         | 48/800 [07:11<2:52:30, 13.76s/it]total_mlp:   6%|▌         | 49/800 [07:25<2:52:28, 13.78s/it]lrs:
+3.675e-05
+---------------------------------
+total_mlp:   6%|▋         | 50/800 [07:40<3:00:00, 14.40s/it]total_mlp:   6%|▋         | 51/800 [07:54<2:55:46, 14.08s/it]lrs:
+3.825e-05
+---------------------------------
+total_mlp:   6%|▋         | 52/800 [08:13<3:15:13, 15.66s/it]total_mlp:   7%|▋         | 53/800 [08:30<3:21:15, 16.16s/it]lrs:
+3.975e-05
+---------------------------------
+total_mlp:   7%|▋         | 54/800 [08:50<3:31:47, 17.03s/it]total_mlp:   7%|▋         | 55/800 [09:06<3:30:06, 16.92s/it]lrs:
+4.125e-05
+---------------------------------
+total_mlp:   7%|▋         | 56/800 [09:26<3:40:31, 17.78s/it]total_mlp:   7%|▋         | 57/800 [09:43<3:36:25, 17.48s/it]lrs:
+4.275e-05
+---------------------------------
+total_mlp:   7%|▋         | 58/800 [10:01<3:40:30, 17.83s/it]total_mlp:   7%|▋         | 59/800 [10:14<3:22:36, 16.41s/it]lrs:
+4.4250000000000005e-05
+---------------------------------
+total_mlp:   8%|▊         | 60/800 [10:30<3:18:52, 16.12s/it]total_mlp:   8%|▊         | 61/800 [10:44<3:10:31, 15.47s/it]lrs:
+4.575e-05
+---------------------------------
+total_mlp:   8%|▊         | 62/800 [10:58<3:05:50, 15.11s/it]total_mlp:   8%|▊         | 63/800 [11:11<2:56:49, 14.40s/it]lrs:
+4.7249999999999997e-05
+---------------------------------
+total_mlp:   8%|▊         | 64/800 [11:27<3:02:35, 14.89s/it]total_mlp:   8%|▊         | 65/800 [11:40<2:56:14, 14.39s/it]lrs:
+4.875e-05
+---------------------------------
+total_mlp:   8%|▊         | 66/800 [11:56<3:02:14, 14.90s/it]total_mlp:   8%|▊         | 67/800 [12:10<2:56:25, 14.44s/it]lrs:
+5.0249999999999995e-05
+---------------------------------
+total_mlp:   8%|▊         | 68/800 [12:28<3:09:37, 15.54s/it]total_mlp:   9%|▊         | 69/800 [12:45<3:15:07, 16.02s/it]lrs:
+5.175e-05
+---------------------------------
+total_mlp:   9%|▉         | 70/800 [13:04<3:27:54, 17.09s/it]total_mlp:   9%|▉         | 71/800 [13:21<3:24:35, 16.84s/it]lrs:
+5.325e-05
+---------------------------------
+total_mlp:   9%|▉         | 72/800 [13:40<3:33:31, 17.60s/it]total_mlp:   9%|▉         | 73/800 [13:57<3:31:20, 17.44s/it]lrs:
+5.475e-05
+---------------------------------
+total_mlp:   9%|▉         | 74/800 [14:16<3:36:49, 17.92s/it]total_mlp:   9%|▉         | 75/800 [14:32<3:30:09, 17.39s/it]lrs:
+5.6250000000000005e-05
+---------------------------------
+total_mlp:  10%|▉         | 76/800 [14:47<3:21:16, 16.68s/it]total_mlp:  10%|▉         | 77/800 [15:00<3:07:52, 15.59s/it]lrs:
+5.775e-05
+---------------------------------
+total_mlp:  10%|▉         | 78/800 [15:15<3:04:27, 15.33s/it]total_mlp:  10%|▉         | 79/800 [15:29<2:58:15, 14.83s/it]lrs:
+5.9250000000000004e-05
+---------------------------------
+total_mlp:  10%|█         | 80/800 [15:42<2:53:48, 14.48s/it]total_mlp:  10%|█         | 81/800 [15:56<2:50:04, 14.19s/it]lrs:
+6.074999999999999e-05
+---------------------------------
+total_mlp:  10%|█         | 82/800 [16:10<2:50:14, 14.23s/it]total_mlp:  10%|█         | 83/800 [16:23<2:45:58, 13.89s/it]lrs:
+6.225e-05
+---------------------------------
+total_mlp:  10%|█         | 84/800 [16:38<2:48:42, 14.14s/it]total_mlp:  11%|█         | 85/800 [16:53<2:49:53, 14.26s/it]lrs:
+6.375e-05
+---------------------------------
+total_mlp:  11%|█         | 86/800 [17:11<3:03:19, 15.41s/it]total_mlp:  11%|█         | 87/800 [17:28<3:08:32, 15.87s/it]lrs:
+6.525e-05
+---------------------------------
+total_mlp:  11%|█         | 88/800 [17:46<3:17:30, 16.64s/it]total_mlp:  11%|█         | 89/800 [18:03<3:18:10, 16.72s/it]lrs:
+6.675e-05
+---------------------------------
+total_mlp:  11%|█▏        | 90/800 [18:23<3:28:10, 17.59s/it]total_mlp:  11%|█▏        | 91/800 [18:39<3:24:28, 17.30s/it]lrs:
+6.825e-05
+---------------------------------
+total_mlp:  12%|█▏        | 92/800 [18:58<3:30:42, 17.86s/it]total_mlp:  12%|█▏        | 93/800 [19:14<3:20:56, 17.05s/it]lrs:
+6.975e-05
+---------------------------------
+total_mlp:  12%|█▏        | 94/800 [19:31<3:22:36, 17.22s/it]total_mlp:  12%|█▏        | 95/800 [19:48<3:21:33, 17.15s/it]lrs:
+7.125000000000001e-05
+---------------------------------
+total_mlp:  12%|█▏        | 96/800 [20:06<3:24:56, 17.47s/it]total_mlp:  12%|█▏        | 97/800 [20:22<3:19:16, 17.01s/it]lrs:
+7.274999999999999e-05
+---------------------------------
+total_mlp:  12%|█▏        | 98/800 [20:41<3:23:43, 17.41s/it]total_mlp:  12%|█▏        | 99/800 [20:58<3:21:58, 17.29s/it]lrs:
+7.425e-05
+---------------------------------
+total_mlp:  12%|█▎        | 100/800 [21:17<3:28:05, 17.84s/it]total_mlp:  13%|█▎        | 101/800 [21:30<3:11:03, 16.40s/it]lrs:
+7.575e-05
+---------------------------------
+total_mlp:  13%|█▎        | 102/800 [21:45<3:04:54, 15.90s/it]total_mlp:  13%|█▎        | 103/800 [21:58<2:55:30, 15.11s/it]lrs:
+7.725e-05
+---------------------------------
+total_mlp:  13%|█▎        | 104/800 [22:13<2:53:39, 14.97s/it]total_mlp:  13%|█▎        | 105/800 [22:25<2:46:19, 14.36s/it]lrs:
+7.875e-05
+---------------------------------
+total_mlp:  13%|█▎        | 106/800 [22:39<2:43:21, 14.12s/it]total_mlp:  13%|█▎        | 107/800 [22:53<2:41:31, 13.98s/it]lrs:
+8.025e-05
+---------------------------------

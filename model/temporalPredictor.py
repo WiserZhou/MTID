@@ -11,9 +11,11 @@ from .helpers import (
 from .actionPredictor import (
     MotionPredictor,
 )
-
+from torch.nn import TransformerEncoder, TransformerEncoderLayer
 
 # Assuming Conv1dBlock, Rearrange, SinusoidalPosEmb, Downsample1d, Upsample1d are predefined
+
+
 class DynamicLinearModel(nn.Module):
     def __init__(self, observation_dim):
         super(DynamicLinearModel, self).__init__()
@@ -194,6 +196,11 @@ class TemporalUnet(nn.Module):
                                                )
 
     # x shape (batch_size,horizon,dimension)
+        num_transformer_blocks = 1
+
+        self.transformer_blocks = nn.ModuleList([TransformerBlock(
+            args.observation_dim + args.class_dim+args.action_dim, num_heads=7,
+            num_layers=args.transformer_num) for _ in range(num_transformer_blocks)])
 
     def forward(self, x, time):
 
@@ -254,7 +261,24 @@ class TemporalUnet(nn.Module):
         x = self.final_conv(x)
 
         x = einops.rearrange(x, 'b t h -> b h t')
+        transformer_input = x
 
+        for transformer_block in self.transformer_blocks:
+            transformer_input = transformer_block(transformer_input)
+
+        return x + transformer_input
+        # return x
+
+
+class TransformerBlock(nn.Module):
+    def __init__(self, dim, num_heads, num_layers):
+        super(TransformerBlock, self).__init__()
+        # embed_dim must be divisible by num_heads
+        encoder_layers = TransformerEncoderLayer(dim, num_heads)
+        self.transformer = TransformerEncoder(encoder_layers, num_layers)
+
+    def forward(self, x):
+        x = self.transformer(x)
         return x
 
 # shape of x

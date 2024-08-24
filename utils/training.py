@@ -233,18 +233,26 @@ class Trainer(object):
                         'task': task_class_}
 
                 x = img_tensors.float()
+                # print('start loss')
 
                 # Compute the loss
                 if dist.is_initialized():
+
                     loss = self.model.module.loss(x, cond)
                 else:
                     loss = self.model.loss(x, cond)
+
+                # print('loss complete')
                 loss = loss / self.gradient_accumulate_every
+
                 loss.backward()
+                # print('backward')
                 losses.update(loss.item(), bs)
+                # print('update')
 
             # Update model parameters and learning rate
             self.optimizer.step()
+
             self.optimizer.zero_grad()
             scheduler.step()
 
