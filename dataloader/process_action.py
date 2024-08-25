@@ -68,7 +68,7 @@ def process_and_save(task_map_path, task_info_path, output_path):
     np.save(output_path, processed_data)
 
 
-def load_processed_data(file_path="/home/zhouyufan/Projects/PDPP/dataloader/processed_data.npy"):
+def load_processed_data(file_path="/data/zhaobo/zhouyufan/PDPP-Optimize/dataloader/processed_data.npy"):
 
     return np.load(file_path, allow_pickle=True).item()
 
@@ -80,9 +80,9 @@ def get_value_by_key(processed_data, key):
 
 if __name__ == "__main__":
     # 定义路径
-    # task_map_path = "/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/actions_one_hot.npy"
-    # task_info_path = "/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/tasks_primary.txt"
-    # output_path = "/home/zhouyufan/Projects/PDPP/dataloader/processed_data.npy"
+    # task_map_path = "/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/actions_one_hot.npy"
+    # task_info_path = "/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/tasks_primary.txt"
+    # output_path = "/data/zhaobo/zhouyufan/PDPP-Optimize/dataloader/processed_data.npy"
 
     # # 处理并保存数据
     # process_and_save(task_map_path, task_info_path, output_path)
@@ -99,11 +99,11 @@ if __name__ == "__main__":
     # else:
     #     print(f"Key {specific_key} not found.")
     data = np.load(
-        '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_features/_2uFcneXTkc.npy', allow_pickle=True)
+        '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_features/_2uFcneXTkc.npy', allow_pickle=True)
     print(np.array(data, dtype=np.float32))
 
     print('-------------------------------------------------------')
 
     data2 = np.load(
-        '/home/zhouyufan/Projects/PDPP/dataset/coin/full_npy/ArcWeld_41_0UcBldDI0RA.npy', allow_pickle=True)
+        '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/full_npy/ArcWeld_41_0UcBldDI0RA.npy', allow_pickle=True)
     print(data2['frames_features'])

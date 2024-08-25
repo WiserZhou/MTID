@@ -70,7 +70,7 @@ def validate(val_loader, model, args):
 
             (acc1, acc5), trajectory_success_rate, MIoU1, MIoU2, a0_acc, aT_acc = \
                 accuracy(actions_pred.cpu(), video_label_reshaped.cpu(),
-                         topk=(1,), max_traj_len=args.horizon)
+                         topk=(1,5), max_traj_len=args.horizon)
 
         losses.update(loss.item(), batch_size_current)
         acc_top1.update(acc1.item(), batch_size_current)

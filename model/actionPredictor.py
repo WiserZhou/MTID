@@ -10,8 +10,9 @@ from transformers import AutoModel, AutoProcessor
 
 
 class ImageEncoder(nn.Module):
-    def __init__(self, input_channels, output_channels):
+    def __init__(self, input_channels, output_channels,ie_num=2):
         super(ImageEncoder, self).__init__()
+        self.ie_num = ie_num
         self.conv1 = nn.Conv1d(
             input_channels, output_channels, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv1d(
@@ -21,8 +22,12 @@ class ImageEncoder(nn.Module):
     def forward(self, x):
 
         x = x.unsqueeze(2)
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
+        
+        if self.ie_num == 2:
+            x = F.relu(self.conv1(x))
+            x = F.relu(self.conv2(x))
+        elif self.ie_num == 1:
+            x = F.relu(self.conv1(x))
 
         x = x.squeeze(2)
 
@@ -117,10 +122,8 @@ class MotionPredictor(nn.Module):
     def __init__(self, args, input_dim, output_dim, dimension_num, block_num, num_transformer_blocks=1):
         super(MotionPredictor, self).__init__()
 
-        if args.imageEncoder == 0:
-            self.encoder = ImageEncoder(input_dim, output_dim)
-        else:
-            self.encoder = ImageEncoderByCLIP(input_dim, output_dim)
+        self.encoder = ImageEncoder(input_dim, output_dim,args.ie_num)
+
 
         self.interpolator = SemanticSpaceInterpolation(
             output_dim, block_num)

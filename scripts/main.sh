@@ -19,7 +19,7 @@ nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor3 --
 nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor4 --gpu=3 \
       --base_model=predictor > out/output_howpredictor4.log 2>&1 &
 
-python inference.py --resume --base_model=predictor --ckpt_path=/home/zhouyufan/Projects/PDPP/save_max/epoch_new_interpolation3_
+python inference.py --resume --base_model=predictor --ckpt_path=/data/zhaobo/zhouyufan/PDPP-Optimize/save_max/epoch_new_interpolation3_
 0038_0.pth.tar > output.txt
 
 
@@ -49,13 +49,13 @@ python main_distributed.py --dataset=crosstask_how --name=how1 --gpu=4 \
 
 
 nohup python main_distributed.py --dataset=NIV --name=NIV1 --gpu=4 \
-      --base_model=base > out/output_NIV1.log 2>&1 &
+      --base_model=predictor --transformer_num=2 --ie_num=1 > out/NIVtransformer_num2ie_num1.log 2>&1 &
 nohup python main_distributed.py --dataset=NIV --name=NIV2 --gpu=3 \
-      --base_model=base --epochs=400 > out/output_NIV2.log 2>&1 &
+      --base_model=predictor --transformer_num=2 --ie_num=2 > out/NIVtransformer_num2ie_num2.log 2>&1 &
 nohup python main_distributed.py --dataset=NIV --name=NIV3 --gpu=4 \
-      --base_model=base --epochs=400 > out/output_NIV3.log 2>&1 &
+      --base_model=predictor --transformer_num=2 > out/output_NIV3.log 2>&1 &
 nohup python main_distributed.py --dataset=NIV --name=NIV4 --gpu=5 \
-      --base_model=base --epochs=400 > out/output_NIV4.log 2>&1 &
+      --base_model=predictor --transformer_num=2 > out/output_NIV4.log 2>&1 &
 
 
 nohup python main_distributed.py --dataset=NIV --name=NIV1 --gpu=4 \

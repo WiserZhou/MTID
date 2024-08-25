@@ -5,15 +5,15 @@ def get_args(description='whl'):
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--checkpoint_root',
                         type=str,
-                        default='/home/zhouyufan/Projects/PDPP/checkpoint',
+                        default='/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint',
                         help='checkpoint dir root')
     parser.add_argument('--checkpoint_max_root',
                         type=str,
-                        default='/home/zhouyufan/Projects/PDPP/save_max',
+                        default='/data/zhaobo/zhouyufan/PDPP-Optimize/save_max',
                         help='checkpoint max dir root')
     parser.add_argument('--log_root',
                         type=str,
-                        default='/home/zhouyufan/Projects/PDPP/log/log',
+                        default='/data/zhaobo/zhouyufan/PDPP-Optimize/log/log',
                         help='log dir root')
     parser.add_argument('--checkpoint_dir',
                         type=str,
@@ -41,7 +41,7 @@ def get_args(description='whl'):
                         help='SGD momemtum')
     parser.add_argument('--save_freq',
                         type=int,
-                        default=1,
+                        default=10,
                         help='how many epochs do we save once')
     parser.add_argument('--crop_only',
                         type=int,
@@ -87,19 +87,19 @@ def get_args(description='whl'):
                         help='')
     parser.add_argument('--root',
                         type=str,
-                        default='/home/zhouyufan/Projects/PDPP/dataset/crosstask',
+                        default='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask',
                         help='root path of dataset crosstask')
     parser.add_argument('--json_path_train',
                         type=str,
-                        default='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/train_list.json',
+                        default='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/train_list.json',
                         help='path of the generated json file for train')
     parser.add_argument('--json_path_val',
                         type=str,
-                        default='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/test_list.json',
+                        default='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/test_list.json',
                         help='path of the generated json file for val train mlp')
     parser.add_argument('--json_path_val2',
                         type=str,
-                        default='/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/output.json',
+                        default='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output.json',
                         help='path of the generated json file for val train model')
     ########################################################################################
 
@@ -176,10 +176,10 @@ def get_args(description='whl'):
                         type=int,
                         default=10,
                         help='')
-    parser.add_argument('--imageEncoder', type=int, default=0,
-                        help='try to change the image encoder')
+    parser.add_argument('--ie_num', type=int, default=2,
+                        help='image encoder convolution layer num')
     parser.add_argument('--transformer_num', type=int,
-                        default=5, help='layer nums for transformer blocks')
+                        default=5, help='layer nums for transformer blocks,NIV:2')
     parser.add_argument('--base_model', type=str,
                         default='base', help='predictor')
 
@@ -194,7 +194,7 @@ def get_args(description='whl'):
     #         dropout=dropout           # Dropout 概率
     parser.add_argument('--num_heads', type=int, default=4)
     parser.add_argument('--num_layers', type=int, default=2)
-    parser.add_argument('--dim_feedforward', type=int, default=1024)
+    parser.add_argument('--dim_feedforward', type=int, default=1024,help='coin:2048')
     parser.add_argument('--dropout', type=float, default=0.4,help='coin:0.7,others:0.4')
 
     parser.add_argument('--horizon',
@@ -203,5 +203,7 @@ def get_args(description='whl'):
                         help='')
     parser.add_argument('--epochs', default=70, type=int, metavar='N',
                         help='number of total epochs to run')
+    parser.add_argument('--if_jump',default=1,
+                        type=int, help='whether to use DDIM to inference')
     args = parser.parse_args()
     return args

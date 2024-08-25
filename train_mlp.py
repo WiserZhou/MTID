@@ -180,7 +180,7 @@ def main():
             is_val=True,
             model=None,
         )
-    args.log_root = '/home/zhouyufan/Projects/PDPP/log_mlp/log'
+    args.log_root = '/data/zhaobo/zhouyufan/PDPP-Optimize/log_mlp/log'
     args.log_root += '_mlp'
     if args.verbose:
         print(args)

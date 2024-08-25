@@ -13,7 +13,7 @@ def valid_raw_file(file, horizon):
     with open(file, 'r') as f:
         json_data = json.load(f)
 
-    if 'id' in json_data[0] and horizon == len(json_data[0]['id']['legal_range']):
+    if len(json_data) !=0 and 'id' in json_data[0] and horizon == len(json_data[0]['id']['legal_range']):
         return True
     else:
         return False
@@ -99,8 +99,8 @@ class PlanningDataset(Dataset):
                     └── videos_val.csv or json
             """
 
-            val_csv_path = '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/raw/test_list.json'
-            video_csv_path = '/home/zhouyufan/Projects/PDPP/dataset/crosstask/crosstask_release/raw/train_list.json'  # 'videos.csv')
+            val_csv_path = '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/raw/test_list.json'
+            video_csv_path = '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/raw/train_list.json'  # 'videos.csv')
 
             if crosstask_use_feature_how:
                 self.features_path = os.path.join(root, 'processed_data')

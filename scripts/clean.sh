@@ -1,6 +1,6 @@
-rm /home/zhouyufan/Projects/PDPP/checkpoint/whl/epoch*
-rm /home/zhouyufan/Projects/PDPP/checkpoint_mlp/whl/epoch*
-rm /home/zhouyufan/Projects/PDPP/save_max/epoch*
-rm /home/zhouyufan/Projects/PDPP/save_max_mlp/epoch*
-rm /home/zhouyufan/Projects/PDPP/out/*
+rm /data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch*
+rm /data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint_mlp/whl/epoch*
+rm /data/zhaobo/zhouyufan/PDPP-Optimize/save_max/epoch*
+rm /data/zhaobo/zhouyufan/PDPP-Optimize/save_max_mlp/epoch*
+rm /data/zhaobo/zhouyufan/PDPP-Optimize/out/*
 

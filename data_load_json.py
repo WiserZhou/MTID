@@ -31,7 +31,9 @@ class PlanningDataset(Dataset):
             f"cuda:{self.args.gpu}" if torch.cuda.is_available() else "cpu")
 
         if 'crosstask' in args.dataset:
-            cross_task_data_name = args.json_path_val
+            cross_task_data_name = args.json_path_val.replace(
+                    ".json", f"_{args.horizon}.json")
+            # print(cross_task_data_name)
             if os.path.exists(cross_task_data_name):
                 with open(cross_task_data_name, 'r') as f:
                     self.json_data = json.load(f)
@@ -39,7 +41,8 @@ class PlanningDataset(Dataset):
             else:
                 assert 0
         elif args.dataset == 'coin':
-            coin_data_name = args.json_path_val
+            coin_data_name = args.json_path_val.replace(
+                    ".json", f"_{args.horizon}.json")
             # "/data1/wanghanlin/diffusion_planning/jsons_coin/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
             # is_val, self.max_traj_len)
             if os.path.exists(coin_data_name):
@@ -49,7 +52,8 @@ class PlanningDataset(Dataset):
             else:
                 assert 0
         elif args.dataset == 'NIV':
-            niv_data_name = args.json_path_val
+            niv_data_name = args.json_path_val.replace(
+                    ".json", f"_{args.horizon}.json")
             # "/data1/wanghanlin/diffusion_planning/jsons_niv/sliding_window_cross_task_data_{}_{}_new_task_id_73.json".format(
             # is_val, self.max_traj_len)
             if os.path.exists(niv_data_name):

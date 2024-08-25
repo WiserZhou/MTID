@@ -283,7 +283,7 @@ def condition_projection_mask(x, conditions, action_dim, class_dim):
     task_ids = task_ids[:, 0]
     action_one_hot = np.load(
         os.path.join(
-            "/home/zhouyufan/Projects/PDPP/dataset/crosstask",
+            "/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask",
             "crosstask_release",
             "actions_one_hot.npy",
         ),
