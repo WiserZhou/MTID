@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
-import clip
+# import clip
 from PIL import Image
 import torchvision.transforms as transforms
 from transformers import AutoModel, AutoProcessor

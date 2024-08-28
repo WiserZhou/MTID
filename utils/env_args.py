@@ -75,7 +75,7 @@ environments = [
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/output6.json',
                     50,
                     50,
-                    50,
+                    120,
                     3e-4)
 ]
 

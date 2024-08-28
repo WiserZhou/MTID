@@ -10,7 +10,7 @@ import torch.utils.data
 import torch.utils.data.distributed
 import numpy as np
 
-from data_load_json import PlanningDataset
+from dataloader.data_load_json import PlanningDataset
 from utils import *
 from utils.args import get_args
 from train_mlp import ResMLP, TransformerHead

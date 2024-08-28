@@ -41,7 +41,7 @@ def get_args(description='whl'):
                         help='SGD momemtum')
     parser.add_argument('--save_freq',
                         type=int,
-                        default=10,
+                        default=1,
                         help='how many epochs do we save once')
     parser.add_argument('--crop_only',
                         type=int,

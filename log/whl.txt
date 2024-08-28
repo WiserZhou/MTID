@@ -1274,3 +1274,160 @@ Starting training loop for rank: 0, total batch size: 256
 Starting training loop for rank: 0, total batch size: 256
 => no checkpoint found at 'False'
 Starting training loop for rank: 0, total batch size: 256
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0040.pth.tar'
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0040.pth.tar'
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0040.pth.tar' (epoch 40)4
+Starting training loop for rank: 0, total batch size: 256
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0040.pth.tar' (epoch 40)3
+Starting training loop for rank: 0, total batch size: 256
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0040.pth.tar'
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0040.pth.tar'
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0040.pth.tar' (epoch 40)4
+Starting training loop for rank: 0, total batch size: 256
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0040.pth.tar' (epoch 40)3
+Starting training loop for rank: 0, total batch size: 256
+Starting training loop for rank: 0, total batch size: 256
+Starting training loop for rank: 0, total batch size: 256
+Starting training loop for rank: 0, total batch size: 256
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0050.pth.tar'
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0050.pth.tar'
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0050.pth.tar' (epoch 50)4
+Starting training loop for rank: 0, total batch size: 256
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0050.pth.tar' (epoch 50)3
+Starting training loop for rank: 0, total batch size: 256
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0050.pth.tar'
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0050.pth.tar' (epoch 50)4
+Starting training loop for rank: 0, total batch size: 256
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0050.pth.tar'
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0050.pth.tar' (epoch 50)4
+Starting training loop for rank: 0, total batch size: 256
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0050.pth.tar'
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0050.pth.tar' (epoch 50)4
+Starting training loop for rank: 0, total batch size: 256
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0050.pth.tar'
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0050.pth.tar' (epoch 50)3
+Starting training loop for rank: 0, total batch size: 256
+Starting training loop for rank: 0, total batch size: 256
+Starting training loop for rank: 0, total batch size: 256
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_coin_0220.pth.tar'
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_coin_0220.pth.tar'
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV1_0100.pth.tar'
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV1_0100.pth.tar' (epoch 100)6
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV1_0100.pth.tar'
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV1_0100.pth.tar' (epoch 100)6
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_coin_0220.pth.tar'
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_coin2_0220.pth.tar'
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0100.pth.tar'
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_coin_0220.pth.tar' (epoch 220)7
+Starting training loop for rank: 0, total batch size: 256
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_coin2_0220.pth.tar' (epoch 220)7
+Starting training loop for rank: 0, total batch size: 256
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV1_0100.pth.tar'
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV3_0100.pth.tar'
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV5_0100.pth.tar'
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV4_0100.pth.tar'
+=> loading checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV6_0100.pth.tar'
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV2_0100.pth.tar' (epoch 100)1
+Starting training loop for rank: 0, total batch size: 256
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV1_0100.pth.tar' (epoch 100)6
+Starting training loop for rank: 0, total batch size: 256
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV6_0100.pth.tar' (epoch 100)5
+Starting training loop for rank: 0, total batch size: 256
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV4_0100.pth.tar' (epoch 100)3
+Starting training loop for rank: 0, total batch size: 256
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV5_0100.pth.tar' (epoch 100)4
+Starting training loop for rank: 0, total batch size: 256
+=> loaded checkpoint '/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint/whl/epoch_NIV3_0100.pth.tar' (epoch 100)2
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256
+=> no checkpoint found at 'False'
+Starting training loop for rank: 0, total batch size: 256

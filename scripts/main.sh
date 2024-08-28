@@ -1,14 +1,7 @@
 nohup python main_distributed.py --dataset=crosstask_how --name=test_predictor --gpu=6 \
       --base_model=predictor --epoch=1 > out/output_test_predictor.log 2>&1 &
 
-nohup python main_distributed.py --dataset=crosstask_how --name=how1 --gpu=2 \
-      --base_model=base > out/output_how1.log 2>&1 &
-nohup python main_distributed.py --dataset=crosstask_how --name=how2 --gpu=1 \
-      --base_model=base > out/output_how2.log 2>&1 &
-nohup python main_distributed.py --dataset=crosstask_how --name=how3 --gpu=2 \
-      --base_model=base > out/output_how3.log 2>&1 &
-nohup python main_distributed.py --dataset=crosstask_how --name=how4 --gpu=4 \
-      --base_model=base > out/output_how4.log 2>&1 &
+
 
 nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor1 --gpu=4 \
       --base_model=predictor > out/output_howpredictor1.log 2>&1 &
@@ -34,8 +27,11 @@ nohup python main_distributed.py --dataset=coin --name=coin4 --gpu=6 \
       --base_model=base --epochs=600 --resume> out/output_coin4.log 2>&1 &
 
 
-nohup python main_distributed.py --dataset=coin --name=coin5 --gpu=4 \
-      --base_model=base > out/output_coin5.log 2>&1 &
+nohup python main_distributed.py --dataset=coin --name=coin --gpu=7 \
+      --base_model=base --horizon=4 > out/output_coin.log 2>&1 &
+nohup python main_distributed.py --dataset=coin --name=coin2 --gpu=7 \
+      --base_model=base --horizon=4 --seed=3407 > out/output_coin2.log 2>&1 &
+
 nohup python main_distributed.py --dataset=coin --name=coin6 --gpu=4 \
       --base_model=base > out/output_coin6.log 2>&1 &
 nohup python main_distributed.py --dataset=coin --name=coin7 --gpu=6 \
@@ -47,11 +43,13 @@ nohup python main_distributed.py --dataset=coin --name=coin8 --gpu=6 \
 python main_distributed.py --dataset=crosstask_how --name=how1 --gpu=4 \
       --base_model=base
 
+nohup python main_distributed.py --dataset=coin --name=coin --gpu=7 \
+      --base_model=base --horizon=4 --resume > out/output_coin.log 2>&1 &
+nohup python main_distributed.py --dataset=coin --name=coin2 --gpu=7 \
+      --base_model=base --horizon=4 --seed=3407 --resume > out/output_coin2.log 2>&1 &
 
-nohup python main_distributed.py --dataset=NIV --name=NIV1 --gpu=4 \
-      --base_model=predictor --transformer_num=2 --ie_num=1 > out/NIVtransformer_num2ie_num1.log 2>&1 &
-nohup python main_distributed.py --dataset=NIV --name=NIV2 --gpu=3 \
-      --base_model=predictor --transformer_num=2 --ie_num=2 > out/NIVtransformer_num2ie_num2.log 2>&1 &
+
+
 nohup python main_distributed.py --dataset=NIV --name=NIV3 --gpu=4 \
       --base_model=predictor --transformer_num=2 > out/output_NIV3.log 2>&1 &
 nohup python main_distributed.py --dataset=NIV --name=NIV4 --gpu=5 \
@@ -60,3 +58,32 @@ nohup python main_distributed.py --dataset=NIV --name=NIV4 --gpu=5 \
 
 nohup python main_distributed.py --dataset=NIV --name=NIV1 --gpu=4 \
       --base_model=predictor --horizon=4 > out/output_NIV1.log 2>&1 &
+
+
+nohup bash run.sh > output.log 2>&1 &
+
+
+
+
+nohup python main_distributed.py --dataset=NIV --name=NIV1 --gpu=0 \
+      --base_model=predictor --transformer_num=2 --ie_num=1 --seed=3407 > out/NIVtransformer_num2ie_num1_1.log 2>&1 &
+nohup python main_distributed.py --dataset=NIV --name=NIV2 --gpu=1 \
+      --base_model=predictor --transformer_num=2 --ie_num=2 --seed=3407 > out/NIVtransformer_num2ie_num2_2.log 2>&1 &
+nohup python main_distributed.py --dataset=NIV --name=NIV3 --gpu=2 \
+      --base_model=predictor --transformer_num=2 --ie_num=1 --seed=3406 > out/NIVtransformer_num2ie_num1_3.log 2>&1 &
+nohup python main_distributed.py --dataset=NIV --name=NIV4 --gpu=5 \
+      --base_model=predictor --transformer_num=2 --ie_num=2 --seed=3406 > out/NIVtransformer_num2ie_num2_4.log 2>&1 &
+nohup python main_distributed.py --dataset=NIV --name=NIV5 --gpu=6 \
+      --base_model=predictor --transformer_num=2 --ie_num=1 > out/NIVtransformer_num2ie_num1_5.log 2>&1 &
+nohup python main_distributed.py --dataset=NIV --name=NIV6 --gpu=0 \
+      --base_model=predictor --transformer_num=2 --ie_num=2 > out/NIVtransformer_num2ie_num2_6.log 2>&1 &
+
+
+nohup python main_distributed.py --dataset=crosstask_how --name=how1 --gpu=2 \
+      --base_model=base --horizon=3 > out/output_how1.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=how2 --gpu=1 \
+      --base_model=base --horizon=4 > out/output_how2.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=how3 --gpu=2 \
+      --base_model=base --horizon=5 > out/output_how3.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=how4 --gpu=1 \
+      --base_model=base --horizon=6 > out/output_how4.log 2>&1 &

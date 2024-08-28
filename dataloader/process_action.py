@@ -99,11 +99,12 @@ if __name__ == "__main__":
     # else:
     #     print(f"Key {specific_key} not found.")
     data = np.load(
-        '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_features/_2uFcneXTkc.npy', allow_pickle=True)
-    print(np.array(data, dtype=np.float32))
+        '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_features/0Fn5FQsE5FY.npy', allow_pickle=True)
+    print(data)
+    # print(np.array(data, dtype=np.float32))
 
     print('-------------------------------------------------------')
 
-    data2 = np.load(
-        '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/full_npy/ArcWeld_41_0UcBldDI0RA.npy', allow_pickle=True)
-    print(data2['frames_features'])
+    # data2 = np.load(
+    #     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/full_npy/ArcWeld_41_0UcBldDI0RA.npy', allow_pickle=True)
+    # print(data2['frames_features'])

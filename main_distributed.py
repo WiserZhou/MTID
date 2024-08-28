@@ -230,7 +230,8 @@ def main_worker(gpu, ngpus_per_node, args):
         os.mkdir(checkpoint_dir)
 
     if args.resume:
-        checkpoint_path = get_last_checkpoint(checkpoint_dir)
+        checkpoint_path = get_last_checkpoint(checkpoint_dir,args.name)
+        print('load checkpoint path:',checkpoint_path)
         if checkpoint_path:
             log("=> loading checkpoint '{}'".format(checkpoint_path), args)
             checkpoint = torch.load(
@@ -413,7 +414,11 @@ def main_worker(gpu, ngpus_per_node, args):
     print(f'max_test_acc:{max_test_acc} max_test_epoch:{max_test_epoch}')
 
     # add inference
+    if ckpt_max_path == '':
+        ckpt_max_path = get_last_checkpoint(args.checkpoint_max_root,args.name)
+        
     ckpt_max_path = os.path.join(args.checkpoint_max_root, ckpt_max_path)
+    
     if ckpt_max_path:
         print("=> loading checkpoint '{}'".format(ckpt_max_path), args)
         checkpoint = torch.load(
@@ -511,8 +516,8 @@ def save_checkpoint_max(name, state, checkpoint_dir, old_epoch, epoch, rank):
     return cktp_name
 
 
-def get_last_checkpoint(checkpoint_dir):
-    all_ckpt = glob.glob(os.path.join(checkpoint_dir, 'epoch*.pth.tar'))
+def get_last_checkpoint(checkpoint_dir,name):
+    all_ckpt = glob.glob(os.path.join(checkpoint_dir, f'epoch_{name}_*.pth.tar'))
     if all_ckpt:
         all_ckpt = sorted(all_ckpt)
         return all_ckpt[-1]

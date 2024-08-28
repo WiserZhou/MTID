@@ -249,6 +249,10 @@ class Trainer(object):
                 # print('backward')
                 losses.update(loss.item(), bs)
                 # print('update')
+            
+            if args.resume:
+                # print('capturable')
+                self.optimizer.param_groups[0]['capturable'] = True
 
             # Update model parameters and learning rate
             self.optimizer.step()

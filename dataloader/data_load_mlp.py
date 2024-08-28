@@ -338,9 +338,31 @@ class PlanningDataset(Dataset):
                         niv_data = json.load(f)
                 for d in niv_data:
                     legal_range = []
-                    path = d['feature']
+                    path = d['feature'] # "/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/processed_data/changing_tire_0006.npy"
                     info = np.load(path, allow_pickle=True)
-                    num_steps = int(info['num_steps'])
+                    # {'name': 'changing_tire_0001.csv_changing_tire_0001.', 'duration': 0.0, 'start': array([-1.]), 
+                    # 'end': array([-1.]), 
+                    # 'frames_features': array([[-0.00483101, -0.00058195, -0.02285086, ...,  0.00349515,
+                    #      0.00721521,  0.01397078],
+                    #    ...,
+                    #    [-0.01316939,  0.00436195, -0.01162706, ...,  0.00957219,
+                    #     -0.00217685, -0.00224021]], dtype=float32), 
+                    # 'steps_features': array([[-3.7809582 ,  2.5330641 ,  2.7331033 , ...,  6.5107613 ,
+                    #     -1.6682445 ,  1.998441  ],
+                    #    ...,
+                    #    [-3.2700143 ,  1.5864558 ,  2.2025495 , ...,  6.8122425 ,
+                    #     -0.81877184,  1.9969207 ]], dtype=float32), 
+                    # 'subs_features': array([[0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+                    #     ....
+                    #     0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]]), 
+                    # 'subs_starts': array([-1.]), 'subs_ends': array([-1.]), 
+                    # 'num_subs': array([], dtype=float64), 'num_steps': 9, 
+                    # 'steps_ids': array([ 9,  0,  1,  2,  3,  4,  5,  6, 10]), 
+                    # 'steps_starts': array([  8.7     ,  32.033333,  44.7     ,  59.033333,  66.36667 ,
+                    #     94.03333 ,  96.7     , 106.46667 , 125.8     ], dtype=float32), 
+                    # 'steps_ends': array([ 25.333334,  40.      ,  47.333332,  66.      ,  67.666664,
+                    #     96.      , 106.1     , 110.96667 , 130.4     ], dtype=float32)}
+                    num_steps = int(info['num_steps']) #
                     assert num_steps == len(info['steps_ids'])
                     assert info['num_steps'] == len(info['steps_starts'])
                     assert info['num_steps'] == len(info['steps_ends'])
