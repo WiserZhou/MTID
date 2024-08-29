@@ -1,111 +1,54 @@
 nohup: ignoring input
-Namespace(checkpoint_root='/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint', checkpoint_max_root='/data/zhaobo/zhouyufan/PDPP-Optimize/save_max', log_root='/data/zhaobo/zhouyufan/PDPP-Optimize/log/log', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='crosstask_how', action_dim=105, observation_dim=1536, class_dim=18, root='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask', json_path_train='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/train_list.json', json_path_val='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/test_list.json', json_path_val2='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output3.json', n_train_steps=200, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='how1', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, log_freq=500, gpu=2, seed=217, weight=6, n_diffusion_steps=200, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, ie_num=2, transformer_num=5, base_model='base', num_heads=4, num_layers=2, dim_feedforward=1024, dropout=0.4, horizon=3, epochs=70, if_jump=1, distributed=False)
-Loaded /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/train_list_3.json
-Loaded /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output3.json
-logging outputs to  /data/zhaobo/zhouyufan/PDPP-Optimize/log/log_how1_20240827215618_crosstask_how
-total train:   0%|          | 0/70 [00:00<?, ?it/s]lrs:
-4.2857142857142856e-05
+Namespace(checkpoint_root='/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint', checkpoint_max_root='/data/zhaobo/zhouyufan/PDPP-Optimize/save_max', log_root='/data/zhaobo/zhouyufan/PDPP-Optimize/log/log', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='crosstask_how', action_dim=105, observation_dim=1536, class_dim=18, root='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask', json_path_train='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/train_list.json', json_path_val='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/test_list.json', json_path_val2='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output5.json', n_train_steps=200, start_epoch=0, resume=False, resume_path='', evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='how1', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, log_freq=500, gpu=0, seed=217, weight=6, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, ie_num=2, transformer_num=5, base_model='base', classfier_model='transformer', n_diffusion_steps=200, num_heads=4, num_layers=2, dim_feedforward=1024, dropout=0.4, horizon=5, epochs=0, if_jump=1, distributed=False)
+Loaded /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/train_list_5.json
+Loaded /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output5.json
+logging outputs to  /data/zhaobo/zhouyufan/PDPP-Optimize/log/log_how1_20240828211520_crosstask_how
+total train:   0%|          | 0/120 [00:00<?, ?it/s]lrs:
+2.5e-05
 ---------------------------------
 /data/zhaobo/zhouyufan/PDPP-Optimize/utils/eval.py:88: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
   torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
-total train:   1%|▏         | 1/70 [03:21<3:51:59, 201.73s/it]4.887628078460693 0
+total train:   1%|          | 1/120 [02:43<5:23:28, 163.10s/it]0.7888349294662476 0
 lrs:
-8.571428571428571e-05
+5e-05
 ---------------------------------
-total train:   3%|▎         | 2/70 [06:31<3:40:50, 194.86s/it]0.0 4.887628078460693
+total train:   2%|▏         | 2/120 [05:22<5:16:39, 161.02s/it]3.8834950923919678 0.7888349294662476
 lrs:
-0.00012857142857142855
+7.5e-05
 ---------------------------------
-total train:   4%|▍         | 3/70 [09:37<3:32:52, 190.63s/it]1.3091861009597778 4.887628078460693
+total train:   2%|▎         | 3/120 [07:59<5:10:26, 159.20s/it]3.6407766342163086 3.8834950923919678
 lrs:
-0.00017142857142857143
+0.0001
 ---------------------------------
-total train:   6%|▌         | 4/70 [12:39<3:26:00, 187.28s/it]1.35282564163208 4.887628078460693
+total train:   3%|▎         | 4/120 [11:16<5:36:24, 174.00s/it]3.8531553745269775 3.8834950923919678
 lrs:
-0.00021428571428571427
+0.000125
 ---------------------------------
-total train:   7%|▋         | 5/70 [15:26<3:14:47, 179.80s/it]1.35282564163208 4.887628078460693
+total train:   4%|▍         | 5/120 [14:37<5:52:08, 183.72s/it]0.0 3.8834950923919678
 lrs:
-0.0002571428571428571
+0.00015
 ---------------------------------
-total train:   9%|▊         | 6/70 [18:31<3:13:40, 181.56s/it]1.35282564163208 4.887628078460693
+total train:   5%|▌         | 6/120 [17:38<5:47:31, 182.91s/it]0.0 3.8834950923919678
+lrs:
+0.000175
+---------------------------------
+total train:   6%|▌         | 7/120 [20:56<5:53:35, 187.74s/it]0.0 3.8834950923919678
+lrs:
+0.0002
+---------------------------------
+total train:   7%|▋         | 8/120 [24:15<5:57:25, 191.48s/it]0.0 3.8834950923919678
+lrs:
+0.00022500000000000002
+---------------------------------
+total train:   8%|▊         | 9/120 [27:14<5:46:57, 187.55s/it]0.0 3.8834950923919678
+/data/zhaobo/zhouyufan/PDPP-Optimize/utils/training.py:288: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(losses.avg), acc1, acc5, torch.tensor(trajectory_success_rate), \
+total train:   8%|▊         | 10/120 [30:41<5:54:57, 193.61s/it]0.0 3.8834950923919678
+lrs:
+0.000275
+---------------------------------
+total train:   9%|▉         | 11/120 [33:59<5:53:46, 194.74s/it]0.0 3.8834950923919678
 lrs:
 0.0003
 ---------------------------------
-total train:  10%|█         | 7/70 [21:34<3:11:14, 182.14s/it]1.35282564163208 4.887628078460693
-lrs:
-0.00034285714285714285
----------------------------------
-total train:  11%|█▏        | 8/70 [24:39<3:09:19, 183.21s/it]1.35282564163208 4.887628078460693
-lrs:
-0.00038571428571428567
----------------------------------
-total train:  13%|█▎        | 9/70 [27:25<3:00:46, 177.82s/it]1.6583024263381958 4.887628078460693
-/data/zhaobo/zhouyufan/PDPP-Optimize/utils/training.py:288: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  return torch.tensor(losses.avg), acc1, acc5, torch.tensor(trajectory_success_rate), \
-total train:  14%|█▍        | 10/70 [30:32<3:00:39, 180.65s/it]1.9637792110443115 4.887628078460693
-lrs:
-0.0004714285714285714
----------------------------------
-total train:  16%|█▌        | 11/70 [33:35<2:58:19, 181.35s/it]4.014837265014648 4.887628078460693
-lrs:
-0.0005
----------------------------------
-total train:  17%|█▋        | 12/70 [36:39<2:56:06, 182.17s/it]8.662447929382324 4.887628078460693
-lrs:
-0.0005
----------------------------------
-total train:  19%|█▊        | 13/70 [39:25<2:48:17, 177.14s/it]13.81191349029541 8.662447929382324
-lrs:
-0.0005
----------------------------------
-total train:  20%|██        | 14/70 [42:27<2:46:50, 178.75s/it]20.794239044189453 13.81191349029541
-lrs:
-0.0005
----------------------------------
-total train:  21%|██▏       | 15/70 [45:32<2:45:37, 180.67s/it]25.725507736206055 20.794239044189453
-lrs:
-0.0005
----------------------------------
-total train:  23%|██▎       | 16/70 [48:37<2:43:34, 181.75s/it]28.47479820251465 25.725507736206055
-lrs:
-0.0005
----------------------------------
-total train:  24%|██▍       | 17/70 [51:22<2:36:11, 176.83s/it]30.744054794311523 28.47479820251465
-lrs:
-0.0005
----------------------------------
-total train:  26%|██▌       | 18/70 [54:25<2:34:54, 178.75s/it]32.33689880371094 30.744054794311523
-lrs:
-0.0005
----------------------------------
-total train:  27%|██▋       | 19/70 [57:27<2:32:39, 179.60s/it]33.296966552734375 32.33689880371094
-total train:  29%|██▊       | 20/70 [1:00:36<2:32:07, 182.56s/it]34.21339797973633 33.296966552734375
-lrs:
-0.0005
----------------------------------
-total train:  30%|███       | 21/70 [1:03:22<2:24:54, 177.45s/it]34.7370719909668 34.21339797973633
-lrs:
-0.0005
----------------------------------
-total train:  31%|███▏      | 22/70 [1:06:29<2:24:16, 180.34s/it]35.348026275634766 34.7370719909668
-lrs:
-0.0005
----------------------------------
-total train:  33%|███▎      | 23/70 [1:09:35<2:22:41, 182.16s/it]35.828060150146484 35.348026275634766
-lrs:
-0.0005
----------------------------------
-total train:  34%|███▍      | 24/70 [1:12:41<2:20:20, 183.06s/it]36.22081756591797 35.828060150146484
-lrs:
-0.0005
----------------------------------
-total train:  36%|███▌      | 25/70 [1:15:45<2:17:37, 183.49s/it]37.00632858276367 36.22081756591797
-lrs:
-0.0005
----------------------------------
-total train:  37%|███▋      | 26/70 [1:18:30<2:10:29, 177.95s/it]37.57364273071289 37.00632858276367
-lrs:
-0.0005
----------------------------------
-total train:  39%|███▊      | 27/70 [1:21:35<2:09:08, 180.19s/it]37.96639633178711 37.57364273071289
+total train:  10%|█         | 12/120 [37:05<5:45:56, 192.19s/it]0.0 3.8834950923919678

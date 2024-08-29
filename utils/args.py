@@ -109,8 +109,12 @@ def get_args(description='whl'):
                         help='training_steps_per_epoch')
     parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                         help='manual epoch number (useful on restarts)')
+    
     parser.add_argument('--resume', dest='resume', action='store_true',
                         help='resume training from last checkpoint')
+    parser.add_argument('--resume_path', default='',type=str,
+                        help='resume training from last checkpoint')
+    
     parser.add_argument('-e', '--evaluate', default=True, dest='evaluate', action='store_true',
                         help='evaluate model on validation set')
     parser.add_argument('--pretrained', dest='pretrained', action='store_true',
@@ -150,10 +154,6 @@ def get_args(description='whl'):
                         help='seed for initializing training. ')
     parser.add_argument('--weight', default=6, type=float,
                         help='weight of the loss function')
-    parser.add_argument('--n_diffusion_steps',
-                        type=int,
-                        default=200,
-                        help='')
     parser.add_argument('--clip_denoised', default=True,
                         action='store_true', help='')
     parser.add_argument('--ddim_discr_method',
@@ -179,10 +179,15 @@ def get_args(description='whl'):
     parser.add_argument('--ie_num', type=int, default=2,
                         help='image encoder convolution layer num')
     parser.add_argument('--transformer_num', type=int,
-                        default=5, help='layer nums for transformer blocks,NIV:2')
+                        default=5, help='layer nums for transformer blocks,NIV:2,coin:7')
     parser.add_argument('--base_model', type=str,
                         default='base', help='predictor')
-
+    parser.add_argument('--classfier_model',default='transformer',
+                        type=str,help='classfier model to use')
+    parser.add_argument('--n_diffusion_steps',
+                        type=int,
+                        default=200,
+                        help='')
     # train_mlp
     # d_model: 必须大于 0。
     # nhead: 必须大于 0，并且能够整除 d_model。这是因为每个注意力头的维度是 d_model / nhead，所以 d_model 必须能够被 nhead 整除。
@@ -201,7 +206,7 @@ def get_args(description='whl'):
                         type=int,
                         default=3,
                         help='')
-    parser.add_argument('--epochs', default=70, type=int, metavar='N',
+    parser.add_argument('--epochs', default=0, type=int, metavar='N',
                         help='number of total epochs to run')
     parser.add_argument('--if_jump',default=1,
                         type=int, help='whether to use DDIM to inference')

@@ -68,7 +68,37 @@ class TransformerHead(nn.Module):
         x = self.fc2(x)
         return x
 
+class head(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(head, self).__init__()
+        middle_dim1 = input_dim // 3
+        middle_dim2 = input_dim * 4
+        self.fc1 = nn.Linear(input_dim, middle_dim1)
+        self.fc2 = nn.Linear(middle_dim1, middle_dim2)
+        self.fc3 = nn.Linear(middle_dim2, middle_dim1)
+        self.fc4 = nn.Linear(middle_dim1, output_dim)
 
+        # # nn.init.xavier_normal_(self.fc.weight)
+        torch.nn.init.kaiming_normal_(self.fc1.weight, mode='fan_in')
+        torch.nn.init.constant_(self.fc1.bias, 0.0)
+        torch.nn.init.kaiming_normal_(self.fc2.weight, mode='fan_in')
+        torch.nn.init.constant_(self.fc2.bias, 0.0)
+        torch.nn.init.kaiming_normal_(self.fc3.weight, mode='fan_in')
+        torch.nn.init.constant_(self.fc3.bias, 0.0)
+        torch.nn.init.kaiming_normal_(self.fc4.weight, mode='fan_in')
+        torch.nn.init.constant_(self.fc4.bias, 0.0)
+        self.dropout = nn.Dropout(0.)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.fc2(x)
+        x = torch.nn.functional.relu(x)
+        x = self.fc3(x)
+        x = torch.nn.functional.relu(x)
+        x = torch.mean(x, dim=1)
+        x = self.fc4(x)
+        return x
+    
 class Affine(nn.Module):
     def __init__(self, channel):
         super().__init__()
@@ -267,12 +297,21 @@ def main_worker(gpu, ngpus_per_node, args):
     )
 
     # create model
-    # input_dim, output_dim, num_heads=4, num_layers=2, dim_feedforward=2048, dropout=0.5
-    model = TransformerHead(
-        input_dim=args.observation_dim, output_dim=args.class_dim, num_heads=args.num_heads,
-        num_layers=args.num_layers, dim_feedforward=args.dim_feedforward, dropout=args.dropout)
+    from resnet import ResNet
 
-    # model = head(args.observation_dim, args.class_dim)
+    if args.classfier_model == 'resnet':
+        model = ResNet(depth=29, num_filters=None, output_dim=18, input_dim=1536, sequence_length=2)
+        
+    elif args.classfier_model == 'transformer':
+        # input_dim, output_dim, num_heads=4, num_layers=2, dim_feedforward=2048, dropout=0.5
+        model = TransformerHead(
+            input_dim=args.observation_dim, output_dim=args.class_dim, num_heads=args.num_heads,
+            num_layers=args.num_layers, dim_feedforward=args.dim_feedforward, dropout=args.dropout)
+    elif args.classfier_model == 'linear':
+        model = head(args.observation_dim, args.class_dim)
+    else:
+        RuntimeError('unknown classfier model!')
+
 
     if args.distributed:
         if args.gpu is not None:

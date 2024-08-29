@@ -1,52 +1,25 @@
 nohup: ignoring input
-Namespace(checkpoint_root='/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint', checkpoint_max_root='/data/zhaobo/zhouyufan/PDPP-Optimize/save_max', log_root='/data/zhaobo/zhouyufan/PDPP-Optimize/log/log', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='NIV', action_dim=48, observation_dim=1536, class_dim=5, root='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV', json_path_train='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/train70.json', json_path_val='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/test30.json', json_path_val2='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/output3.json', n_train_steps=50, start_epoch=0, resume=False, evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='NIV4', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, log_freq=500, gpu=5, seed=3406, weight=6, n_diffusion_steps=50, clip_denoised=True, ddim_discr_method='uniform', lr=0.0003, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, ie_num=2, transformer_num=2, base_model='predictor', num_heads=4, num_layers=2, dim_feedforward=1024, dropout=0.4, horizon=3, epochs=120, if_jump=1, distributed=False)
+Namespace(checkpoint_root='/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint', checkpoint_max_root='/data/zhaobo/zhouyufan/PDPP-Optimize/save_max', log_root='/data/zhaobo/zhouyufan/PDPP-Optimize/log/log', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='NIV', action_dim=48, observation_dim=1536, class_dim=5, root='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV', json_path_train='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/train70.json', json_path_val='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/test30.json', json_path_val2='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/output3.json', n_train_steps=50, start_epoch=0, resume=False, resume_path='', evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='NIV4', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, log_freq=500, gpu=5, seed=3406, weight=6, clip_denoised=True, ddim_discr_method='uniform', lr=0.0003, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, ie_num=2, transformer_num=2, base_model='predictor', classfier_model='transformer', n_diffusion_steps=50, num_heads=4, num_layers=2, dim_feedforward=1024, dropout=0.4, horizon=3, epochs=0, if_jump=1, distributed=False)
 /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/train70_3.json
 Loaded /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/train70_3.json
 /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/output3.json
 Loaded /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/output3.json
-logging outputs to  /data/zhaobo/zhouyufan/PDPP-Optimize/log/log_NIV4_20240827215239_NIV
+logging outputs to  /data/zhaobo/zhouyufan/PDPP-Optimize/log/log_NIV4_20240828212235_NIV
 total train:   0%|          | 0/120 [00:00<?, ?it/s]lrs:
-1.4999999999999999e-05
+3.6118468576932333e-06
 ---------------------------------
 /data/zhaobo/zhouyufan/PDPP-Optimize/utils/eval.py:88: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
   torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
-total train:   1%|          | 1/120 [07:46<15:24:52, 466.32s/it]6.666666507720947 0
+total train:   1%|          | 1/120 [07:16<14:25:40, 436.48s/it]1.1111111640930176 0
 lrs:
-2.9999999999999997e-05
+7.2236937153864666e-06
 ---------------------------------
-total train:   2%|▏         | 2/120 [15:48<15:35:34, 475.72s/it]9.259259223937988 6.666666507720947
+total train:   2%|▏         | 2/120 [14:26<14:10:35, 432.51s/it]1.8518518209457397 1.1111111640930176
 lrs:
-4.4999999999999996e-05
+1.08355405730797e-05
 ---------------------------------
-total train:   2%|▎         | 3/120 [23:26<15:11:47, 467.58s/it]11.851851463317871 9.259259223937988
+total train:   2%|▎         | 3/120 [21:48<14:12:15, 437.06s/it]10.0 1.1111111640930176
 lrs:
-5.9999999999999995e-05
+1.4447387430772933e-05
 ---------------------------------
-total train:   3%|▎         | 4/120 [30:59<14:52:35, 461.68s/it]0.0 11.851851463317871
-lrs:
-7.5e-05
----------------------------------
-total train:   4%|▍         | 5/120 [38:25<14:33:58, 455.98s/it]0.37037035822868347 11.851851463317871
-lrs:
-8.999999999999999e-05
----------------------------------
-total train:   5%|▌         | 6/120 [45:52<14:21:08, 453.23s/it]1.1111111640930176 11.851851463317871
-lrs:
-0.00010499999999999999
----------------------------------
-total train:   6%|▌         | 7/120 [53:21<14:10:30, 451.60s/it]0.37037035822868347 11.851851463317871
-lrs:
-0.00011999999999999999
----------------------------------
-total train:   7%|▋         | 8/120 [1:00:42<13:56:54, 448.34s/it]10.370370864868164 11.851851463317871
-lrs:
-0.000135
----------------------------------
-total train:   8%|▊         | 9/120 [1:08:07<13:47:30, 447.30s/it]9.629630088806152 11.851851463317871
-/data/zhaobo/zhouyufan/PDPP-Optimize/utils/training.py:288: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  return torch.tensor(losses.avg), acc1, acc5, torch.tensor(trajectory_success_rate), \
-total train:   8%|▊         | 10/120 [1:15:40<13:43:24, 449.13s/it]9.629630088806152 11.851851463317871
-lrs:
-0.000165
----------------------------------
-total train:   9%|▉         | 11/120 [1:23:06<13:34:13, 448.19s/it]11.11111068725586 11.851851463317871
+total train:   3%|▎         | 4/120 [29:10<14:08:23, 438.82s/it]20.740739822387695 10.0

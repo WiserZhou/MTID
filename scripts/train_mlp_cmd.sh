@@ -32,3 +32,6 @@ python temp.py --num_thread_reader=1 --resume --dataset=crosstask_how \
 nohup python train_mlp.py --name=note1 --dataset=crosstask_how --gpu=0 --epochs=160 --horizon=4 > out/horizon4.log 2>&1 &
 nohup python train_mlp.py --name=note1 --dataset=crosstask_how --gpu=1 --epochs=160 --horizon=5 > out/horizon5.log 2>&1 &
 nohup python train_mlp.py --name=note1 --dataset=crosstask_how --gpu=2 --epochs=160 --horizon=6 > out/horizon6.log 2>&1 &
+
+
+nohup python train_mlp.py --name=note1 --dataset=crosstask_how --gpu=1 --epochs=160 --classfier_model=resnet32x4 > out/horizon3.log 2>&1 &

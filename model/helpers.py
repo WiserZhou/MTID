@@ -392,10 +392,42 @@ Losses = {
 # -----------------------------------------------------------------------------#
 
 
-def get_lr_schedule_with_warmup(optimizer, num_training_steps, last_epoch=-1):
-    num_warmup_steps = num_training_steps * 20 / 120
-    decay_steps = num_training_steps * 30 / 120
-
+def get_lr_schedule_with_warmup(optimizer, num_training_steps,dataset,base_model,scale1=1/6, scale2=1/4,train=False,last_epoch=-1):
+    
+    if not train:
+        if dataset == 'crosstask_how' and base_model == 'base':
+            num_warmup_steps_scale = 1 / 6
+            decay_steps_scale = 1 / 4
+        elif dataset == 'crosstask_base' and base_model == 'base':
+            num_warmup_steps_scale = 1 / 3
+            decay_steps_scale = 1 / 2
+        elif dataset == 'NIV' and base_model == 'base':
+            num_warmup_steps_scale =  9 / 13
+            decay_steps_scale =  3 / 13
+        elif dataset == 'coin' and base_model == 'base':
+            num_warmup_steps_scale = 1 / 40
+            decay_steps_scale = 1 / 16
+        elif dataset == 'crosstask_how' and base_model == 'predictor':
+            num_warmup_steps_scale = 1 / 6
+            decay_steps_scale = 1 / 4
+        elif dataset == 'crosstask_base' and base_model == 'predictor':
+            num_warmup_steps_scale = 1 / 3
+            decay_steps_scale = 1 / 2
+        elif dataset == 'NIV' and base_model == 'predictor':
+            num_warmup_steps_scale =  9 / 13
+            decay_steps_scale =  3 / 13
+        elif dataset == 'coin' and base_model == 'predictor':
+            num_warmup_steps_scale = 1 / 40
+            decay_steps_scale = 1 / 16
+        else:
+            RuntimeError('select error!')
+    else:
+        num_warmup_steps_scale = scale1
+        decay_steps_scale = scale2
+        
+    num_warmup_steps = int(num_training_steps * num_warmup_steps_scale)
+    decay_steps = int(num_training_steps * decay_steps_scale)
+    
     def lr_lambda(current_step):
         if current_step <= num_warmup_steps:
             return max(0., float(current_step) / float(max(1, num_warmup_steps)))

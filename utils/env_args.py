@@ -33,18 +33,18 @@ class EnvironmentInfo:
 
 # Define the environments based on the provided data
 environments = [
-    EnvironmentInfo("crosstask_how",  1536, 105, 18,
+    EnvironmentInfo("crosstask_how_predictor",  1536, 105, 18,
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/train_list.json',
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/test_list.json',
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output3.json',
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output4.json',
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output5.json',
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output6.json',
-                    200,
-                    200,
-                    70,
-                    5e-4),
-    EnvironmentInfo("crosstask_base",  9600, 105, 18,
+                    200,    # self.n_diffusion_steps = n_diffusion_steps
+                    200,    # self.n_train_steps = n_train_steps
+                    70,     # self.epochs = epochs
+                    5e-4),  # self.lr = lr
+    EnvironmentInfo("crosstask_base_predictor",  9600, 105, 18,
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/base/train_list.json',
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/base/test_list.json',
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/base/output3.json',
@@ -55,7 +55,7 @@ environments = [
                     200,
                     60,
                     8e-4),
-    EnvironmentInfo("coin", 1536, 778, 180,
+    EnvironmentInfo("coin_predictor", 1536, 778, 180,
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/coin_train_70.json',
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/coin_test_30.json',
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/output3.json',
@@ -66,7 +66,7 @@ environments = [
                     200,
                     400,
                     1e-5),
-    EnvironmentInfo("NIV", 1536, 48, 5,
+    EnvironmentInfo("NIV_predictor", 1536, 48, 5,
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/train70.json',
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/test30.json',
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/output3.json',
@@ -76,13 +76,57 @@ environments = [
                     50,
                     50,
                     120,
+                    3e-4),
+    EnvironmentInfo("crosstask_how_base",  1536, 105, 18,
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/train_list.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/test_list.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output3.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output4.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output5.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output6.json',
+                    200,    # self.n_diffusion_steps = n_diffusion_steps
+                    200,    # self.n_train_steps = n_train_steps
+                    120,     # self.epochs = epochs
+                    5e-4),  # self.lr = lr
+    EnvironmentInfo("crosstask_base_base",  9600, 105, 18,
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/base/train_list.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/base/test_list.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/base/output3.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/base/output4.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/base/output5.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/base/output6.json',
+                    200,
+                    200,
+                    60,
+                    8e-4),
+    EnvironmentInfo("coin_base", 1536, 778, 180,
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/coin_train_70.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/coin_test_30.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/output3.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/output4.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/output5.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/output6.json',
+                    200,
+                    200,
+                    800,
+                    1e-5),
+    EnvironmentInfo("NIV_base", 1536, 48, 5,
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/train70.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/test30.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/output3.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/output4.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/output5.json',
+                    '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/output6.json',
+                    50,
+                    50,
+                    130,
                     3e-4)
 ]
 
 
-def get_environment_shape(name, horizon):
+def get_environment_shape(name, horizon,model):
     for env in environments:
-        if env.name == name:
+        if env.name == name +'_'+ str(model):
             json_path_val_key = f'json_path_val{horizon}'
             return {
                 'observation_dim': env.observation_dim,

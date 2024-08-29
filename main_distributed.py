@@ -108,7 +108,7 @@ def main_worker(gpu, ngpus_per_node, args):
     args.gpu = gpu
 
     # deploy the specific dataset
-    env_dict = get_environment_shape(args.dataset, args.horizon)
+    env_dict = get_environment_shape(args.dataset, args.horizon,args.base_model)
     args.action_dim = env_dict['action_dim']
     args.observation_dim = env_dict['observation_dim']
     args.class_dim = env_dict['class_dim']
@@ -118,8 +118,9 @@ def main_worker(gpu, ngpus_per_node, args):
     args.json_path_val2 = env_dict['json_path_val2']
     args.n_diffusion_steps = env_dict['n_diffusion_steps']
     args.n_train_steps = env_dict['n_train_steps']
-    args.epochs = env_dict['epochs']
+    epoch_env = env_dict['epochs']
     args.lr = env_dict['lr']
+    
 
     if args.verbose:
         print(args)
@@ -222,7 +223,7 @@ def main_worker(gpu, ngpus_per_node, args):
         model.ema_model = torch.nn.DataParallel(model.ema_model).cuda()
 
     scheduler = get_lr_schedule_with_warmup(
-        model.optimizer, int(args.n_train_steps * args.epochs))
+        model.optimizer, int(args.n_train_steps * epoch_env),args.dataset,args.base_model)
 
     checkpoint_dir = os.path.join(os.path.dirname(
         __file__), 'checkpoint', args.checkpoint_dir)
@@ -230,7 +231,14 @@ def main_worker(gpu, ngpus_per_node, args):
         os.mkdir(checkpoint_dir)
 
     if args.resume:
-        checkpoint_path = get_last_checkpoint(checkpoint_dir,args.name)
+        if args.resume_path == '':
+            checkpoint_path = get_last_checkpoint(checkpoint_dir,args.name)
+        else:
+            checkpoint_path = args.resume_path
+        
+        if args.epochs != None:
+            epoch_env = args.epochs
+            
         print('load checkpoint path:',checkpoint_path)
         if checkpoint_path:
             log("=> loading checkpoint '{}'".format(checkpoint_path), args)
@@ -282,7 +290,7 @@ def main_worker(gpu, ngpus_per_node, args):
     max_test_epoch = 0
 
     # Main training loop across epochs
-    for epoch in tqdm(range(args.start_epoch, args.epochs), desc='total train'):
+    for epoch in tqdm(range(args.start_epoch, epoch_env), desc='total train'):
 
         # If distributed training is enabled, set the epoch for the sampler
         if args.distributed:
@@ -410,6 +418,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                     "scheduler": scheduler.state_dict(),
                                 }, checkpoint_dir, epoch + 1
                                 )
+                
     print(f'max_train_acc:{max_train_acc} max_train_epoch:{max_train_epoch}')
     print(f'max_test_acc:{max_test_acc} max_test_epoch:{max_test_epoch}')
 
@@ -523,36 +532,6 @@ def get_last_checkpoint(checkpoint_dir,name):
         return all_ckpt[-1]
     else:
         return ''
-
-
-def run_python_file(file_path, args=None):
-    """
-    Executes a Python file using subprocess.
-
-    Args:
-    - file_path (str): Path to the Python file to be executed.
-    - args (list, optional): List of arguments to be passed to the Python file.
-
-    Returns:
-    - output (str): Standard output from the executed command.
-    - error (str): Standard error from the executed command.
-    """
-    command = ['python', file_path]
-
-    if args:
-        command.extend(args)
-
-    try:
-        result = subprocess.run(
-            command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        return result.stdout, result.stderr
-    except subprocess.CalledProcessError as e:
-        return e.stdout, e.stderr
-
-# Example usage
-# output, error = run_python_file('path/to/your_script.py', args=['--arg1', 'value1', '--arg2', 'value2'])
-# print('Output:', output)
-# print('Error:', error)
 
 
 if __name__ == "__main__":
