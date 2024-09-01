@@ -16,7 +16,7 @@ from utils.env_args import get_environment_shape
 
 import utils
 from dataloader.data_load import PlanningDataset
-from model import diffusion, temporal, temporal_fourier, temporalPredictor
+from model import diffusion, temporal, temporal_fourier, temporalPredictor,temporalPredictorfull,temporalPredictorhalf
 from model.helpers import get_lr_schedule_with_warmup
 
 from utils import *
@@ -108,7 +108,11 @@ def main_worker(gpu, ngpus_per_node, args):
     args.gpu = gpu
 
     # deploy the specific dataset
-    env_dict = get_environment_shape(args.dataset, args.horizon,args.base_model)
+    if args.base_model != 'base':
+        base_model = 'predictor'
+    else:
+        base_model = 'base'
+    env_dict = get_environment_shape(args.dataset, args.horizon,base_model)
     args.action_dim = env_dict['action_dim']
     args.observation_dim = env_dict['observation_dim']
     args.class_dim = env_dict['class_dim']
@@ -193,6 +197,17 @@ def main_worker(gpu, ngpus_per_node, args):
         temporal_model = temporalPredictor.TemporalUnet(args,
                                                         dim=256,
                                                         dim_mults=(1, 2, 4), )
+    elif args.base_model == 'prehalf':
+        temporal_model = temporalPredictorhalf.TemporalUnet(args,
+                                                        dim=256,
+                                                        dim_mults=(1, 2, 4), )
+    elif args.base_model == 'prefull':
+        temporal_model = temporalPredictorfull.TemporalUnet(args,
+                                                        dim=256,
+                                                        dim_mults=(1, 2, 4), )
+    
+    if args.base_model != 'base':
+        args.base_model = 'predictor'
 
     diffusion_model = diffusion.GaussianDiffusion(
         args, temporal_model)
@@ -231,7 +246,7 @@ def main_worker(gpu, ngpus_per_node, args):
         os.mkdir(checkpoint_dir)
 
     if args.resume:
-        if args.resume_path == '':
+        if args.resume_path == 'None':
             checkpoint_path = get_last_checkpoint(checkpoint_dir,args.name)
         else:
             checkpoint_path = args.resume_path
@@ -336,12 +351,13 @@ def main_worker(gpu, ngpus_per_node, args):
                                  args, scheduler).cuda()
             losses_reduced = reduce_tensor(losses).item()
             if args.rank == 0:
-                print('lrs:')
+                print()
                 for p in model.optimizer.param_groups:
-                    print(p['lr'])
+                    print('lrs:' + str(p['lr']))
                 print('---------------------------------')
 
                 logs = OrderedDict()
+                logs['Train/lrs'] = p['lr']
                 logs['Train/EpochLoss'] = losses_reduced
                 for key, value in logs.items():
                     tb_logger.log_scalar(value, key, epoch + 1)
@@ -447,11 +463,11 @@ def main_worker(gpu, ngpus_per_node, args):
     test_times = 1
 
     for epoch in range(0, test_times):
-        tmp = epoch
-        random.seed(tmp)
-        np.random.seed(tmp)
-        torch.manual_seed(tmp)
-        torch.cuda.manual_seed_all(tmp)
+        # tmp = epoch
+        # random.seed(tmp)
+        # np.random.seed(tmp)
+        # torch.manual_seed(tmp)
+        # torch.cuda.manual_seed_all(tmp)
 
         acc_top1, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, acc_a0, acc_aT = test_inference(
             test_loader, model.ema_model, args)

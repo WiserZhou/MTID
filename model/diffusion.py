@@ -20,13 +20,18 @@ class GaussianDiffusion(nn.Module):
         self.class_dim = args.class_dim  # Set the class dimension
         self.model = model  # Set the model (e.g., UNet)
         self.weight = args.weight  # Set the weight for the loss function
+        self.ifMask = args.ifMask
 
         # Set the number of timesteps for diffusion
         self.n_timesteps = args.n_diffusion_steps # default=200
         self.clip_denoised = args.clip_denoised  # Whether to clip the denoised output, default=True
         self.eta = 0.0  # Eta parameter for DDIM sampling
         self.random_ratio = 1.0  # Ratio of random noise
-
+        
+        self.l_order=args.l_order
+        self.l_pos=args.l_pos
+        self.l_perm=args.l_perm
+        
         # Calculate the beta schedule using a cosine function
         betas = cosine_beta_schedule(self.n_timesteps)
         alphas = 1. - betas
@@ -78,7 +83,7 @@ class GaussianDiffusion(nn.Module):
 
         # Set the loss type and corresponding loss function
         self.loss_type = args.loss_type
-        self.loss_fn = Losses[args.loss_type](
+        self.loss_fn = Losses[self.loss_type](
             self.action_dim, self.class_dim, self.weight)
 
     # ------------------------------------------ sampling ------------------------------------------#
@@ -95,9 +100,12 @@ class GaussianDiffusion(nn.Module):
         return posterior_mean, posterior_variance, posterior_log_variance_clipped
 
     # Function to compute the mean and variance of the model's predictions
-    def p_mean_variance(self, x, cond, t):
+    def p_mean_variance(self, x, cond, t, mask=None):
         x_recon = self.model(x, t)  # Reconstruct x from the model
-
+        
+        if mask is not None:
+            x_recon = x_recon * mask
+            
         if self.clip_denoised:
             x_recon.clamp(-1., 1.)  # Clip the denoised output if specified
         else:
@@ -251,8 +259,12 @@ class GaussianDiffusion(nn.Module):
 
         x_recon = condition_projection(
             x_recon, cond, self.action_dim, self.class_dim)
-
-        loss = self.loss_fn(x_recon, x_start)  # Compute the loss
+        
+        
+        if self.loss_type == 'Sequence_CE':        
+             loss = self.loss_fn(x_recon, x_start, self.l_order,self.l_pos,self.l_perm)  # Compute the loss
+        else:
+            loss = self.loss_fn(x_recon, x_start)  # Compute the loss
         return loss
 
     # Compute the loss for the batch

@@ -112,7 +112,7 @@ def get_args(description='whl'):
     
     parser.add_argument('--resume', dest='resume', action='store_true',
                         help='resume training from last checkpoint')
-    parser.add_argument('--resume_path', default='',type=str,
+    parser.add_argument('--resume_path', default='None',type=str,
                         help='resume training from last checkpoint')
     
     parser.add_argument('-e', '--evaluate', default=True, dest='evaluate', action='store_true',
@@ -136,8 +136,7 @@ def get_args(description='whl'):
                              'multi node data parallel training')
     parser.add_argument('--name', default='default', type=str,
                         help='note the specific log and checkpoint')
-    parser.add_argument('--loss_type', default='Weighted_Gradient_MSE', type=str,
-                        help='Weighted_MSE: only 10 on both side ; Weighted_Gradient_MSE: gradient change')
+
     parser.add_argument('--ckpt_path', default='', type=str,
                         help='checkpoint path for max')
     parser.add_argument('--dist_port', default=21712, type=int,
@@ -177,7 +176,7 @@ def get_args(description='whl'):
                         default=10,
                         help='')
     parser.add_argument('--ie_num', type=int, default=2,
-                        help='image encoder convolution layer num')
+                        help='image encoder convolution layer num,NIV:2')
     parser.add_argument('--transformer_num', type=int,
                         default=5, help='layer nums for transformer blocks,NIV:2,coin:7')
     parser.add_argument('--base_model', type=str,
@@ -206,9 +205,16 @@ def get_args(description='whl'):
                         type=int,
                         default=3,
                         help='')
-    parser.add_argument('--epochs', default=0, type=int, metavar='N',
+    parser.add_argument('--epochs', default=None, type=int, metavar='N',
                         help='number of total epochs to run')
     parser.add_argument('--if_jump',default=1,
                         type=int, help='whether to use DDIM to inference')
+    
+    parser.add_argument('--loss_type', default='Weighted_Gradient_MSE', type=str,
+                    help='Weighted_Gradient_MSE: gradient change ; Sequence_CE: CE and order loss')
+    parser.add_argument('--l_order', default=5000.0, type=float, help='ratio of lambda_order')
+    parser.add_argument('--l_pos', default=0.01, type=float, help='ratio of lambda_pos')
+    parser.add_argument('--l_perm', default=1.0, type=float, help='ratio of lambda_perm')
+    
     args = parser.parse_args()
     return args

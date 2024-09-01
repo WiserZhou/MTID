@@ -9,7 +9,6 @@ from .helpers import (
     Upsample1d,
     Conv1dBlock,
 )
-from torch.nn import TransformerEncoder, TransformerEncoderLayer
 
 # Define a residual block used in the Temporal Unet
 
@@ -46,7 +45,23 @@ class ResidualTemporalBlock(nn.Module):
         return out + self.residual_conv(x)
 
 # Define the Temporal Unet model
+# 自定义层，根据kind动态控制actions矩阵的不同部位
+class ActionModifier(nn.Module):
+    def __init__(self):
+        super(ActionModifier, self).__init__()
+        self.weights1 = nn.Parameter(torch.randn(1))  # 可学习的权重1
+        self.weights2 = nn.Parameter(torch.randn(1))  # 可学习的权重2
+        self.weights3 = nn.Parameter(torch.randn(1))  # 可学习的权重3
 
+    def forward(self, actions, kind):
+        # 根据kind控制actions的不同部位
+        if kind == 0:
+            actions[:, :35] *= self.weights1
+        elif kind == 1:
+            actions[:, 35:70] *= self.weights2
+        else:
+            actions[:, 70:] *= self.weights3
+        return actions
 
 #  transition_dim=args.action_dim + args.observation_dim + args.class_dim,
 class TemporalUnet(nn.Module):

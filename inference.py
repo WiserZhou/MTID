@@ -1,7 +1,7 @@
 import os
 import random
 import time
-
+from tqdm import tqdm
 import numpy as np
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
@@ -265,6 +265,19 @@ def main():
     args = get_args()
     os.environ['PYTHONHASHSEED'] = str(args.seed)
 
+    env_dict = get_environment_shape(args.dataset, args.horizon,args.base_model)
+    args.action_dim = env_dict['action_dim']
+    args.observation_dim = env_dict['observation_dim']
+    args.class_dim = env_dict['class_dim']
+    args.root = env_dict['root']
+    args.json_path_train = env_dict['json_path_train']
+    args.json_path_val = env_dict['json_path_val']
+    args.json_path_val2 = env_dict['json_path_val2']
+    args.n_diffusion_steps = env_dict['n_diffusion_steps']
+    args.n_train_steps = env_dict['n_train_steps']
+    # epoch_env = env_dict['epochs']
+    args.lr = env_dict['lr']
+    
     if args.verbose:
         print(args)
     if args.seed is not None:
@@ -345,10 +358,10 @@ def main_worker(gpu, ngpus_per_node, args):
 
     model = utils.Trainer(args, diffusion_model, None)
 
-    if args.pretrain_cnn_path:
-        net_data = torch.load(args.pretrain_cnn_path)
-        model.model.load_state_dict(net_data)
-        model.ema_model.load_state_dict(net_data)
+    # if args.pretrain_cnn_path:
+    #     net_data = torch.load(args.pretrain_cnn_path)
+    #     model.model.load_state_dict(net_data)
+    #     model.ema_model.load_state_dict(net_data)
     if args.distributed:
         if args.gpu is not None:
             model.model.cuda(args.gpu)
@@ -397,8 +410,8 @@ def main_worker(gpu, ngpus_per_node, args):
     acc_aT_reduced_sum = []
     test_times = 1
 
-    for epoch in range(0, test_times):
-        tmp = epoch
+    for epoch in tqdm(range(0, test_times)):
+        tmp = args.seed
         random.seed(tmp)
         np.random.seed(tmp)
         torch.manual_seed(tmp)

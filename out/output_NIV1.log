@@ -1,33 +1,0 @@
-nohup: ignoring input
-Namespace(checkpoint_root='/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint', checkpoint_max_root='/data/zhaobo/zhouyufan/PDPP-Optimize/save_max', log_root='/data/zhaobo/zhouyufan/PDPP-Optimize/log/log', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='NIV', action_dim=48, observation_dim=1536, class_dim=5, root='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV', json_path_train='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/train70.json', json_path_val='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/test30.json', json_path_val2='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/output3.json', n_train_steps=50, start_epoch=0, resume=False, resume_path='', evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='NIV7', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, log_freq=500, gpu=1, seed=3407, weight=6, clip_denoised=True, ddim_discr_method='uniform', lr=0.0003, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, ie_num=2, transformer_num=5, base_model='base', classfier_model='transformer', n_diffusion_steps=50, num_heads=4, num_layers=2, dim_feedforward=1024, dropout=0.4, horizon=3, epochs=0, if_jump=1, distributed=False)
-/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/train70_3.json
-Loaded /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/train70_3.json
-/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/output3.json
-Loaded /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/output3.json
-logging outputs to  /data/zhaobo/zhouyufan/PDPP-Optimize/log/log_NIV7_20240828211244_NIV
-total train:   0%|          | 0/130 [00:00<?, ?it/s]lrs:
-3.3333333333333333e-06
----------------------------------
-/data/zhaobo/zhouyufan/PDPP-Optimize/utils/eval.py:88: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
-total train:   1%|          | 1/130 [05:20<11:28:14, 320.11s/it]4.0740742683410645 0
-lrs:
-6.666666666666667e-06
----------------------------------
-total train:   2%|▏         | 2/130 [11:14<12:05:31, 340.09s/it]1.1111111640930176 4.0740742683410645
-lrs:
-9.999999999999999e-06
----------------------------------
-total train:   2%|▏         | 3/130 [18:07<13:10:11, 373.32s/it]2.222222089767456 4.0740742683410645
-lrs:
-1.3333333333333333e-05
----------------------------------
-total train:   3%|▎         | 4/130 [25:07<13:42:38, 391.73s/it]3.3333334922790527 4.0740742683410645
-lrs:
-1.6666666666666664e-05
----------------------------------
-total train:   4%|▍         | 5/130 [32:07<13:57:26, 401.97s/it]5.555555820465088 4.0740742683410645
-lrs:
-1.9999999999999998e-05
----------------------------------
-total train:   5%|▍         | 6/130 [39:06<14:03:11, 407.99s/it]7.037036895751953 5.555555820465088

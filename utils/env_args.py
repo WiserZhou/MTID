@@ -42,7 +42,7 @@ environments = [
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output6.json',
                     200,    # self.n_diffusion_steps = n_diffusion_steps
                     200,    # self.n_train_steps = n_train_steps
-                    70,     # self.epochs = epochs
+                    150,     # self.epochs = epochs
                     5e-4),  # self.lr = lr
     EnvironmentInfo("crosstask_base_predictor",  9600, 105, 18,
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/base/train_list.json',
@@ -53,7 +53,7 @@ environments = [
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/base/output6.json',
                     200,
                     200,
-                    60,
+                    150,
                     8e-4),
     EnvironmentInfo("coin_predictor", 1536, 778, 180,
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/coin_train_70.json',
@@ -64,7 +64,7 @@ environments = [
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/output6.json',
                     200,
                     200,
-                    400,
+                    200,
                     1e-5),
     EnvironmentInfo("NIV_predictor", 1536, 48, 5,
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/train70.json',
@@ -75,7 +75,7 @@ environments = [
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/output6.json',
                     50,
                     50,
-                    120,
+                    150,
                     3e-4),
     EnvironmentInfo("crosstask_how_base",  1536, 105, 18,
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/train_list.json',

@@ -263,16 +263,6 @@ class TemporalUnet(nn.Module):
         # return x
 
 
-# class TransformerBlock(nn.Module):
-#     def __init__(self, dim, num_heads, num_layers):
-#         super(TransformerBlock, self).__init__()
-#         # embed_dim must be divisible by num_heads
-#         encoder_layers = TransformerEncoderLayer(dim, num_heads)
-#         self.transformer = TransformerEncoder(encoder_layers, num_layers)
-
-#     def forward(self, x):
-#         x = self.transformer(x)
-#         return x
 
 # shape of x
 

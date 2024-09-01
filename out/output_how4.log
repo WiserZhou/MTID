@@ -1,50 +1,0 @@
-nohup: ignoring input
-Namespace(checkpoint_root='/data/zhaobo/zhouyufan/PDPP-Optimize/checkpoint', checkpoint_max_root='/data/zhaobo/zhouyufan/PDPP-Optimize/save_max', log_root='/data/zhaobo/zhouyufan/PDPP-Optimize/log/log', checkpoint_dir='whl', optimizer='adam', num_thread_reader=8, batch_size=256, batch_size_val=256, momemtum=0.9, save_freq=1, crop_only=1, centercrop=0, random_flip=1, verbose=1, fps=1, cudnn_benchmark=1, dataset='crosstask_how', action_dim=105, observation_dim=1536, class_dim=18, root='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask', json_path_train='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/train_list.json', json_path_val='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/test_list.json', json_path_val2='/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output6.json', n_train_steps=200, start_epoch=0, resume=False, resume_path='', evaluate=True, pretrained=False, pin_memory=True, world_size=1, rank=0, dist_file='dist-file', dist_backend='nccl', multiprocessing_distributed=False, name='how4', loss_type='Weighted_Gradient_MSE', ckpt_path='', dist_port=21712, log_freq=500, gpu=7, seed=3407, weight=6, clip_denoised=True, ddim_discr_method='uniform', lr=0.0005, ema_decay=0.995, gradient_accumulate_every=1, step_start_ema=400, update_ema_every=10, ie_num=2, transformer_num=5, base_model='base', classfier_model='transformer', n_diffusion_steps=200, num_heads=4, num_layers=2, dim_feedforward=1024, dropout=0.4, horizon=6, epochs=0, if_jump=1, distributed=False)
-Loaded /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/train_list_6.json
-Loaded /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output6.json
-logging outputs to  /data/zhaobo/zhouyufan/PDPP-Optimize/log/log_how4_20240828211520_crosstask_how
-total train:   0%|          | 0/120 [00:00<?, ?it/s]lrs:
-2.5e-05
----------------------------------
-/data/zhaobo/zhouyufan/PDPP-Optimize/utils/eval.py:88: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
-total train:   1%|          | 1/120 [02:51<5:39:21, 171.11s/it]0.0 0
-lrs:
-5e-05
----------------------------------
-total train:   2%|▏         | 2/120 [05:40<5:34:20, 170.00s/it]0.0 0
-lrs:
-7.5e-05
----------------------------------
-total train:   2%|▎         | 3/120 [08:52<5:51:33, 180.28s/it]0.0 0
-lrs:
-0.0001
----------------------------------
-total train:   3%|▎         | 4/120 [12:21<6:09:58, 191.36s/it]0.0 0
-lrs:
-0.000125
----------------------------------
-total train:   4%|▍         | 5/120 [15:55<6:22:26, 199.53s/it]0.0 0
-lrs:
-0.00015
----------------------------------
-total train:   5%|▌         | 6/120 [19:28<6:28:15, 204.35s/it]0.0 0
-lrs:
-0.000175
----------------------------------
-total train:   6%|▌         | 7/120 [23:04<6:31:56, 208.11s/it]0.32085561752319336 0
-lrs:
-0.0002
----------------------------------
-total train:   7%|▋         | 8/120 [26:35<6:30:10, 209.03s/it]0.35650622844696045 0.32085561752319336
-lrs:
-0.00022500000000000002
----------------------------------
-total train:   8%|▊         | 9/120 [30:13<6:31:33, 211.65s/it]0.35650622844696045 0.35650622844696045
-/data/zhaobo/zhouyufan/PDPP-Optimize/utils/training.py:288: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  return torch.tensor(losses.avg), acc1, acc5, torch.tensor(trajectory_success_rate), \
-total train:   8%|▊         | 10/120 [33:46<6:29:10, 212.28s/it]0.35650622844696045 0.35650622844696045
-lrs:
-0.000275
----------------------------------
-total train:   9%|▉         | 11/120 [37:20<6:26:08, 212.56s/it]0.35650622844696045 0.35650622844696045

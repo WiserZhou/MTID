@@ -8,6 +8,9 @@ import os
 import numpy as np
 import logging
 from tensorboardX import SummaryWriter
+import itertools
+from collections import OrderedDict
+# from loss_function import compute_losses
 
 
 # -----------------------------------------------------------------------------#
@@ -316,8 +319,62 @@ def condition_projection_mask(x, conditions, action_dim, class_dim):
 # ---------------------------------- Loss -------------------------------------#
 # -----------------------------------------------------------------------------#
 
+def compute_losses(model_outputs, targets, lambda_order=5000.0, lambda_pos=0.01, lambda_perm=1.0):
+    # Convert logits to probabilities
+    probs = F.softmax(model_outputs, dim=-1)
+    
+    batch_size,horizon,action_dim = model_outputs.shape
+    
+    # Cross-Entropy Loss
+    ce_loss = F.cross_entropy(model_outputs.reshape(-1, action_dim),targets.reshape(-1, action_dim).argmax(dim=-1))
+    # ce_loss = F.cross_entropy(model_outputs.view(-1, action_dim), targets.view(-1, action_dim).argmax(dim=-1))
+    
+    # Order Loss
+    order_loss = 0
+    for t in range(horizon - 1):
+        a_t = targets[:, t].argmax(dim=-1)
+        a_tp1 = targets[:, t + 1].argmax(dim=-1)
+        
+        prob_t_at = probs[torch.arange(batch_size), t, a_t]
+        prob_tp1_atp1 = probs[torch.arange(batch_size), t + 1, a_tp1]
+        
+        order_loss += torch.max(torch.zeros_like(prob_t_at), prob_t_at - prob_tp1_atp1).mean()
+    
+    # Position Loss
+    pos_loss = 0
+    for t in range(horizon):
+        predicted_label = probs[:, t].argmax(dim=-1)
+        true_label = targets[:, t].argmax(dim=-1)
+        pos_loss += torch.abs(predicted_label - true_label).float().mean()
 
-class Weighted_MSE(nn.Module):
+    # Permutation Loss
+    perm_loss = 0
+    predicted_seq = probs.argmax(dim=-1)  # shape (batch_size, horizon)
+    true_seq = targets.argmax(dim=-1)  # shape (batch_size, horizon)
+    
+    for i in range(batch_size):
+        predicted_permutation = list(itertools.permutations(predicted_seq[i].tolist()))
+        true_permutation = list(itertools.permutations(true_seq[i].tolist()))
+        hamming_distances = [sum(p1 != p2 for p1, p2 in zip(predicted, true_seq[i].tolist())) 
+                             for predicted in predicted_permutation]
+        perm_loss += min(hamming_distances)
+    perm_loss /= batch_size * horizon
+    
+    # Combine Losses
+    total_loss = ce_loss + lambda_order * order_loss + lambda_pos * pos_loss + lambda_perm * perm_loss
+
+    
+    # print(f"Total Loss: {total_loss.item()}")
+    # print(f"Cross Entropy Loss: {ce_loss.item()}")
+    # print(f"Order Loss: {lambda_order *order_loss.item()}")
+    # print(f"Position Loss: {lambda_pos * pos_loss.item()}")
+    # print(f"Permutation Loss: {lambda_perm * perm_loss}")  # Directly print perm_loss as it is a float
+    # (tensor(7.5086, device='cuda:6', grad_fn=<AddBackward0>), tensor(4.6501, device='cuda:6',
+    # grad_fn=<NllLossBackward0>), tensor(0.0003, device='cuda:6', grad_fn=<AddBackward0>), tensor(80.6094, 
+    # device='cuda:6'), 0.9934895833333334)
+    return total_loss, ce_loss, order_loss, pos_loss, perm_loss
+
+class Sequence_CE(nn.Module):
 
     def __init__(self,  action_dim, class_dim, weight):
         super().__init__()
@@ -325,20 +382,24 @@ class Weighted_MSE(nn.Module):
         self.class_dim = class_dim
         self.weight = weight
 
-    def forward(self, pred, targ):
+    def forward(self, pred, targ,l_order=200.0, l_pos=0.01, l_perm=2.0):
         """
         :param pred: [B, T, task_dim+action_dim+observation_dim]
         :param targ: [B, T, task_dim+action_dim+observation_dim]
         :return:
         """
+        loss_action = compute_losses(pred[:,:,self.class_dim:self.class_dim +
+                                    self.action_dim], targ[:,:,self.class_dim:self.class_dim +
+                                    self.action_dim], lambda_order=l_order,
+                                    lambda_pos=l_pos, lambda_perm=l_perm)
+        
+        def scale_tuple_elements(t, factor=1000):
+            return tuple(x * factor for x in t)
+        
+        loss_action = scale_tuple_elements(loss_action)
+        # print(loss_action)
 
-        loss_action = F.mse_loss(pred, targ, reduction='none')
-        loss_action[:, 0, self.class_dim:self.class_dim +
-                    self.action_dim] *= self.weight
-        loss_action[:, -1, self.class_dim:self.class_dim +
-                    self.action_dim] *= self.weight
-        loss_action = loss_action.sum()
-        return loss_action
+        return loss_action[0] 
 
 
 class Weighted_Gradient_MSE(nn.Module):
@@ -379,12 +440,67 @@ class Weighted_Gradient_MSE(nn.Module):
                         self.action_dim] *= weights[t]
 
         loss_action = loss_action.sum()
+        
+        # print(loss_action)
+        return loss_action
+    
+def variance_loss(predictions):
+    mean = torch.mean(predictions)
+    variance = torch.mean((predictions - mean) ** 2)
+    return variance.sum()
+class Variance_Weighted_MSE(nn.Module):
+
+    def __init__(self,  action_dim, class_dim, weight):
+        super().__init__()
+        # self.register_buffer('weights', weights)
+        self.action_dim = action_dim
+        self.class_dim = class_dim
+        self.weight = weight
+        self.scale = nn.Parameter(torch.tensor(0.1))
+
+    def forward(self, pred, targ):
+        """
+        :param pred: [B, T, task_dim+action_dim+observation_dim]
+        :param targ: [B, T, task_dim+action_dim+observation_dim]
+        :return:
+        """
+        variance_loss_action = variance_loss(pred)
+
+        loss_action = F.mse_loss(pred, targ, reduction='none')
+        # Gradient weight
+        batch_size, time_steps, _ = pred.size()
+        half_time_steps = time_steps // 2
+        if time_steps % 2 == 0:
+            weights = torch.linspace(
+                self.weight, 1, half_time_steps, device=pred.device)
+            weights = torch.cat([weights, weights.flip(0)])
+        else:
+            weights = torch.cat([
+                torch.linspace(self.weight, 1, half_time_steps +
+                               1, device=pred.device),
+                torch.linspace(1, self.weight, half_time_steps +
+                               1, device=pred.device)[1:]
+            ])
+
+        # Apply weights to the action part of the loss
+        for t in range(time_steps):
+            loss_action[:, t, self.class_dim:self.class_dim +
+                        self.action_dim] *= weights[t]
+
+        loss_action = loss_action.sum()
         return loss_action
 
 
+
+# 示例用法
+# predictions = torch.tensor([1.0, 2.0, 3.0, 4.0])
+# loss = variance_loss(predictions)
+# print("Loss:", loss.item())
+
 Losses = {
-    'Weighted_MSE': Weighted_MSE,
-    'Weighted_Gradient_MSE': Weighted_Gradient_MSE
+    'Sequence_CE': Sequence_CE,
+    'Weighted_Gradient_MSE': Weighted_Gradient_MSE,
+    'Variance_Weighted_MSE':Variance_Weighted_MSE
 }
 
 # -----------------------------------------------------------------------------#
