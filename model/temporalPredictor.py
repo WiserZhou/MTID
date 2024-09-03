@@ -15,23 +15,6 @@ from .actionPredictor import (
 # Assuming Conv1dBlock, Rearrange, SinusoidalPosEmb, Downsample1d, Upsample1d are predefined
 
 
-class DynamicLinearModel(nn.Module):
-    def __init__(self, observation_dim):
-        super(DynamicLinearModel, self).__init__()
-        self.observation_dim = observation_dim
-        self.linear_layers = nn.ModuleDict({
-            'output_256': nn.Linear(self.observation_dim, 256),
-            'output_512': nn.Linear(self.observation_dim, 512),
-            'output_1024': nn.Linear(self.observation_dim, 1024),
-        })
-
-    def forward(self, x, output_dim):
-        # print(x.shape) # torch.Size([1536, 256, 1])
-        key = f'output_{output_dim}'
-        layer = self.linear_layers[key]
-        return layer(x)
-
-
 class CrossAttention(nn.Module):
     def __init__(self, observation_dim, embed_dim, num_heads):
         super().__init__()
@@ -43,7 +26,7 @@ class CrossAttention(nn.Module):
             nn.Mish(),
             nn.Linear(embed_dim * 4, embed_dim)
         )
-        self.dynamic_linears = DynamicLinearModel(observation_dim)
+        self.linear = nn.Linear(observation_dim, embed_dim)
 
     def forward(self, x, context):
 
@@ -61,7 +44,10 @@ class CrossAttention(nn.Module):
         # print(x.shape)  # torch.Size([3, 256, 256])
         # print(context.shape)  # torch.Size([1, 256, 1536])
 
-        context = self.dynamic_linears(context, x.shape[2])
+        context = self.linear(context)
+        # print(x.shape[2])
+        # 1024
+# residual torch.Size([256, 1024, 1])
 
         attn_output, _ = self.multihead_attn(x, context, context)
         x = x + attn_output
@@ -75,6 +61,8 @@ class ResidualTemporalBlock(nn.Module):
 
     def __init__(self, observation_dim, inp_channels, out_channels, embed_dim, kernel_size=3, num_heads=4):
         super().__init__()
+        
+        self.out_channels = out_channels
 
         # Define a sequence of convolutional blocks
         self.blocks = nn.ModuleList([
@@ -108,6 +96,9 @@ class ResidualTemporalBlock(nn.Module):
         out = out2 + out
 
         out = self.blocks[1](out)
+        
+        # print("residual",out.shape)
+        # print('self.out_channels',self.out_channels)
 
         return out + self.residual_conv(x)
 

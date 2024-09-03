@@ -157,7 +157,7 @@ def test_inference(val_loader, model, args):
     A0_acc = AverageMeter()
     AT_acc = AverageMeter()
 
-    for i_batch, sample_batch in enumerate(val_loader):
+    for i_batch, sample_batch in tqdm(enumerate(val_loader)):
         # compute output
         global_img_tensors = sample_batch[0].cuda().contiguous()
         # print('global_img_tensors')
@@ -410,7 +410,7 @@ def main_worker(gpu, ngpus_per_node, args):
     acc_aT_reduced_sum = []
     test_times = 1
 
-    for epoch in tqdm(range(0, test_times)):
+    for epoch in range(0, test_times):
         tmp = args.seed
         random.seed(tmp)
         np.random.seed(tmp)

@@ -11,7 +11,7 @@ from tensorboardX import SummaryWriter
 import itertools
 from collections import OrderedDict
 # from loss_function import compute_losses
-
+from utils.args import get_args
 
 # -----------------------------------------------------------------------------#
 # ---------------------------------- modules ----------------------------------#
@@ -255,8 +255,8 @@ def condition_projection(x, conditions, action_dim, class_dim):
 
     return x
 
-
-def condition_projection_mask(x, conditions, action_dim, class_dim):
+def compute_mask(x):
+    args = get_args()
     task_class = {
         "0": 23521,
         "1": 59684,
@@ -277,12 +277,7 @@ def condition_projection_mask(x, conditions, action_dim, class_dim):
         "16": 87706,
         "17": 91515,
     }
-    # clone the observation dim at the start and end
-    for t, val in conditions.items():
-        if t != "task":
-            x[:, t, class_dim + action_dim:] = val.clone()
-
-    task_ids = torch.argmax(conditions["task"], axis=-1)  # (256*3)
+    task_ids = torch.argmax(x[:, :, : args.class_dim], axis=-1)  # (256*3)
     task_ids = task_ids[:, 0]
     action_one_hot = np.load(
         os.path.join(
@@ -302,78 +297,24 @@ def condition_projection_mask(x, conditions, action_dim, class_dim):
                 action_indices.append(action_index)
         return action_indices
 
-    # set the observation to zero except for start and end
-    x[:, 1:-1, class_dim + action_dim:] = 0.0
-    x[:, :, :class_dim] = conditions["task"]
+    mask = torch.zeros(x.shape[0], args.action_dim)
     for i in range(len(task_ids)):
         task_id = str(task_ids[i].item())
         action_indices = find_action_index(task_class[task_id], action_one_hot)
-        mask = torch.zeros(action_dim)
         for j in action_indices:
-            mask[j] = 1.0
-        x[i, :, class_dim: class_dim + action_dim] *= mask.cuda()
+            mask[i, j] = 1.0
 
-    return x
+    maskTotal = torch.ones_like(x)
+    maskTotal[:, :, args.class_dim: args.class_dim + args.action_dim] = mask.unsqueeze(
+        1
+    ).repeat(1, args.horizon, 1)
+    return maskTotal.cuda()
 
 # -----------------------------------------------------------------------------#
 # ---------------------------------- Loss -------------------------------------#
 # -----------------------------------------------------------------------------#
 
-def compute_losses(model_outputs, targets, lambda_order=5000.0, lambda_pos=0.01, lambda_perm=1.0):
-    # Convert logits to probabilities
-    probs = F.softmax(model_outputs, dim=-1)
-    
-    batch_size,horizon,action_dim = model_outputs.shape
-    
-    # Cross-Entropy Loss
-    ce_loss = F.cross_entropy(model_outputs.reshape(-1, action_dim),targets.reshape(-1, action_dim).argmax(dim=-1))
-    # ce_loss = F.cross_entropy(model_outputs.view(-1, action_dim), targets.view(-1, action_dim).argmax(dim=-1))
-    
-    # Order Loss
-    order_loss = 0
-    for t in range(horizon - 1):
-        a_t = targets[:, t].argmax(dim=-1)
-        a_tp1 = targets[:, t + 1].argmax(dim=-1)
-        
-        prob_t_at = probs[torch.arange(batch_size), t, a_t]
-        prob_tp1_atp1 = probs[torch.arange(batch_size), t + 1, a_tp1]
-        
-        order_loss += torch.max(torch.zeros_like(prob_t_at), prob_t_at - prob_tp1_atp1).mean()
-    
-    # Position Loss
-    pos_loss = 0
-    for t in range(horizon):
-        predicted_label = probs[:, t].argmax(dim=-1)
-        true_label = targets[:, t].argmax(dim=-1)
-        pos_loss += torch.abs(predicted_label - true_label).float().mean()
-
-    # Permutation Loss
-    perm_loss = 0
-    predicted_seq = probs.argmax(dim=-1)  # shape (batch_size, horizon)
-    true_seq = targets.argmax(dim=-1)  # shape (batch_size, horizon)
-    
-    for i in range(batch_size):
-        predicted_permutation = list(itertools.permutations(predicted_seq[i].tolist()))
-        true_permutation = list(itertools.permutations(true_seq[i].tolist()))
-        hamming_distances = [sum(p1 != p2 for p1, p2 in zip(predicted, true_seq[i].tolist())) 
-                             for predicted in predicted_permutation]
-        perm_loss += min(hamming_distances)
-    perm_loss /= batch_size * horizon
-    
-    # Combine Losses
-    total_loss = ce_loss + lambda_order * order_loss + lambda_pos * pos_loss + lambda_perm * perm_loss
-
-    
-    # print(f"Total Loss: {total_loss.item()}")
-    # print(f"Cross Entropy Loss: {ce_loss.item()}")
-    # print(f"Order Loss: {lambda_order *order_loss.item()}")
-    # print(f"Position Loss: {lambda_pos * pos_loss.item()}")
-    # print(f"Permutation Loss: {lambda_perm * perm_loss}")  # Directly print perm_loss as it is a float
-    # (tensor(7.5086, device='cuda:6', grad_fn=<AddBackward0>), tensor(4.6501, device='cuda:6',
-    # grad_fn=<NllLossBackward0>), tensor(0.0003, device='cuda:6', grad_fn=<AddBackward0>), tensor(80.6094, 
-    # device='cuda:6'), 0.9934895833333334)
-    return total_loss, ce_loss, order_loss, pos_loss, perm_loss
-
+from model.loss_function import compute_losses
 class Sequence_CE(nn.Module):
 
     def __init__(self,  action_dim, class_dim, weight):
@@ -382,24 +323,45 @@ class Sequence_CE(nn.Module):
         self.class_dim = class_dim
         self.weight = weight
 
-    def forward(self, pred, targ,l_order=200.0, l_pos=0.01, l_perm=2.0):
+    def forward(self, pred, targ,l_order=200.0, l_pos=0.01, l_perm=2.0,kind = 0):
         """
         :param pred: [B, T, task_dim+action_dim+observation_dim]
         :param targ: [B, T, task_dim+action_dim+observation_dim]
         :return:
         """
-        loss_action = compute_losses(pred[:,:,self.class_dim:self.class_dim +
-                                    self.action_dim], targ[:,:,self.class_dim:self.class_dim +
-                                    self.action_dim], lambda_order=l_order,
-                                    lambda_pos=l_pos, lambda_perm=l_perm)
+        mse_loss = F.mse_loss(pred, targ, reduction='none').sum()
+        
+        total_loss, ce_loss, order_loss, pos_loss, \
+            perm_loss = compute_losses(pred[:,:,self.class_dim:self.class_dim +
+                                        self.action_dim], targ[:,:,self.class_dim:self.class_dim +
+                                        self.action_dim], lambda_oc=l_order,
+                                        lambda_fp=l_pos, lambda_r=l_perm)
+        if kind == 0 :
+            return ce_loss
+        elif kind == 1:
+            return ce_loss+order_loss
+        elif kind == 2:
+            return ce_loss + pos_loss
+        elif kind == 3:
+            return ce_loss + perm_loss
+        elif kind == 4:
+            return mse_loss
+        elif kind == 5:
+            return mse_loss + order_loss
+        elif kind == 6:
+            return mse_loss + pos_loss
+        elif kind == 7:
+            return mse_loss + perm_loss
+        else:
+            RuntimeError('unvalid kind')
         
         def scale_tuple_elements(t, factor=1000):
             return tuple(x * factor for x in t)
         
-        loss_action = scale_tuple_elements(loss_action)
+        # loss_action = scale_tuple_elements(loss_action)
         # print(loss_action)
 
-        return loss_action[0] 
+        return ce_loss
 
 
 class Weighted_Gradient_MSE(nn.Module):
@@ -411,7 +373,7 @@ class Weighted_Gradient_MSE(nn.Module):
         self.class_dim = class_dim
         self.weight = weight
 
-    def forward(self, pred, targ):
+    def forward(self, pred, targ, mask=None):
         """
         :param pred: [B, T, task_dim+action_dim+observation_dim]
         :param targ: [B, T, task_dim+action_dim+observation_dim]
@@ -434,10 +396,27 @@ class Weighted_Gradient_MSE(nn.Module):
                                1, device=pred.device)[1:]
             ])
 
-        # Apply weights to the action part of the loss
-        for t in range(time_steps):
-            loss_action[:, t, self.class_dim:self.class_dim +
-                        self.action_dim] *= weights[t]
+
+        if mask is not None:
+            # Scale tensor
+            scale = torch.full((time_steps,), 1.1, device=pred.device)
+            # Apply weights to the action part of the loss
+            loss_action = loss_action[
+                :, :, self.class_dim: self.class_dim + self.action_dim
+            ]
+            mask = mask[:, :, self.class_dim: self.class_dim + self.action_dim]
+            for t in range(time_steps):
+                loss_action[:, t, :] = torch.where(
+                    mask[:, t, :] == 1,
+                    loss_action[:, t, :] * scale[t],
+                    loss_action[:, t, :],
+                )
+                loss_action[:, t, :] *= weights[t]
+
+        else:
+            for t in range(time_steps):
+                loss_action[:, t, self.class_dim:self.class_dim +
+                            self.action_dim] *= weights[t]
 
         loss_action = loss_action.sum()
         

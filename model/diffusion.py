@@ -8,6 +8,7 @@ from .helpers import (
     extract,
     condition_projection,
     Losses,
+    compute_mask,
 )
 
 
@@ -21,6 +22,7 @@ class GaussianDiffusion(nn.Module):
         self.model = model  # Set the model (e.g., UNet)
         self.weight = args.weight  # Set the weight for the loss function
         self.ifMask = args.ifMask
+        self.kind = args.kind
 
         # Set the number of timesteps for diffusion
         self.n_timesteps = args.n_diffusion_steps # default=200
@@ -157,13 +159,13 @@ class GaussianDiffusion(nn.Module):
 
     # Function to perform standard diffusion model sampling
     @torch.no_grad()
-    def p_sample(self, x, cond, t):
+    def p_sample(self, x, cond, t, mask=None):
         b, *_, device = *x.shape, x.device
         # t是当前的时间步，一个标量或一维张量，指示我们处于去噪过程中的哪个阶段
         # model_mean 模型预测的均值
         # 模型预测的对数方差
         model_mean, _, model_log_variance = self.p_mean_variance(
-            x=x, cond=cond, t=t) 
+            x=x, cond=cond, t=t, mask=mask)
         noise = torch.randn_like(x) * self.random_ratio
         # (t == 0): 返回一个布尔张量，其中 ：
         # t 为 0 的位置为 True，否则为 False。
@@ -186,20 +188,27 @@ class GaussianDiffusion(nn.Module):
         x = torch.randn(shape, device=device) * \
             self.random_ratio  # Initialize xt for Noise and diffusion
         # x = torch.zeros(shape, device=device)   # for Deterministic
-        x = condition_projection(x, cond, self.action_dim, self.class_dim)
-
+        mask = None
+        if self.ifMask:
+            mask = compute_mask(x)
+            x = condition_projection(x, cond, self.action_dim, self.class_dim)
+            x = x * mask
+        else:
+            x = condition_projection(x, cond, self.action_dim, self.class_dim)
         '''
         The if-else below is for diffusion, should be removed for Noise and Deterministic
         '''
-        if not if_jump:
+        if not if_jump: # DDPM
             for i in reversed(range(0, self.n_timesteps)):
                 timesteps = torch.full(
                     (batch_size,), i, device=device, dtype=torch.long) # 用于创建一个给定形状的张量，并填充指定的值
-                x = self.p_sample(x, cond, timesteps)
+                
+                x = self.p_sample(x, cond, timesteps, mask=mask)
+                
                 x = condition_projection(
                     x, cond, self.action_dim, self.class_dim)
 
-        else:
+        else: #DDIM
             for i in reversed(range(0, self.ddim_timesteps)):
                 timesteps = torch.full(
                     (batch_size,), self.ddim_timestep_seq[i], device=device, dtype=torch.long)
@@ -246,7 +255,10 @@ class GaussianDiffusion(nn.Module):
         noise = torch.randn_like(x_start) * self.random_ratio
         # noise = torch.zeros_like(x_start)   # for Deterministic
         # x_noisy = noise   # for Noise and Deterministic
-
+        mask = None
+        if self.ifMask:
+            mask = compute_mask(x_start)
+            x_start = x_start * mask
         # For diffusion, add noise to the input
         x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
 
@@ -262,9 +274,11 @@ class GaussianDiffusion(nn.Module):
         
         
         if self.loss_type == 'Sequence_CE':        
-             loss = self.loss_fn(x_recon, x_start, self.l_order,self.l_pos,self.l_perm)  # Compute the loss
+             loss = self.loss_fn(x_recon, x_start, self.l_order,self.l_pos,self.l_perm,self.kind)  # Compute the loss
+        elif self.ifMask:
+            loss = self.loss_fn(x_recon, x_start, mask)  # Compute the loss
         else:
-            loss = self.loss_fn(x_recon, x_start)  # Compute the loss
+            loss = self.loss_fn(x_recon, x_start)
         return loss
 
     # Compute the loss for the batch
@@ -278,5 +292,5 @@ class GaussianDiffusion(nn.Module):
         return self.p_losses(x, cond, t)
 
     # Forward pass of the model
-    def forward(self, cond, if_jump=False):
+    def forward(self, cond, if_jump=True):
         return self.p_sample_loop(cond, if_jump)

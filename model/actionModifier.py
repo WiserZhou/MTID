@@ -89,6 +89,7 @@ print(target)
 for epoch in tqdm(range(100000)):  # 训练1000个epoch
     optimizer.zero_grad()  # 清空梯度
     output = net(k)  # 前向传播
+    print(output)
     loss = criterion(output, target)  # 计算损失
     loss.backward()  # 反向传播
     optimizer.step()  # 优化

@@ -42,7 +42,7 @@ environments = [
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/output6.json',
                     200,    # self.n_diffusion_steps = n_diffusion_steps
                     200,    # self.n_train_steps = n_train_steps
-                    150,     # self.epochs = epochs
+                    100,     # self.epochs = epochs
                     5e-4),  # self.lr = lr
     EnvironmentInfo("crosstask_base_predictor",  9600, 105, 18,
                     '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/base/train_list.json',

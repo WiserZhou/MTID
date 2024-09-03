@@ -16,7 +16,6 @@ from utils.env_args import get_environment_shape
 
 import utils
 from dataloader.data_load import PlanningDataset
-from model import diffusion, temporal, temporal_fourier, temporalPredictor,temporalPredictorfull,temporalPredictorhalf
 from model.helpers import get_lr_schedule_with_warmup
 
 from utils import *
@@ -27,7 +26,22 @@ from model.helpers import Logger
 from tqdm import tqdm
 import subprocess
 from inference import test_inference
+import fractions
 
+def parse_fraction_or_float(value):
+    """尝试将字符串转换为浮点数或分数"""
+    try:
+        # 尝试直接转换为浮点数
+        return float(value)
+    except ValueError:
+        # 如果不是浮点数，尝试将其作为分数处理
+        try:
+            # 将字符串转换为Fraction对象
+            fraction = fractions.Fraction(value)
+            # 将Fraction对象转换为浮点数
+            return float(fraction)
+        except (ValueError, TypeError):
+            raise ValueError(f"无法将 '{value}' 转换为浮点数或分数")
 
 def reduce_tensor(tensor):
     # Check if the distributed package is initialized.
@@ -187,25 +201,23 @@ def main_worker(gpu, ngpus_per_node, args):
         num_workers=args.num_thread_reader,
         sampler=test_sampler,
     )
+    from model import diffusion, temporal, temporalPredictor,temporalPreAll,temporalPreStep,temporalPredictorCasual
 
     # create model
     if args.base_model == 'base':
-        temporal_model = temporal.TemporalUnet(args,
-                                               dim=256,
-                                               dim_mults=(1, 2, 4), )
+        temporal_model = temporal.TemporalUnet(args,dim=256,dim_mults=(1, 2, 4), )
     elif args.base_model == 'predictor':
-        temporal_model = temporalPredictor.TemporalUnet(args,
-                                                        dim=256,
-                                                        dim_mults=(1, 2, 4), )
-    elif args.base_model == 'prehalf':
-        temporal_model = temporalPredictorhalf.TemporalUnet(args,
-                                                        dim=256,
-                                                        dim_mults=(1, 2, 4), )
-    elif args.base_model == 'prefull':
-        temporal_model = temporalPredictorfull.TemporalUnet(args,
-                                                        dim=256,
-                                                        dim_mults=(1, 2, 4), )
+        temporal_model = temporalPredictor.TemporalUnet(args,dim=256,dim_mults=(1, 2, 4), )
+    elif args.base_model == 'preAll':
+        temporal_model = temporalPreAll.TemporalUnet(args,dim=256,dim_mults=(1, 2, 4), )
+    elif args.base_model == 'preStep':
+        temporal_model = temporalPreStep.TemporalUnet(args,dim=256,dim_mults=(1, 2, 4), )
+    elif args.base_model == 'preCas':
+        temporal_model = temporalPredictorCasual.TemporalUnet(args,dim=256,dim_mults=(1, 2, 4),)
+    else:
+        RuntimeError('unvalid base model!')
     
+        
     if args.base_model != 'base':
         args.base_model = 'predictor'
 
@@ -236,9 +248,15 @@ def main_worker(gpu, ngpus_per_node, args):
     else:
         model.model = torch.nn.DataParallel(model.model).cuda()
         model.ema_model = torch.nn.DataParallel(model.ema_model).cuda()
-
+        
+    scale1 = parse_fraction_or_float(args.scale1)
+    scale2 = parse_fraction_or_float(args.scale2)
+    
     scheduler = get_lr_schedule_with_warmup(
-        model.optimizer, int(args.n_train_steps * epoch_env),args.dataset,args.base_model)
+        model.optimizer, int(args.n_train_steps * epoch_env),
+        args.dataset,args.base_model,
+        # scale1=scale1, scale2=scale2,
+        )
 
     checkpoint_dir = os.path.join(os.path.dirname(
         __file__), 'checkpoint', args.checkpoint_dir)
@@ -303,6 +321,8 @@ def main_worker(gpu, ngpus_per_node, args):
     max_train_epoch = 0
     max_test_acc = 0
     max_test_epoch = 0
+
+    
 
     # Main training loop across epochs
     for epoch in tqdm(range(args.start_epoch, epoch_env), desc='total train'):
@@ -400,7 +420,7 @@ def main_worker(gpu, ngpus_per_node, args):
                     tb_logger.log_scalar(value, key, epoch + 1)
 
                 tb_logger.flush()
-                print(trajectory_success_rate_meter_reduced, max_eva)
+                print(trajectory_success_rate_meter_reduced,acc_top1_reduced,MIoU2_meter_reduced, max_eva)
 
             # Save checkpoint if the new trajectory success rate is better
             if trajectory_success_rate_meter_reduced > max_eva and acc_top1_reduced >= max_acc:

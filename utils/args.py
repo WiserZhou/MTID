@@ -211,10 +211,13 @@ def get_args(description='whl'):
                         type=int, help='whether to use DDIM to inference')
     
     parser.add_argument('--loss_type', default='Weighted_Gradient_MSE', type=str,
-                    help='Weighted_Gradient_MSE: gradient change ; Sequence_CE: CE and order loss')
-    parser.add_argument('--l_order', default=5000.0, type=float, help='ratio of lambda_order')
-    parser.add_argument('--l_pos', default=0.01, type=float, help='ratio of lambda_pos')
+                    help='Weighted_Gradient_MSE: gradient change ; Sequence_CE: CE and order loss;')
+    parser.add_argument('--kind',default=0,type=int)
+    parser.add_argument('--l_order', default=1000.0, type=float, help='ratio of lambda_order')
+    parser.add_argument('--l_pos', default=1.0, type=float, help='ratio of lambda_pos')
     parser.add_argument('--l_perm', default=1.0, type=float, help='ratio of lambda_perm')
-    
+    parser.add_argument("--ifMask", type=bool,default=False, help="whether use mask")
+    parser.add_argument('--scale1',type=str,default='1/6')
+    parser.add_argument('--scale2',type=str,default='1/4')
     args = parser.parse_args()
     return args
