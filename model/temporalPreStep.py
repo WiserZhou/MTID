@@ -16,51 +16,50 @@ from .actionPredictorPre import (
 
 
 class CrossAttention(nn.Module):
-    def __init__(self, observation_dim, embed_dim, num_heads):
+    def __init__(self, observation_dim, embed_dim, num_heads,interpolation_num):
         super().__init__()
         self.multihead_attn = nn.MultiheadAttention(
-            embed_dim, num_heads, batch_first=False)
+            embed_dim, num_heads, batch_first=True)
         self.layer_norm = nn.LayerNorm(embed_dim)
         self.ffn = nn.Sequential(
             nn.Linear(embed_dim, embed_dim * 4),
             nn.Mish(),
             nn.Linear(embed_dim * 4, embed_dim)
         )
-        self.linear = nn.Linear(observation_dim, embed_dim)
+        self.linear = nn.Linear(observation_dim*interpolation_num, embed_dim)
 
     def forward(self, x, context):
 
-        # print(x.shape)  # torch.Size([256, 256, 3])
-        # print(context.shape)  # torch.Size([256, 256])
-        
+        # print(x.shape)  # torch.Size([256, 256, 4])
+        # print(context.shape)  # torch.Size([256, 7680])
 
-        context = context.unsqueeze(2)  # torch.Size([256,256,1])
+        context = context.unsqueeze(2)  # torch.Size([256,7680,1])
 
-        x = einops.rearrange(x, 'b t c -> c b t')
+        x = einops.rearrange(x, 'b t c -> b c t') 
         # Assuming you added only the sequence length dimension
-        context = einops.rearrange(context, 'b s c -> c b s')
+        context = einops.rearrange(context, 'b s c -> b c s')
         # If you added both dimensions, you might need to rearrange differently:
         # context = einops.rearrange(context, 's b c -> b s c')
-
-        # print(x.shape)  # torch.Size([3, 256, 256])
-        # print(context.shape)  # torch.Size([1, 256, 1536])
-
+        
+        # print(x.shape) # torch.Size([256,4,  256])
+        # print(context.shape)  # torch.Size([256,1,  7680])
         context = self.linear(context)
-        # print(x.shape[2])
-        # 1024
-# residual torch.Size([256, 1024, 1])
+        # residual torch.Size([256, 1024, 1])
+        # print(x.shape)  # torch.Size([256,4,  256])
+        # print(context.shape)  # torch.Size([256,1,256])
 
         attn_output, _ = self.multihead_attn(x, context, context)
         x = x + attn_output
         x = self.layer_norm(x)
         x = x + self.ffn(x)
-        x = einops.rearrange(x, 'c b t -> b t c')
-        return x
+        
+        x = einops.rearrange(x, 'b c t -> b t c')
+        return x  # torch.Size([256, 4, 256])
 
 
 class ResidualTemporalBlock(nn.Module):
 
-    def __init__(self, observation_dim, inp_channels, out_channels, embed_dim, kernel_size=3, num_heads=4):
+    def __init__(self, observation_dim, inp_channels, out_channels,interpolation_num, embed_dim, kernel_size=3, num_heads=4):
         super().__init__()
         
         self.out_channels = out_channels
@@ -84,15 +83,16 @@ class ResidualTemporalBlock(nn.Module):
 
         # Cross attention block
         self.cross_attention = CrossAttention(
-            observation_dim, out_channels, num_heads)
+            observation_dim, out_channels, num_heads,interpolation_num)
 
     def forward(self, x, t, context):
 
         # Forward pass with time embedding (for diffusion models)
         out = self.blocks[0](x) + self.time_mlp(t)   # for diffusion
 
-        # print(out.shape)  # torch.Size([256, 256, 3])
+        # print(out.shape)  # torch.Size([256, 256, 4])
         out2 = self.cross_attention(out, context)
+        # print(out2.shape) # torch.Size([256, 4, 256])
 
         out = out2 + out
 
@@ -117,6 +117,7 @@ class TemporalUnet(nn.Module):
         self.args = args
 
         transition_dim = args.action_dim + args.observation_dim + args.class_dim
+        self.interpolation_num = 5
 
         # Determine the dimensions at each stage
         dims = [transition_dim, *map(lambda m: dim * m, dim_mults)]
@@ -142,9 +143,9 @@ class TemporalUnet(nn.Module):
 
             self.downs.append(nn.ModuleList([
                 ResidualTemporalBlock(args.observation_dim,
-                                      dim_in, dim_out, embed_dim=time_dim, num_heads=num_heads),
+                                      dim_in, dim_out,self.interpolation_num, embed_dim=time_dim, num_heads=num_heads),
                 ResidualTemporalBlock(args.observation_dim,
-                                      dim_out, dim_out, embed_dim=time_dim, num_heads=num_heads),
+                                      dim_out, dim_out,self.interpolation_num, embed_dim=time_dim, num_heads=num_heads),
                 Downsample1d(dim_out) if not is_last else nn.Identity(),
             ]))
 
@@ -154,9 +155,9 @@ class TemporalUnet(nn.Module):
 
         # Define the middle blocks
         self.mid_block1 = ResidualTemporalBlock(args.observation_dim,
-                                                mid_dim, mid_dim, embed_dim=time_dim, num_heads=num_heads)
+                                                mid_dim, mid_dim,self.interpolation_num, embed_dim=time_dim, num_heads=num_heads)
         self.mid_block2 = ResidualTemporalBlock(args.observation_dim,
-                                                mid_dim, mid_dim, embed_dim=time_dim, num_heads=num_heads)
+                                                mid_dim, mid_dim,self.interpolation_num, embed_dim=time_dim, num_heads=num_heads)
 
         self.block_num += 2
 
@@ -166,9 +167,9 @@ class TemporalUnet(nn.Module):
 
             self.ups.append(nn.ModuleList([
                 ResidualTemporalBlock(args.observation_dim,
-                                      dim_out * 2, dim_in, embed_dim=time_dim, num_heads=num_heads),
+                                      dim_out * 2, dim_in,self.interpolation_num, embed_dim=time_dim, num_heads=num_heads),
                 ResidualTemporalBlock(args.observation_dim,
-                                      dim_in, dim_in, embed_dim=time_dim, num_heads=num_heads),
+                                      dim_in, dim_in,self.interpolation_num, embed_dim=time_dim, num_heads=num_heads),
                 Upsample1d(dim_in) if not is_last else nn.Identity()
             ]))
 
@@ -180,10 +181,10 @@ class TemporalUnet(nn.Module):
             nn.Conv1d(dim, transition_dim, 1),
         )
         
-        self.interpolation_num = 3
+        
         self.motionPredictor = MotionPredictor(self.args,
                                                self.args.observation_dim,
-                                               self.args.observation_dim//self.interpolation_num,
+                                               self.args.observation_dim,
                                                dim,
                                                self.interpolation_num
                                                )
@@ -201,21 +202,25 @@ class TemporalUnet(nn.Module):
         cross_features = self.motionPredictor(x[:, 0, self.args.class_dim + self.args.action_dim:],
                                               x[:, -1, self.args.class_dim + self.args.action_dim:])
 
-        # print(cross_features.shape) torch.Size([256, 3, 512])
+        # print(cross_features.shape) # torch.Size([256, 5, 1536])
         # cross_features = cross_features.permute(1, 0, 2)
-        cross_features_pre1 = cross_features[:,self.interpolation_num//2,:].repeat(1,self.interpolation_num,1)
-        cross_features_pre1 = cross_features_pre1.view(cross_features.shape[0],-1)
+        # cross_features_pre1 = cross_features[:,self.interpolation_num//2,:].repeat(1,self.interpolation_num,1)
+        # cross_features_pre1 = cross_features_pre1.view(cross_features.shape[0],-1)
+        
+        # print(cross_features_pre1.shape) # torch.Size([256, 7680])
         
         # cross_features_pre2 = cross_features[:,1:4,:].repeat(1,2,1)
         # cross_features_pre2 = cross_features_pre2.view(cross_features.shape[0],-1)       
         
         
-        cross_features = cross_features.view(cross_features.shape[0],-1)
+        cross_features = cross_features.view(cross_features.shape[0],-1) # torch.Size([256, 7680])
         
         # print(cross_features.shape) torch.Size([256, 1536])
-        if cross_features.shape[1] != self.args.observation_dim:
+        if cross_features.shape[1] != self.args.observation_dim * self.interpolation_num:
             batch_size = cross_features.size(0)
-            padding = torch.zeros(batch_size, self.args.observation_dim - cross_features.shape[1]).to(cross_features.device)  # 1536 - 1344 = 192
+            padding = torch.zeros(batch_size, 
+                                    self.args.observation_dim* self.interpolation_num - cross_features.shape[1]
+                                    ).to(cross_features.device) 
             return torch.cat([cross_features, padding], dim=1)
         # x shape (batch_size,horizon,dimension)
         # Rearrange input tensor dimensions
@@ -235,9 +240,9 @@ class TemporalUnet(nn.Module):
 
         # Forward pass through downsampling blocks
         for resnet, resnet2, downsample in self.downs:
-            x = resnet(x, t, cross_features_pre1)
+            x = resnet(x, t, cross_features)
             index += 1
-            x = resnet2(x, t, cross_features_pre1)
+            x = resnet2(x, t, cross_features)
             index += 1
             h.append(x)
             x = downsample(x)

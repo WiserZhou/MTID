@@ -24,7 +24,6 @@ from utils.args import get_args
 import numpy as np
 from model.helpers import Logger
 from tqdm import tqdm
-import subprocess
 from inference import test_inference
 import fractions
 

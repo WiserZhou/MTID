@@ -1,7 +1,6 @@
 import os
 import random
 import time
-from tqdm import tqdm
 import numpy as np
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
@@ -157,7 +156,7 @@ def test_inference(val_loader, model, args):
     A0_acc = AverageMeter()
     AT_acc = AverageMeter()
 
-    for i_batch, sample_batch in tqdm(enumerate(val_loader)):
+    for i_batch, sample_batch in enumerate(val_loader):
         # compute output
         global_img_tensors = sample_batch[0].cuda().contiguous()
         # print('global_img_tensors')

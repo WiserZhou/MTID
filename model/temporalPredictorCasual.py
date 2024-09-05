@@ -38,18 +38,19 @@ class CrossAttention(nn.Module):
         context = einops.rearrange(context, 'b s c -> c b s')
         context = self.linear(context)
         
-        causal_mask = torch.tril(torch.ones(self.num_heads*x.shape[1],x.shape[0], context.shape[0])).to(x.device).bool()
+        # causal_mask = torch.tril(torch.ones(self.num_heads*x.shape[1],x.shape[0], context.shape[0])).to(x.device).bool()
          # 创建一个全为 False 的掩码张量
-        # causal_mask = torch.zeros((self.num_heads*x.shape[1],x.shape[0], context.shape[0]), dtype=torch.bool, device=x.device)
+        causal_mask = torch.zeros((self.num_heads*x.shape[1],x.shape[0], context.shape[0]), dtype=torch.bool, device=x.device)
 
         # # 循环遍历每个序列位置
         # for i in range(x.shape[0]):
         #     # 在第二个维度上从 0 到 i 的位置设置为 True
         #     causal_mask[:, i, :i+1] = True
+        causal_mask[:,0,:] = True
             
-        print(causal_mask)
+        # print(causal_mask)
         attn_output, _ = self.multihead_attn(x, context, context, attn_mask=causal_mask) 
-        print(attn_output)
+        # print(attn_output)
         x = x + attn_output
         x = self.layer_norm(x)
         x = x + self.ffn(x)

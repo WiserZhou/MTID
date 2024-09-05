@@ -509,8 +509,8 @@ def get_lr_schedule_with_warmup(optimizer, num_training_steps,dataset,base_model
             num_warmup_steps_scale = 1 / 3
             decay_steps_scale = 1 / 2
         elif dataset == 'NIV' and base_model == 'predictor':
-            num_warmup_steps_scale =  9 / 13
-            decay_steps_scale =  3 / 13
+            num_warmup_steps_scale =  1/5
+            decay_steps_scale =  1/3
         elif dataset == 'coin' and base_model == 'predictor':
             num_warmup_steps_scale = 1 / 40
             decay_steps_scale = 1 / 16
