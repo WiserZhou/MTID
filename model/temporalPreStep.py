@@ -29,30 +29,20 @@ class CrossAttention(nn.Module):
         self.linear = nn.Linear(observation_dim*interpolation_num, embed_dim)
 
     def forward(self, x, context):
-
         # print(x.shape)  # torch.Size([256, 256, 4])
         # print(context.shape)  # torch.Size([256, 7680])
-
         context = context.unsqueeze(2)  # torch.Size([256,7680,1])
-
         x = einops.rearrange(x, 'b t c -> b c t') 
-        # Assuming you added only the sequence length dimension
         context = einops.rearrange(context, 'b s c -> b c s')
-        # If you added both dimensions, you might need to rearrange differently:
-        # context = einops.rearrange(context, 's b c -> b s c')
-        
         # print(x.shape) # torch.Size([256,4,  256])
         # print(context.shape)  # torch.Size([256,1,  7680])
         context = self.linear(context)
-        # residual torch.Size([256, 1024, 1])
         # print(x.shape)  # torch.Size([256,4,  256])
         # print(context.shape)  # torch.Size([256,1,256])
-
         attn_output, _ = self.multihead_attn(x, context, context)
         x = x + attn_output
         x = self.layer_norm(x)
         x = x + self.ffn(x)
-        
         x = einops.rearrange(x, 'b c t -> b t c')
         return x  # torch.Size([256, 4, 256])
 

@@ -512,8 +512,9 @@ def get_lr_schedule_with_warmup(optimizer, num_training_steps,dataset,base_model
             num_warmup_steps_scale =  1/5
             decay_steps_scale =  1/3
         elif dataset == 'coin' and base_model == 'predictor':
-            num_warmup_steps_scale = 1 / 40
-            decay_steps_scale = 1 / 16
+            print('coin&predictor')
+            num_warmup_steps_scale = 1 / 6
+            decay_steps_scale = 1 / 4
         else:
             RuntimeError('select error!')
     else:
@@ -522,6 +523,11 @@ def get_lr_schedule_with_warmup(optimizer, num_training_steps,dataset,base_model
         
     num_warmup_steps = int(num_training_steps * num_warmup_steps_scale)
     decay_steps = int(num_training_steps * decay_steps_scale)
+    
+    print('num_training_steps')
+    print(num_training_steps)
+    print('decay_steps')
+    print(decay_steps)
     
     def lr_lambda(current_step):
         if current_step <= num_warmup_steps:

@@ -136,8 +136,8 @@ def main_worker(gpu, ngpus_per_node, args):
     args.n_diffusion_steps = env_dict['n_diffusion_steps']
     args.n_train_steps = env_dict['n_train_steps']
     epoch_env = env_dict['epochs']
-    args.lr = env_dict['lr']
-    
+    if args.dataset == 'coin':
+        args.lr = env_dict['lr']
 
     if args.verbose:
         print(args)

@@ -61,6 +61,7 @@ dependencies:
   - zipp=3.20.0=pyhd8ed1ab_0
   - zlib=1.2.13=h5eee18b_1
   - pip:
+      - absl-py==2.1.0
       - accelerate==0.33.0
       - addict==2.4.0
       - aiohappyeyeballs==2.4.0
@@ -72,6 +73,8 @@ dependencies:
       - anyio==4.4.0
       - async-timeout==4.0.3
       - attrs==24.2.0
+      - blessed==1.20.0
+      - bypy==1.8.5
       - certifi==2024.7.4
       - cffi==1.17.0
       - charset-normalizer==3.3.2
@@ -93,7 +96,9 @@ dependencies:
       - gast==0.6.0
       - gitdb==4.0.11
       - gitpython==3.1.43
+      - gpustat==1.1.1
       - greenlet==3.0.3
+      - grpcio==1.66.0
       - h11==0.14.0
       - httpcore==1.0.5
       - httpx==0.27.0
@@ -109,6 +114,7 @@ dependencies:
       - langchain-core==0.1.52
       - langchain-text-splitters==0.0.2
       - langsmith==0.1.99
+      - markdown==3.7
       - markupsafe==2.1.5
       - marshmallow==3.21.3
       - modelscope==1.11.0
@@ -127,6 +133,7 @@ dependencies:
       - nvidia-curand-cu12==10.3.2.106
       - nvidia-cusolver-cu12==11.4.5.107
       - nvidia-cusparse-cu12==12.1.0.106
+      - nvidia-ml-py==12.560.30
       - nvidia-nccl-cu12==2.20.5
       - nvidia-nvjitlink-cu12==12.6.20
       - nvidia-nvtx-cu12==12.1.105
@@ -146,6 +153,7 @@ dependencies:
       - pyyaml==6.0.2
       - regex==2024.7.24
       - requests==2.32.3
+      - requests-toolbelt==1.0.0
       - safetensors==0.4.4
       - scipy==1.14.0
       - sentry-sdk==2.13.0
@@ -157,6 +165,8 @@ dependencies:
       - sqlalchemy==2.0.32
       - sympy==1.13.2
       - tenacity==8.5.0
+      - tensorboard==2.17.1
+      - tensorboard-data-server==0.7.2
       - tensorboardx==2.6.2.2
       - tokenizers==0.19.1
       - tomli==2.0.1
@@ -170,6 +180,7 @@ dependencies:
       - tzdata==2024.1
       - urllib3==2.2.2
       - wandb==0.17.7
+      - werkzeug==3.0.4
       - xxhash==3.5.0
       - yapf==0.40.2
       - yarl==1.9.4

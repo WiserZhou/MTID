@@ -32,10 +32,7 @@ class CrossAttention(nn.Module):
 
         # print(x.shape)  # torch.Size([256, 256, 3])
         # print(context.shape)  # torch.Size([256, 256])
-        
-
         context = context.unsqueeze(2)  # torch.Size([256,256,1])
-
         x = einops.rearrange(x, 'b t c -> c b t')
         # Assuming you added only the sequence length dimension
         context = einops.rearrange(context, 'b s c -> c b s')

@@ -137,18 +137,6 @@ class MotionPredictor(nn.Module):
         self.transformer_blocks = nn.ModuleList([TransformerBlock(
             output_dim, num_heads=8, num_layers=args.transformer_num) for _ in range(num_transformer_blocks)])
 
-        # self.residual_conv = nn.Conv1d(input_dim, output_dim, 1) \
-        #     if input_dim != output_dim else nn.Identity()
-
-        # self.ffn = nn.Sequential(
-        #     nn.Linear(output_dim, dimension_num * 4),
-        #     nn.Mish(),
-        #     nn.Linear(dimension_num * 4, dimension_num)
-        # )
-
-#   MotionPredictor(
-#   x[:, 0, self.args.action_dim + self.args.observation_dim:],
-#   x[:, -1, self.args.action_dim + self.args.observation_dim:],
     def forward(self, x1, x2):
 
         # print(x1.shape)torch.Size([256, 1536])
@@ -160,7 +148,6 @@ class MotionPredictor(nn.Module):
         # x2_encoded = x2
 
         # print(x1_encoded.shape)torch.Size([256, 1536, 1])
-
         interpolated_frames = self.interpolator(
             x1_encoded, x2_encoded)
 
