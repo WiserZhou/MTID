@@ -487,45 +487,43 @@ Losses = {
 # -----------------------------------------------------------------------------#
 
 
-def get_lr_schedule_with_warmup(optimizer, num_training_steps,dataset,base_model,schedule,scale1=1/6, scale2=1/4,train=False,last_epoch=-1):
+def get_lr_schedule_with_warmup(optimizer, num_training_steps,dataset,
+                                base_model,schedule,scale1=1/6, scale2=1/4,train=False,last_epoch=-1):
     
-    if not train:
-        if dataset == 'crosstask_how' and base_model == 'base':
-            num_warmup_steps_scale = 1 / 6
-            decay_steps_scale = 1 / 4
-        elif dataset == 'crosstask_base' and base_model == 'base':
-            num_warmup_steps_scale = 1 / 3
-            decay_steps_scale = 1 / 2
-        elif dataset == 'NIV' and base_model == 'base':
-            num_warmup_steps_scale =  9 / 13
-            decay_steps_scale =  3 / 13
-        elif dataset == 'coin' and base_model == 'base':
-            num_warmup_steps_scale = 1 / 40
-            decay_steps_scale = 1 / 16
-        elif dataset == 'crosstask_how' and base_model == 'predictor':
-            num_warmup_steps_scale = 1 / 6
-            decay_steps_scale = 1 / 4
-        elif dataset == 'crosstask_base' and base_model == 'predictor':
-            num_warmup_steps_scale = 1 / 3
-            decay_steps_scale = 1 / 2
-        elif dataset == 'NIV' and base_model == 'predictor':
-            num_warmup_steps_scale =  1/5
-            decay_steps_scale =  1/3
-        elif dataset == 'coin' and base_model == 'predictor':
-            print('coin&predictor')
-            if schedule == 'not':
-                num_warmup_steps_scale = 1 / 40
-                decay_steps_scale = 1 / 16
-            else:
-                num_warmup_steps_scale = 1 / 6
-                decay_steps_scale = 1 / 4
+    # if not train:
+    #     if dataset == 'crosstask_how' and base_model == 'base':
+    #         num_warmup_steps_scale = 1 / 6
+    #         decay_steps_scale = 1 / 4
+    #     elif dataset == 'crosstask_base' and base_model == 'base':
+    #         num_warmup_steps_scale = 1 / 3
+    #         decay_steps_scale = 1 / 2
+    #     elif dataset == 'NIV' and base_model == 'base':
+    #         num_warmup_steps_scale =  9 / 13
+    #         decay_steps_scale =  3 / 13
+    #     elif dataset == 'coin' and base_model == 'base':
+    #         num_warmup_steps_scale = 1 / 4
+    #         decay_steps_scale = 1 / 6
+    #     elif dataset == 'crosstask_how' and base_model == 'predictor':
+    #         num_warmup_steps_scale = 1 / 6
+    #         decay_steps_scale = 1 / 4
+    #     elif dataset == 'crosstask_base' and base_model == 'predictor':
+    #         num_warmup_steps_scale = 1 / 3
+    #         decay_steps_scale = 1 / 2
+    #     elif dataset == 'NIV' and base_model == 'predictor':
+    #         num_warmup_steps_scale =  1/5
+    #         decay_steps_scale =  1/3
+    #     elif dataset == 'coin' and base_model == 'predictor':
+    #         # print('coin&predictor')
+    #         num_warmup_steps_scale = 1 / 6
+    #         decay_steps_scale = 1 / 4
             
-        else:
-            RuntimeError('select error!')
-    else:
-        num_warmup_steps_scale = scale1
-        decay_steps_scale = scale2
-        
+    #     else:
+    #         RuntimeError('select error!')
+    # else:
+    #     num_warmup_steps_scale = scale1
+    #     decay_steps_scale = scale2
+    num_warmup_steps_scale = 1 / 6
+    decay_steps_scale = 1 / 4
     num_warmup_steps = int(num_training_steps * num_warmup_steps_scale)
     decay_steps = int(num_training_steps * decay_steps_scale)
     

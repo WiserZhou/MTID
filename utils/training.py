@@ -1,5 +1,5 @@
 import copy
-from model.helpers import AverageMeter
+from model.helpers import AverageMeter, Logger
 from .accuracy import *
 import torch.distributed as dist
 
@@ -104,6 +104,7 @@ class Trainer(object):
 
         self.reset_parameters()
         self.step = 0
+        self.action_dim = args.action_dim
 
     def reset_parameters(self):
         """
@@ -178,12 +179,7 @@ class Trainer(object):
 
                 # Initialize an empty tensor for one-hot encoded action labels.
                 # If distributed training is initialized, use model.module.action_dim, else use model.action_dim.
-                if dist.is_initialized():
-                    action_label_onehot = torch.zeros(
-                        (video_label.size(0), self.model.module.action_dim))
-                else:
-                    action_label_onehot = torch.zeros(
-                        (video_label.size(0), self.model.action_dim))
+                action_label_onehot = torch.zeros((video_label.size(0), self.action_dim))
 
                 # Create an index tensor with values ranging from 0 to the length of video_label.
                 ind = torch.arange(0, len(video_label))

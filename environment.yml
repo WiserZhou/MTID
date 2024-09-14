@@ -1,4 +1,4 @@
-name: PDPP
+name: MTID
 channels:
   - conda-forge
   - defaults
@@ -184,4 +184,4 @@ dependencies:
       - xxhash==3.5.0
       - yapf==0.40.2
       - yarl==1.9.4
-prefix: /home/zhaoboqi/miniconda3/envs/PDPP
+prefix: /home/zhaoboqi/miniconda3/envs/MTID

@@ -1,13 +1,7 @@
-# PDPP
-[CVPR 2023 Hightlight] PDPP: Projected Diffusion for Procedure Planning in Instructional Videos
+# MTID
+MTID: Masked Temporal Interpolation Diffusion For Procedure Planning
 
-This repository gives the official PyTorch implementation of [PDPP:Projected Diffusion for Procedure Planning in Instructional Videos](https://arxiv.org/abs/2303.14676v2) (CVPR 2023)
-
-### News
-* We have updated our paper with the following changes:
-  * We correct a mistake in the classification result of MLP for $CrossTask_{Base}$ when T=3, which should be around 83. The evaluation metrics results for $CrossTask_{Base}$ when T=3 thus dropped slightly, but still outperform all previous methods.
-  * We notice the initial random noise for sampling can influence the result, especially for NIV. Thus we update our results to the mean values of multiple sampling results with different initial random noises. We use the DDIM sampling process to get all results.
-  * The batch size value in our "Impact of batch size on mIoU" section of supplement is the sum of 8 GPUs in our old version paper. We rewrite it as the batch size value for a single GPU to avoid misunderstanding.
+<!-- This repository gives the official PyTorch implementation of [MTID: Masked Temporal Interpolation Diffusion For Procedure Planning](https://arxiv.org/abs/2303.14676v2) (CVPR 2023) -->
 
 ### Setup
 
@@ -17,7 +11,7 @@ In a conda env with cuda available, run:
 
 ```
 conda env create -f environment.yaml
-conda activate PDPP
+conda activate MTID
 ```
 
 
@@ -68,10 +62,10 @@ bash download.sh
 
 ------
 
-1. Train MLPs for task category prediction(By default,8 GPUs are used for training), you can modify the dataset, train steps, horizon(prediction length), json files savepath etc. in `args.py`. 
+1. Train transformer for task category prediction wiht single GPU.
 
 ```
-nohup python train_mlp.py --name=note > out/output_note.log 2>&1 &
+nohup python train_mlp.py --name=how1 --dataset=crosstask_how --gpu=0 --epochs=160 --horizon=3 > out/how1.log 2>&1 &
 ```
 
 ​	  Dimensions for different datasets are listed below:
@@ -82,7 +76,7 @@ nohup python train_mlp.py --name=note > out/output_note.log 2>&1 &
 | COIN      | 1536                 | 778        | 180       |
 | NIV       | 1536                 | 48         | 5         |
 
-​	  The trained MLPs will be saved in `{root}/save_max_mlp` and json files for training and testing data will be generated. Then run `temp.py` to generate json files with predicted task class for testing:
+​	  The trained transformer will be saved in `{root}/save_max_mlp` and json files for training and testing data will be generated. Then run `temp.py` to generate json files with predicted task class for testing:
 
 ​	  Modify the checkpoint path(L86) and json file path(L111) in `temp.py` and run:
 
@@ -91,7 +85,7 @@ CUDA_VISIBLE_DEVICES=0 python temp.py --num_thread_reader=1 --resume --batch_siz
 ```
 
 
-2. Train PDPP: Modify the 'json_path_val' in `args.py` as the output file of `temp.py` and run:
+2. Train MTID: Modify the 'json_path_val' in `args.py` as the output file of `temp.py` and run:
 
 ```
 nohup python main_distributed.py --name=your_note --gpu=1 > out/output_note.log 2>&1 &
@@ -180,4 +174,4 @@ If this project helps you in your research or project, please cite our paper:
 
 ------
 
-We would like to thank [He Zhao](https://joehezhao.github.io/) for his help in extracting the s3d features and providing the evaluation code of probabilistic modeling in [P3IV](https://github.com/JoeHEZHAO/procedure-planing). The diffusion model implementation is based on [diffuser](https://github.com/jannerm/diffuser) and [improved-diffusion](https://github.com/openai/improved-diffusion). We also reference and use some code from [PlaTe](https://github.com/Jiankai-Sun/plate-pytorch). Very sincere thanks to the contributors to these excellent codebases.
+<!-- We would like to thank [He Zhao](https://joehezhao.github.io/) for his help in extracting the s3d features and providing the evaluation code of probabilistic modeling in [P3IV](https://github.com/JoeHEZHAO/procedure-planing). The diffusion model implementation is based on [diffuser](https://github.com/jannerm/diffuser) and [improved-diffusion](https://github.com/openai/improved-diffusion). We also reference and use some code from [PlaTe](https://github.com/Jiankai-Sun/plate-pytorch). Very sincere thanks to the contributors to these excellent codebases. -->

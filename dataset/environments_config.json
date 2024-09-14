@@ -46,7 +46,7 @@
             "json_path_val6": "coin/output6.json",
             "n_diffusion_steps": 200,
             "n_train_steps": 200,
-            "epochs": 80,
+            "epochs": 100,
             "lr": 1e-5
         },
         {
@@ -62,7 +62,7 @@
             "json_path_val6": "NIV/output6.json",
             "n_diffusion_steps": 50,
             "n_train_steps": 50,
-            "epochs": 150,
+            "epochs": 100,
             "lr": 3e-4
         },
         {
@@ -78,7 +78,7 @@
             "json_path_val6": "crosstask/crosstask_release/output6.json",
             "n_diffusion_steps": 200,
             "n_train_steps": 200,
-            "epochs": 120,
+            "epochs": 100,
             "lr": 5e-4
         },
         {
@@ -94,7 +94,7 @@
             "json_path_val6": "crosstask/crosstask_release/base/output6.json",
             "n_diffusion_steps": 200,
             "n_train_steps": 200,
-            "epochs": 60,
+            "epochs": 150,
             "lr": 8e-4
         },
         {
@@ -110,7 +110,7 @@
             "json_path_val6": "coin/output6.json",
             "n_diffusion_steps": 200,
             "n_train_steps": 200,
-            "epochs": 800,
+            "epochs": 100,
             "lr": 1e-5
         },
         {
@@ -126,7 +126,7 @@
             "json_path_val6": "NIV/output6.json",
             "n_diffusion_steps": 50,
             "n_train_steps": 50,
-            "epochs": 130,
+            "epochs": 100,
             "lr": 3e-4
         }
     ]

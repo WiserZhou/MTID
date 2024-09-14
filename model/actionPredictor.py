@@ -146,10 +146,13 @@ class MotionPredictor(nn.Module):
 
         # x1_encoded = x1
         # x2_encoded = x2
+        # print(x1_encoded.shape)
 
         # print(x1_encoded.shape)torch.Size([256, 1536, 1])
         interpolated_frames = self.interpolator(
             x1_encoded, x2_encoded)
+        
+        # print(interpolated_frames.shape)
 
         # print(interpolated_frames.shape)  # torch.Size([256, 12, 1536])
 

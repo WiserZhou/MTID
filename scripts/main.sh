@@ -263,27 +263,7 @@ nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor8 --
 
 
 nohup python main_distributed.py --dataset=coin --name=coin1 --gpu=0 \
-      --base_model=predictor --horizon=4 --lr=1e-5 --schedule=not1 > out/coin1.log 2>&1 &
-nohup python main_distributed.py --dataset=coin --name=coin2 --gpu=7 \
-      --base_model=predictor --horizon=4 --lr=1.2e-5 --schedule=not1 > out/coin2.log 2>&1 &
-nohup python main_distributed.py --dataset=coin --name=coin3 --gpu=2 \
-      --base_model=predictor --horizon=4 --lr=1.4e-5 --schedule=not1 > out/coin3.log 2>&1 &
-nohup python main_distributed.py --dataset=coin --name=coin4 --gpu=3 \
-      --base_model=predictor --horizon=4 --lr=1.6e-5 --schedule=not1 > out/coin4.log 2>&1 &
-nohup python main_distributed.py --dataset=coin --name=coin5 --gpu=4 \
-      --base_model=predictor --horizon=4 --lr=1.8e-5 --schedule=not1 > out/coin5.log 2>&1 &
-nohup python main_distributed.py --dataset=coin --name=coin6 --gpu=5 \
-      --base_model=predictor --horizon=4 --lr=2.0e-5 --schedule=not1 > out/coin6.log 2>&1 &
-nohup python main_distributed.py --dataset=coin --name=coin7 --gpu=6 \
-      --base_model=predictor --horizon=4 --lr=0.8e-5 --schedule=not1 > out/coin7.log 2>&1 &
-nohup python main_distributed.py --dataset=coin --name=coin8 --gpu=7 \
-      --base_model=predictor --horizon=4 --lr=0.6e-5 --schedule=not1 > out/coin8.log 2>&1 &
-nohup python main_distributed.py --dataset=coin --name=coin9 --gpu=0 \
-      --base_model=predictor --horizon=4 --lr=0.4e-5 --schedule=not1 > out/coin9.log 2>&1 &
-nohup python main_distributed.py --dataset=coin --name=coin10 --gpu=1 \
-      --base_model=predictor --horizon=4 --lr=0.2e-5 --schedule=not1 > out/coin10.log 2>&1 &
-nohup python main_distributed.py --dataset=coin --name=coin11 --gpu=7 \
-      --base_model=predictor --horizon=4 --lr=1.2e-5 --schedule=not > out/coin11.log 2>&1 &
+      --base_model=predictor --horizon=4 --lr=1e-5 > out/coin1.log 2>&1 &
 
 
 
@@ -291,3 +271,5 @@ nohup python main_distributed.py --dataset=coin --name=coin7 --gpu=2 \
       --base_model=predictor --horizon=4 --seed=3407 > out/coin7.log 2>&1 &
 nohup python main_distributed.py --dataset=coin --name=coin8 --gpu=3 \
       --base_model=predictor --horizon=4 > out/coin8.log 2>&1 &
+
+
