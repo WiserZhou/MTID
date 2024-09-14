@@ -2,6 +2,7 @@
 MTID: Masked Temporal Interpolation Diffusion For Procedure Planning
 
 <!-- This repository gives the official PyTorch implementation of [MTID: Masked Temporal Interpolation Diffusion For Procedure Planning](https://arxiv.org/abs/2303.14676v2) (CVPR 2023) -->
+![architecture](figure/architecture.png)
 
 ### Setup
 
