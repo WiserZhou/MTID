@@ -254,6 +254,7 @@ def main_worker(gpu, ngpus_per_node, args):
     scheduler = get_lr_schedule_with_warmup(
         model.optimizer, int(args.n_train_steps * epoch_env),
         args.dataset,args.base_model,
+        args.schedule
         # scale1=scale1, scale2=scale2,
         )
 

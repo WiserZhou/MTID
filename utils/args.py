@@ -219,5 +219,6 @@ def get_args(description='whl'):
     parser.add_argument("--ifMask", type=bool,default=False, help="whether use mask")
     parser.add_argument('--scale1',type=str,default='1/6')
     parser.add_argument('--scale2',type=str,default='1/4')
+    parser.add_argument('--schedule',type=str,default='not')
     args = parser.parse_args()
     return args

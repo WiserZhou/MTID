@@ -18,7 +18,7 @@ class EnvironmentInfo:
                 setattr(self, key, os.path.join(base_path, getattr(self, key)))
 
 # Load environments from JSON file
-json_path = os.path.join(os.path.dirname(__file__), 'environments_config.json')
+json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'dataset/environments_config.json')
 with open(json_path, 'r') as f:
     config = json.load(f)
 

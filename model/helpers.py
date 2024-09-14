@@ -487,7 +487,7 @@ Losses = {
 # -----------------------------------------------------------------------------#
 
 
-def get_lr_schedule_with_warmup(optimizer, num_training_steps,dataset,base_model,scale1=1/6, scale2=1/4,train=False,last_epoch=-1):
+def get_lr_schedule_with_warmup(optimizer, num_training_steps,dataset,base_model,schedule,scale1=1/6, scale2=1/4,train=False,last_epoch=-1):
     
     if not train:
         if dataset == 'crosstask_how' and base_model == 'base':
@@ -513,8 +513,13 @@ def get_lr_schedule_with_warmup(optimizer, num_training_steps,dataset,base_model
             decay_steps_scale =  1/3
         elif dataset == 'coin' and base_model == 'predictor':
             print('coin&predictor')
-            num_warmup_steps_scale = 1 / 6
-            decay_steps_scale = 1 / 4
+            if schedule == 'not':
+                num_warmup_steps_scale = 1 / 40
+                decay_steps_scale = 1 / 16
+            else:
+                num_warmup_steps_scale = 1 / 6
+                decay_steps_scale = 1 / 4
+            
         else:
             RuntimeError('select error!')
     else:
