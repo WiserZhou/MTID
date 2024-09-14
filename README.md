@@ -4,6 +4,21 @@ MTID: Masked Temporal Interpolation Diffusion For Procedure Planning
 <!-- This repository gives the official PyTorch implementation of [MTID: Masked Temporal Interpolation Diffusion For Procedure Planning](https://arxiv.org/abs/2303.14676v2) (CVPR 2023) -->
 ![architecture](figure/architecture.png)
 
+## Overview
+
+Our masked temporal interpolation diffusion (prediction horizon $T=3$) works as follows:
+
+1. Train a transformer task classifier to generate condition information $c$, used as guidance along with observations $V_s$ and $V_g$.
+
+2. Input concatenated observations into latent space temporal interpolation module to obtain latent temporal and logic supervision.
+
+3. Compute denoising process iteratively:
+   - Conduct masked projection on input
+   - Predict initial distribution using learned model $f(\theta)$
+   - Calculate $\hat{x}_{n-1}$ with U-Net output $\hat{x}_0$
+
+4. After $N$ denoising steps, select action dimensions as final result.
+
 ### Setup
 
 ------

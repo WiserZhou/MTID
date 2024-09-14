@@ -31,32 +31,42 @@ def cycle(dl):
             yield data
 
 class TransformerHead(nn.Module):
-    def __init__(self,input_dim,output_dim,num_heads=4,num_layers=3,dim_feedforward=1024,dropout=0.3):
-        super(TransformerHead,self).__init__()
-        self.embedding=nn.Linear(input_dim,dim_feedforward)
-        encoder_layer=nn.TransformerEncoderLayer(
+    def __init__(self, input_dim, output_dim, num_heads=4, num_layers=3, dim_feedforward=1024, dropout=0.3):
+        super(TransformerHead, self).__init__()
+        
+        # Replace linear embedding with CNN
+        self.embedding = nn.Sequential(
+            nn.Conv1d(input_dim, dim_feedforward, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.Conv1d(dim_feedforward, dim_feedforward, kernel_size=3, padding=1),
+            nn.ReLU(),
+        )
+        
+        encoder_layer = nn.TransformerEncoderLayer(
             d_model=dim_feedforward,
             nhead=num_heads,
             dim_feedforward=dim_feedforward,
             dropout=dropout
         )
-        self.transformer=nn.TransformerEncoder(
-            encoder_layer,num_layers=num_layers)
-        self.fc1=nn.Linear(dim_feedforward,dim_feedforward//2)
-        self.fc2=nn.Linear(dim_feedforward//2,output_dim)
-        self.dropout=nn.Dropout(dropout)
-        self.relu=nn.ReLU()
-    def forward(self,x):
-        x=self.embedding(x)
-        x=self.relu(x)
-        x=self.dropout(x)
-        x=x.permute(1,0,2)
-        x=self.transformer(x)
-        x=torch.mean(x,dim=0)
-        x=self.fc1(x)
-        x=self.relu(x)
-        x=self.dropout(x)
-        x=self.fc2(x)
+        self.transformer = nn.TransformerEncoder(
+            encoder_layer, num_layers=num_layers)
+        self.fc1 = nn.Linear(dim_feedforward, dim_feedforward//2)
+        self.fc2 = nn.Linear(dim_feedforward//2, output_dim)
+        self.dropout = nn.Dropout(dropout)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        # Adjust input for CNN: [batch_size, input_dim, sequence_length]
+        x = x.permute(0, 2, 1)
+        x = self.embedding(x)
+        # Adjust back for transformer: [sequence_length, batch_size, dim_feedforward]
+        x = x.permute(2, 0, 1)
+        x = self.transformer(x)
+        x = torch.mean(x, dim=0)
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = self.fc2(x)
         return x
 
 class head(nn.Module):
