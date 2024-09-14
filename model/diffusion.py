@@ -190,7 +190,7 @@ class GaussianDiffusion(nn.Module):
         # x = torch.zeros(shape, device=device)   # for Deterministic
         mask = None
         if self.ifMask:
-            mask = compute_mask(x)
+            mask = compute_mask(x,self.class_dim,self.action_dim,self.horizon)
             x = condition_projection(x, cond, self.action_dim, self.class_dim)
             x = x * mask
         else:
@@ -257,7 +257,7 @@ class GaussianDiffusion(nn.Module):
         # x_noisy = noise   # for Noise and Deterministic
         mask = None
         if self.ifMask:
-            mask = compute_mask(x_start)
+            mask = compute_mask(x_startx,self.class_dim,self.action_dim,self.horizon)
             x_start = x_start * mask
         # For diffusion, add noise to the input
         x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)

@@ -23,49 +23,40 @@ from utils.args import get_args
 import numpy as np
 from tqdm import tqdm
 from utils.env_args import *
-
+from utils.accuracy import parse_fraction_or_float
 
 def cycle(dl):
     while True:
         for data in dl:
             yield data
 
-
 class TransformerHead(nn.Module):
-    def __init__(self, input_dim, output_dim, num_heads=4, num_layers=3, dim_feedforward=1024, dropout=0.3):
-        super(TransformerHead, self).__init__()
-
-        self.embedding = nn.Linear(input_dim, dim_feedforward)
-
-        encoder_layer = nn.TransformerEncoderLayer(
-            d_model=dim_feedforward,  # 这里 `d_model` 和 `dim_feedforward` 都设置为同一个值
-            nhead=num_heads,          # 注意力头的数量
-            dim_feedforward=dim_feedforward,  # 前馈网络内部的维度
-            dropout=dropout           # Dropout 概率
+    def __init__(self,input_dim,output_dim,num_heads=4,num_layers=3,dim_feedforward=1024,dropout=0.3):
+        super(TransformerHead,self).__init__()
+        self.embedding=nn.Linear(input_dim,dim_feedforward)
+        encoder_layer=nn.TransformerEncoderLayer(
+            d_model=dim_feedforward,
+            nhead=num_heads,
+            dim_feedforward=dim_feedforward,
+            dropout=dropout
         )
-        self.transformer = nn.TransformerEncoder(
-            encoder_layer, num_layers=num_layers)
-
-        self.fc1 = nn.Linear(dim_feedforward, dim_feedforward // 2)
-        self.fc2 = nn.Linear(dim_feedforward // 2, output_dim)
-
-        self.dropout = nn.Dropout(dropout)
-        self.relu = nn.ReLU()
-
-    def forward(self, x):
-        x = self.embedding(x)
-        x = self.relu(x)
-        x = self.dropout(x)
-
-        x = x.permute(1, 0, 2)
-        x = self.transformer(x)
-        x = torch.mean(x, dim=0)
-
-        x = self.fc1(x)
-        x = self.relu(x)
-        x = self.dropout(x)
-
-        x = self.fc2(x)
+        self.transformer=nn.TransformerEncoder(
+            encoder_layer,num_layers=num_layers)
+        self.fc1=nn.Linear(dim_feedforward,dim_feedforward//2)
+        self.fc2=nn.Linear(dim_feedforward//2,output_dim)
+        self.dropout=nn.Dropout(dropout)
+        self.relu=nn.ReLU()
+    def forward(self,x):
+        x=self.embedding(x)
+        x=self.relu(x)
+        x=self.dropout(x)
+        x=x.permute(1,0,2)
+        x=self.transformer(x)
+        x=torch.mean(x,dim=0)
+        x=self.fc1(x)
+        x=self.relu(x)
+        x=self.dropout(x)
+        x=self.fc2(x)
         return x
 
 class head(nn.Module):
@@ -179,7 +170,11 @@ def main():
     args = get_args()
 
     # deploy the specific dataset
-    env_dict = get_environment_shape(args.dataset, args.horizon)
+    if args.base_model != 'base':
+        base_model = 'predictor'
+    else:
+        base_model = 'base'
+    env_dict = get_environment_shape(args.dataset, args.horizon,base_model)
     args.action_dim = env_dict['action_dim']
     args.observation_dim = env_dict['observation_dim']
     args.class_dim = env_dict['class_dim']
@@ -329,8 +324,16 @@ def main_worker(gpu, ngpus_per_node, args):
 
     optimizer = torch.optim.AdamW(
         model.parameters(), lr=1e-4, weight_decay=0.0)
+    
+    scale1 = parse_fraction_or_float(args.scale1)
+    scale2 = parse_fraction_or_float(args.scale2)
+    
     scheduler = get_lr_schedule_with_warmup(
-        optimizer, int(args.n_train_steps * args.epochs))
+        optimizer, int(args.n_train_steps * args.epochs),
+        args.dataset, args.base_model,
+        args.schedule
+        # scale1=scale1, scale2=scale2,
+    )
 
     checkpoint_dir = os.path.join(os.path.dirname(
         __file__), 'checkpoint_mlp', args.checkpoint_dir)

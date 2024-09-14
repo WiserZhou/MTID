@@ -158,15 +158,15 @@ CUDA_VISIBLE_DEVICES=0 python uncertain.py --multiprocessing-distributed --num_t
 
 ------
 
-If this project helps you in your research or project, please cite our paper:
+<!-- If this project helps you in your research or project, please cite our paper: -->
 
 ```
-@inproceedings{wang2023PDPPprojected,
+<!-- @inproceedings{wang2023PDPPprojected,
       title={PDPP:Projected Diffusion for Procedure Planning in Instructional Videos}, 
       author={Hanlin Wang and Yilu Wu and Sheng Guo and Limin Wang},
       booktitle={{CVPR}},
       year={2023}
-}
+} -->
 ```
 
 

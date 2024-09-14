@@ -11,7 +11,7 @@ from tensorboardX import SummaryWriter
 import itertools
 from collections import OrderedDict
 # from loss_function import compute_losses
-from utils.args import get_args
+# from utils.args import get_args
 
 # -----------------------------------------------------------------------------#
 # ---------------------------------- modules ----------------------------------#
@@ -255,8 +255,8 @@ def condition_projection(x, conditions, action_dim, class_dim):
 
     return x
 
-def compute_mask(x):
-    args = get_args()
+def compute_mask(x,class_dim,action_dim,horizon):
+    # args = get_args()
     task_class = {
         "0": 23521,
         "1": 59684,
@@ -277,7 +277,7 @@ def compute_mask(x):
         "16": 87706,
         "17": 91515,
     }
-    task_ids = torch.argmax(x[:, :, : args.class_dim], axis=-1)  # (256*3)
+    task_ids = torch.argmax(x[:, :, : class_dim], axis=-1)  # (256*3)
     task_ids = task_ids[:, 0]
     action_one_hot = np.load(
         os.path.join(
@@ -297,7 +297,7 @@ def compute_mask(x):
                 action_indices.append(action_index)
         return action_indices
 
-    mask = torch.zeros(x.shape[0], args.action_dim)
+    mask = torch.zeros(x.shape[0], action_dim)
     for i in range(len(task_ids)):
         task_id = str(task_ids[i].item())
         action_indices = find_action_index(task_class[task_id], action_one_hot)
@@ -305,9 +305,9 @@ def compute_mask(x):
             mask[i, j] = 1.0
 
     maskTotal = torch.ones_like(x)
-    maskTotal[:, :, args.class_dim: args.class_dim + args.action_dim] = mask.unsqueeze(
+    maskTotal[:, :, class_dim: class_dim + action_dim] = mask.unsqueeze(
         1
-    ).repeat(1, args.horizon, 1)
+    ).repeat(1, horizon, 1)
     return maskTotal.cuda()
 
 # -----------------------------------------------------------------------------#
@@ -490,40 +490,40 @@ Losses = {
 def get_lr_schedule_with_warmup(optimizer, num_training_steps,dataset,
                                 base_model,schedule,scale1=1/6, scale2=1/4,train=False,last_epoch=-1):
     
-    # if not train:
-    #     if dataset == 'crosstask_how' and base_model == 'base':
-    #         num_warmup_steps_scale = 1 / 6
-    #         decay_steps_scale = 1 / 4
-    #     elif dataset == 'crosstask_base' and base_model == 'base':
-    #         num_warmup_steps_scale = 1 / 3
-    #         decay_steps_scale = 1 / 2
-    #     elif dataset == 'NIV' and base_model == 'base':
-    #         num_warmup_steps_scale =  9 / 13
-    #         decay_steps_scale =  3 / 13
-    #     elif dataset == 'coin' and base_model == 'base':
-    #         num_warmup_steps_scale = 1 / 4
-    #         decay_steps_scale = 1 / 6
-    #     elif dataset == 'crosstask_how' and base_model == 'predictor':
-    #         num_warmup_steps_scale = 1 / 6
-    #         decay_steps_scale = 1 / 4
-    #     elif dataset == 'crosstask_base' and base_model == 'predictor':
-    #         num_warmup_steps_scale = 1 / 3
-    #         decay_steps_scale = 1 / 2
-    #     elif dataset == 'NIV' and base_model == 'predictor':
-    #         num_warmup_steps_scale =  1/5
-    #         decay_steps_scale =  1/3
-    #     elif dataset == 'coin' and base_model == 'predictor':
-    #         # print('coin&predictor')
-    #         num_warmup_steps_scale = 1 / 6
-    #         decay_steps_scale = 1 / 4
+    if not train:
+        if dataset == 'crosstask_how' and base_model == 'base':
+            num_warmup_steps_scale = 1 / 6
+            decay_steps_scale = 1 / 4
+        elif dataset == 'crosstask_base' and base_model == 'base':
+            num_warmup_steps_scale = 1 / 3
+            decay_steps_scale = 1 / 2
+        elif dataset == 'NIV' and base_model == 'base':
+            num_warmup_steps_scale =  9 / 13
+            decay_steps_scale =  3 / 13
+        elif dataset == 'coin' and base_model == 'base':
+            num_warmup_steps_scale = 1 / 4
+            decay_steps_scale = 1 / 6
+        elif dataset == 'crosstask_how' and base_model == 'predictor':
+            num_warmup_steps_scale = 1 / 6
+            decay_steps_scale = 1 / 4
+        elif dataset == 'crosstask_base' and base_model == 'predictor':
+            num_warmup_steps_scale = 1 / 3
+            decay_steps_scale = 1 / 2
+        elif dataset == 'NIV' and base_model == 'predictor':
+            num_warmup_steps_scale =  1/5
+            decay_steps_scale =  1/3
+        elif dataset == 'coin' and base_model == 'predictor':
+            # print('coin&predictor')
+            num_warmup_steps_scale = 1 / 6
+            decay_steps_scale = 1 / 4
             
-    #     else:
-    #         RuntimeError('select error!')
-    # else:
-    #     num_warmup_steps_scale = scale1
-    #     decay_steps_scale = scale2
-    num_warmup_steps_scale = 1 / 6
-    decay_steps_scale = 1 / 4
+        else:
+            RuntimeError('select error!')
+    else:
+        num_warmup_steps_scale = scale1
+        decay_steps_scale = scale2
+    # num_warmup_steps_scale = 1 / 6
+    # decay_steps_scale = 1 / 4
     num_warmup_steps = int(num_training_steps * num_warmup_steps_scale)
     decay_steps = int(num_training_steps * decay_steps_scale)
     

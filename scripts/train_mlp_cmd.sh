@@ -16,7 +16,7 @@ nohup python train_mlp.py --name=note7 --dataset=coin --gpu=4 --epochs=800 \
 
 nohup python train_mlp.py --name=note1 --dataset=crosstask_how --gpu=0 --epochs=160 > out/output_note1.log 2>&1 &
 nohup python train_mlp.py --name=note1 --dataset=crosstask_base --gpu=5 --epochs=160 > out/output_note1.log 2>&1 &
-nohup python train_mlp.py --name=note4 --dataset=coin --gpu=6  --epochs=260 > out/output_note4.log 2>&1 &
+nohup python train_mlp.py --name=note4 --dataset=coin --gpu=6  --epochs=160 > out/output_note4.log 2>&1 &
 nohup python train_mlp.py --name=note3 --dataset=NIV --gpu=4  --epochs=160 > out/output_note3.log 2>&1 &
 
 nohup python train_mlp.py --name=note5 --dataset=crosstask_how --horizon=3 \
