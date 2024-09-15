@@ -25,22 +25,8 @@ import numpy as np
 from model.helpers import Logger
 from tqdm import tqdm
 from inference import test_inference
-import fractions
+from utils.accuracy import parse_fraction_or_float
 
-def parse_fraction_or_float(value):
-    """尝试将字符串转换为浮点数或分数"""
-    try:
-        # 尝试直接转换为浮点数
-        return float(value)
-    except ValueError:
-        # 如果不是浮点数，尝试将其作为分数处理
-        try:
-            # 将字符串转换为Fraction对象
-            fraction = fractions.Fraction(value)
-            # 将Fraction对象转换为浮点数
-            return float(fraction)
-        except (ValueError, TypeError):
-            raise ValueError(f"无法将 '{value}' 转换为浮点数或分数")
 
 def reduce_tensor(tensor):
     # Check if the distributed package is initialized.

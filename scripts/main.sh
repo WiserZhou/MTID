@@ -280,3 +280,13 @@ nohup python main_distributed.py --dataset=coin --name=coin8 --gpu=3 \
       --base_model=predictor --horizon=4 > out/coin8.log 2>&1 &
 
 
+
+
+nohup python main_distributed.py --dataset=crosstask_base --name=test1 --gpu=0 \
+      --base_model=predictor --horizon=3 --ifMask=True > out/test1.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_base --name=test2 --gpu=1 \
+      --base_model=predictor --horizon=4 --ifMask=True > out/test2.log 2>&1 &     
+nohup python main_distributed.py --dataset=crosstask_base --name=test3 --gpu=2 \
+      --base_model=predictor --horizon=5  --ifMask=True > out/test3.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_base --name=test4 --gpu=3 \
+      --base_model=predictor --horizon=6 --ifMask=True > out/test4.log 2>&1 &     

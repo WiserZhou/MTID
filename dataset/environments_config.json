@@ -12,9 +12,9 @@
             "json_path_val4": "crosstask/crosstask_release/output4.json",
             "json_path_val5": "crosstask/crosstask_release/output5.json",
             "json_path_val6": "crosstask/crosstask_release/output6.json",
-            "n_diffusion_steps": 200,
-            "n_train_steps": 200,
-            "epochs": 70,
+            "n_diffusion_steps": 250,
+            "n_train_steps": 250,
+            "epochs": 80,
             "lr": 5e-4
         },
         {

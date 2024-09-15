@@ -26,10 +26,16 @@ Our masked temporal interpolation diffusion (prediction horizon $T=3$) works as 
 In a conda env with cuda available, run:
 
 ```
+conda create --name MTID python=3.10
+conda activate MTID
+pip install -r requirements.txt
+```
+or
+
+```
 conda env create -f environment.yaml
 conda activate MTID
 ```
-
 
 
 ### Data Preparation
