@@ -1,0 +1,68 @@
+
+total train:   0%|          | 0/80 [00:00<?, ?it/s]
+lrs:3.750375037503751e-05
+total train:   0%|          | 0/80 [00:00<?, ?it/s]/data/zhaobo/zhouyufan/PDPP-Optimize/utils/eval.py:88: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+1.4867982864379883 29.691104888916016 36.63578414916992 28.378772735595703 0
+total train:   1%|▏         | 1/80 [04:24<5:47:53, 264.22s/it]
+lrs:7.500750075007501e-05
+---------------------------------
+
+total train:   2%|▎         | 2/80 [08:45<5:41:27, 262.66s/it]
+lrs:0.0001125112511251125
+---------------------------------
+
+total train:   4%|▍         | 3/80 [12:52<5:27:53, 255.50s/it]
+lrs:0.00015001500150015003
+---------------------------------
+total train:   4%|▍         | 3/80 [12:52<5:27:53, 255.50s/it]/data/zhaobo/zhouyufan/PDPP-Optimize/utils/eval.py:88: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+total train:   5%|▌         | 4/80 [16:11<4:55:23, 233.20s/it]
+lrs:0.00018751875187518753
+---------------------------------
+
+total train:   6%|▋         | 5/80 [19:23<4:32:55, 218.34s/it]
+lrs:0.000225022502250225
+---------------------------------
+
+total train:   8%|▊         | 6/80 [22:32<4:16:52, 208.27s/it]
+lrs:0.0002625262526252625
+---------------------------------
+
+total train:   9%|▉         | 7/80 [25:42<4:05:59, 202.19s/it]
+lrs:0.00030003000300030005
+---------------------------------
+
+total train:  10%|█         | 8/80 [28:49<3:56:58, 197.47s/it]
+lrs:0.00033753375337533753
+---------------------------------
+
+total train:  11%|█▏        | 9/80 [31:56<3:49:53, 194.28s/it]/data/zhaobo/zhouyufan/PDPP-Optimize/utils/training.py:284: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  return torch.tensor(losses.avg), acc1, acc5, torch.tensor(trajectory_success_rate), \
+14.7910795211792 52.68520736694336 59.546207427978516 51.55887222290039 13.842604637145996
+total train:  12%|█▎        | 10/80 [35:03<3:44:04, 192.06s/it]
+lrs:0.00041254125412541255
+---------------------------------
+
+total train:  14%|█▍        | 11/80 [38:11<3:39:14, 190.64s/it]
+lrs:0.00045004500450045
+---------------------------------
+
+total train:  15%|█▌        | 12/80 [41:20<3:35:25, 190.08s/it]
+lrs:0.00048754875487548756
+---------------------------------
+
+total train:  16%|█▋        | 13/80 [44:27<3:31:24, 189.32s/it]
+lrs:0.0005
+---------------------------------
+
+total train:  18%|█▊        | 14/80 [47:35<3:27:50, 188.95s/it]
+lrs:0.0005
+---------------------------------
+
+total train:  19%|█▉        | 15/80 [50:44<3:24:44, 188.99s/it]
+lrs:0.0005
+---------------------------------
+
+total train:  20%|██        | 16/80 [53:54<3:21:42, 189.10s/it]
+lrs:0.0005

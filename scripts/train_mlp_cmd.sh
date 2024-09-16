@@ -35,3 +35,5 @@ nohup python train_mlp.py --name=note1 --dataset=crosstask_how --gpu=2 --epochs=
 
 
 nohup python train_mlp.py --name=note1 --dataset=crosstask_how --gpu=1 --epochs=160 --classfier_model=resnet32x4 > out/horizon3.log 2>&1 &
+
+python train_mlp.py --name=note1 --dataset=crosstask_how --gpu=0 --epochs=160

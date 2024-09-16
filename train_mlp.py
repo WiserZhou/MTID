@@ -24,6 +24,7 @@ import numpy as np
 from tqdm import tqdm
 from utils.env_args import *
 from utils.accuracy import parse_fraction_or_float
+import wandb
 
 def cycle(dl):
     while True:
@@ -269,7 +270,9 @@ def main():
 
 def main_worker(gpu, ngpus_per_node, args):
     args.gpu = gpu
-
+    
+    current_time = time.strftime("%Y%m%d_%H%M%S")
+    wandb_name = f"{args.classfier_model}_{args.name}_{current_time}"
     if args.distributed:
         if args.multiprocessing_distributed:
             args.rank = args.rank * ngpus_per_node + gpu
@@ -389,23 +392,12 @@ def main_worker(gpu, ngpus_per_node, args):
             model.load_state_dict(checkpoint["model"])
             scheduler.load_state_dict(checkpoint["scheduler"])
             optimizer.load_state_dict(checkpoint["optimizer"])
-            if args.rank == 0:
-                # creat logger
-                tb_logdir = checkpoint["tb_logdir"]
-                tb_logger = Logger(tb_logdir)
-            log("=> loaded checkpoint '{}' (epoch {}){}".format(
-                checkpoint_path, checkpoint["epoch"], args.gpu), args)
-    else:
-        if args.rank == 0:
-            # creat logger
-            time_pre = time.strftime("%Y%m%d%H%M%S", time.localtime())
-            logname = args.log_root + '_' + args.name + '_' + time_pre + '_' + args.dataset
-            tb_logdir = os.path.join(args.log_root, logname)
-            if not (os.path.exists(tb_logdir)):
-                os.makedirs(tb_logdir)
-            tb_logger = Logger(tb_logdir)
-            tb_logger.log_info(args)
-        log("=> no checkpoint found at '{}'".format(args.resume), args)
+            
+    if args.rank == 0:
+        # Initialize wandb
+        wandb.init(project="MTID_classifier_{args.dataset}_T{args.horizon}", name=wandb_name+"_resume", config=args)
+    log("=> loaded checkpoint '{}' (epoch {}){}".format(
+        checkpoint_path, checkpoint["epoch"], args.gpu), args)
 
     if args.cudnn_benchmark:
         cudnn.benchmark = True
@@ -435,20 +427,18 @@ def main_worker(gpu, ngpus_per_node, args):
             acc_reduced = reduce_tensor(acc.cuda()).item()
 
             if args.rank == 0:
-                logs = OrderedDict()
-                logs['Val/EpochLoss'] = losses_reduced
-                logs['Val/EpochAcc@1'] = acc_reduced
-                for key, value in logs.items():
-                    tb_logger.log_scalar(value, key, epoch + 1)
-
-                tb_logger.flush()
-
+                logs = {
+                    'Val/EpochLoss': losses_reduced,
+                    'Val/EpochAcc@1': acc_reduced,
+                    'epoch': epoch + 1
+                }
+                wandb.log(logs)
+                
                 if acc_reduced >= max_eva:
                     save_checkpoint2(args.name,
                                      {
                                          "epoch": epoch + 1,
                                          "model": model.state_dict(),
-                                         "tb_logdir": tb_logdir,
                                          "scheduler": scheduler.state_dict(),
                                          "optimizer": optimizer.state_dict(),
                                      }, save_max, old_max_epoch, epoch + 1
@@ -467,13 +457,12 @@ def main_worker(gpu, ngpus_per_node, args):
             acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
 
             if args.rank == 0:
-                logs = OrderedDict()
-                logs['Train/EpochLoss'] = losses_reduced
-                logs['Train/EpochAcc@1'] = acc_top1_reduced
-                for key, value in logs.items():
-                    tb_logger.log_scalar(value, key, epoch + 1)
-
-                tb_logger.flush()
+                logs = {
+                    'Train/EpochLoss': losses_reduced,
+                    'Train/EpochAcc@1': acc_top1_reduced,
+                    'epoch': epoch + 1
+                }
+                wandb.log(logs)
         else:
             losses = train(train_loader, args.n_train_steps, model,
                            scheduler, args, optimizer, False).cuda()
@@ -484,12 +473,11 @@ def main_worker(gpu, ngpus_per_node, args):
                     print(p['lr'])
                 print('---------------------------------')
 
-                logs = OrderedDict()
-                logs['Train/EpochLoss'] = losses_reduced
-                for key, value in logs.items():
-                    tb_logger.log_scalar(value, key, epoch + 1)
-
-                tb_logger.flush()
+                logs = {
+                    'Train/EpochLoss': losses_reduced,
+                    'epoch': epoch + 1
+                }
+                wandb.log(logs)
 
         if (epoch + 1) % args.save_freq == 0:
             if args.rank == 0:
@@ -498,10 +486,14 @@ def main_worker(gpu, ngpus_per_node, args):
                                     "epoch": epoch + 1,
                                     "model": model.state_dict(),
                                     "optimizer": optimizer.state_dict(),
-                                    "tb_logdir": tb_logdir,
                                     "scheduler": scheduler.state_dict(),
                                 }, checkpoint_dir, epoch + 1
                                 )
+    wandb.log({
+        'max_train_acc': max_train_acc,
+        'max_test_acc': max_test_acc
+    })
+    wandb.finish()
     print(f'max_train_acc:{max_train_acc}')
     print(f'max_test_acc:{max_test_acc}')
 

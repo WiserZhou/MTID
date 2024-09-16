@@ -1,0 +1,1 @@
+{"Train/EpochLoss": 7.393222767859697e-05, "epoch": 100, "_timestamp": 1726499947.5164843, "_runtime": 1321.0768723487854, "_step": 150, "Val/EpochLoss": 0.6242800354957581, "Val/EpochAcc@1": 94.04634857177734, "Train/EpochAcc@1": 100.0, "max_train_acc": 100.0, "max_test_acc": 94.26024627685547, "_wandb": {"runtime": 1319}}

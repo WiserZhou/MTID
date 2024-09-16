@@ -19,94 +19,53 @@ from dataloader.data_load import PlanningDataset
 from model.helpers import get_lr_schedule_with_warmup
 
 from utils import *
-from logging import log
+# from logging import log
 from utils.args import get_args
 import numpy as np
 from model.helpers import Logger
 from tqdm import tqdm
 from inference import test_inference
 from utils.accuracy import parse_fraction_or_float
+import wandb
 
 
 def reduce_tensor(tensor):
-    # Check if the distributed package is initialized.
-    # This ensures that we are running in a distributed environment.
     if dist.is_initialized():
-
-        # Clone the tensor to avoid modifying the original tensor.
-        # This is necessary because the all_reduce operation will modify the tensor in-place.
         rt = tensor.clone()
-
-        # Perform an all-reduce operation on the cloned tensor.
-        # The all_reduce operation sums up the values of the tensor across all processes.
-        # All processes will end up with the same reduced value.
         dist.all_reduce(rt, op=ReduceOp.SUM)
-
-        # Normalize the result by dividing it by the number of processes.
-        # This is done to get the average value across all processes.
         rt /= dist.get_world_size()
-
-        # Return the reduced and normalized tensor.
         return rt
-
-    # If the distributed package is not initialized,
-    # it means we are not in a distributed environment.
-    # In this case, simply return the original tensor.
     else:
         return tensor
 
 
 def main():
-    # Parse command-line arguments using a predefined function get_args().
-    # This is typically used to handle program options and parameters.
     args = get_args()
-
-    # Set the PYTHONHASHSEED environment variable to ensure reproducibility.
-    # This is important when using hash-based operations which might be non-deterministic.
     os.environ['PYTHONHASHSEED'] = str(args.seed)
     torch.set_num_threads(20)
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6'
-    # Print the parsed arguments if verbose mode is enabled.
 
-  # 打印环境变量以确认设置
-    # print(f"CUDA_VISIBLE_DEVICES: {os.environ.get('CUDA_VISIBLE_DEVICES')}")
-    # print(f"Number of GPUs visible to PyTorch: {torch.cuda.device_count()}")
-    # Set seeds for various random number generators to ensure reproducibility.
     if args.seed is not None:
         random.seed(args.seed)
         np.random.seed(args.seed)
         torch.manual_seed(args.seed)
         torch.cuda.manual_seed_all(args.seed)
 
-    # print(f"CUDA_VISIBLE_DEVICES: {os.environ.get('CUDA_VISIBLE_DEVICES')}")
-    # print(f"Number of GPUs visible to PyTorch: {torch.cuda.device_count()}")
-
-    # Determine if the script is running in a distributed setup.
-    # This is true if there is more than one GPU available or if multiprocessing is requested.
     args.distributed = args.world_size > 1 or args.multiprocessing_distributed
     ngpus_per_node = torch.cuda.device_count()
 
-    # print(ngpus_per_node)
-
-    # If multiprocessing is requested, adjust the world size accordingly.
-    # Spawn multiple processes to handle each GPU, effectively parallelizing the workload.
     if args.multiprocessing_distributed:
         args.world_size = ngpus_per_node * args.world_size
-        # Use the multiprocessing module's spawn function to launch workers.
-        # Each worker will run the main_worker function.
         mp.spawn(main_worker, nprocs=ngpus_per_node,
                  args=(ngpus_per_node, args))
     else:
-        # If not in a multiprocessing or distributed setup, just run the main_worker function directly.
-        # This is typically for single-GPU or non-distributed runs.
-        torch.multiprocessing.set_start_method('spawn')# good solution !!!!
+        torch.multiprocessing.set_start_method('spawn')
         main_worker(args.gpu, ngpus_per_node, args)
 
 
 def main_worker(gpu, ngpus_per_node, args):
     args.gpu = gpu
 
-    # deploy the specific dataset
     if args.base_model != 'base':
         base_model = 'predictor'
     else:
@@ -124,6 +83,9 @@ def main_worker(gpu, ngpus_per_node, args):
     epoch_env = env_dict['epochs']
     if args.dataset != 'coin':
         args.lr = env_dict['lr']
+        
+    current_time = time.strftime("%Y%m%d_%H%M%S")
+    wandb_name = f"{args.base_model}_{args.name}_{current_time}"
 
     if args.verbose:
         print(args)
@@ -260,7 +222,7 @@ def main_worker(gpu, ngpus_per_node, args):
             
         print('load checkpoint path:',checkpoint_path)
         if checkpoint_path:
-            log("=> loading checkpoint '{}'".format(checkpoint_path), args)
+            print("=> loading checkpoint '{}'".format(checkpoint_path), args)
             checkpoint = torch.load(
                 checkpoint_path, map_location='cuda:{}'.format(args.gpu))
             args.start_epoch = checkpoint["epoch"]
@@ -269,28 +231,16 @@ def main_worker(gpu, ngpus_per_node, args):
             model.optimizer.load_state_dict(checkpoint["optimizer"])
             model.step = checkpoint["step"]
             scheduler.load_state_dict(checkpoint["scheduler"])
-            tb_logdir = checkpoint["tb_logdir"]
-            if args.rank == 0:
-                # creat logger
-                tb_logger = Logger(tb_logdir)
-                log("=> loaded checkpoint '{}' (epoch {}){}".format(
-                    checkpoint_path, checkpoint["epoch"], args.gpu), args)
-    else:
-        time_pre = time.strftime("%Y%m%d%H%M%S", time.localtime())
-        logname = args.log_root + '_' + args.name + '_' + time_pre + '_' + args.dataset
-        tb_logdir = os.path.join(args.log_root, logname)
-        if args.rank == 0:
-            # creat logger
-            if not (os.path.exists(tb_logdir)):
-                os.makedirs(tb_logdir)
-            tb_logger = Logger(tb_logdir)
-            tb_logger.log_info(args)
-        log("=> no checkpoint found at '{}'".format(args.resume), args)
+            
+    if args.rank == 0:
+        wandb.init(project=f"MTID_{args.dataset}_T{args.horizon}", name=wandb_name, config=args)
+        wandb.watch(model.model)
+
 
     if args.cudnn_benchmark:
         cudnn.benchmark = True
     total_batch_size = args.world_size * args.batch_size
-    log(
+    print(
         "Starting training loop for rank: {}, total batch size: {}".format(
             args.rank, total_batch_size
         ), args
@@ -318,7 +268,7 @@ def main_worker(gpu, ngpus_per_node, args):
             train_sampler.set_epoch(epoch)
 
         # train for one epoch
-        if (epoch + 1) % 10 == 0:  # calculate on training set
+        if (epoch + 1) % 5 == 0:  # calculate on training set
             losses, acc_top1, acc_top5, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
                 acc_a0, acc_aT = model.train(
                     args.n_train_steps, True, args, scheduler)
@@ -348,10 +298,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 logs['Train/MIoU2'] = MIoU2_meter_reduced
                 logs['Train/acc_a0'] = acc_a0_reduced
                 logs['Train/acc_aT'] = acc_aT_reduced
-                for key, value in logs.items():
-                    tb_logger.log_scalar(value, key, epoch + 1)
-
-                tb_logger.flush()
+                wandb.log(logs, step=epoch + 1)
         else:
             losses = model.train(args.n_train_steps, False,
                                  args, scheduler).cuda()
@@ -365,10 +312,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 logs = OrderedDict()
                 logs['Train/lrs'] = p['lr']
                 logs['Train/EpochLoss'] = losses_reduced
-                for key, value in logs.items():
-                    tb_logger.log_scalar(value, key, epoch + 1)
-
-                tb_logger.flush()
+                wandb.log(logs, step=epoch + 1)
 
         # Evaluate the model every epochs if evaluation is enabled
         if args.evaluate:
@@ -402,10 +346,8 @@ def main_worker(gpu, ngpus_per_node, args):
                 logs['Val/MIoU2'] = MIoU2_meter_reduced
                 logs['Val/acc_a0'] = acc_a0_reduced
                 logs['Val/acc_aT'] = acc_aT_reduced
-                for key, value in logs.items():
-                    tb_logger.log_scalar(value, key, epoch + 1)
-
-                tb_logger.flush()
+                wandb.log(logs, step=epoch + 1)
+                
                 print(trajectory_success_rate_meter_reduced,acc_top1_reduced,MIoU2_meter_reduced,MIoU1_meter_reduced, max_eva)
 
             # Save checkpoint if the new trajectory success rate is better
@@ -418,7 +360,6 @@ def main_worker(gpu, ngpus_per_node, args):
                                                         "ema": model.ema_model.state_dict(),
                                                         "optimizer": model.optimizer.state_dict(),
                                                         "step": model.step,
-                                                        "tb_logdir": tb_logdir,
                                                         "scheduler": scheduler.state_dict(),
                                                     }, save_max, old_max_epoch, epoch + 1, args.rank
                                                     )
@@ -436,7 +377,6 @@ def main_worker(gpu, ngpus_per_node, args):
                                     "ema": model.ema_model.state_dict(),
                                     "optimizer": model.optimizer.state_dict(),
                                     "step": model.step,
-                                    "tb_logdir": tb_logdir,
                                     "scheduler": scheduler.state_dict(),
                                 }, checkpoint_dir, epoch + 1
                                 )
@@ -514,14 +454,24 @@ def main_worker(gpu, ngpus_per_node, args):
               test_times, np.var(acc_a0_reduced_sum))
         print('Val/acc_aT', sum(acc_aT_reduced_sum) /
               test_times, np.var(acc_aT_reduced_sum))
+        
+        wandb.log({
+            'Final/EpochAcc@1': EpochAcc1,
+            'Final/Traj_Success_Rate': Traj_Success_Rate,
+            'Final/MIoU1': sum(MIoU1_meter_reduced_sum) / test_times,
+            'Final/MIoU2': MIoU2,
+            'Final/acc_a0': sum(acc_a0_reduced_sum) / test_times,
+            'Final/acc_aT': sum(acc_aT_reduced_sum) / test_times,
+        })
+        wandb.finish()
 
         # print experiment results
         print(f"{args.name} {args.dataset} {args.horizon} {old_max_epoch} {Traj_Success_Rate} {EpochAcc1} {MIoU2}")
 
 
-def log(output, args):
-    with open(os.path.join(os.path.dirname(__file__), 'log', args.checkpoint_dir + '.txt'), "a") as f:
-        f.write(output + '\n')
+# def log(output, args):
+#     with open(os.path.join(os.path.dirname(__file__), 'log', args.checkpoint_dir + '.txt'), "a") as f:
+#         f.write(output + '\n')
 
 
 def save_checkpoint(name, state, checkpoint_dir, epoch, n_ckpt=3):
