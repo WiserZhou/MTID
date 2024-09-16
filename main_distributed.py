@@ -406,7 +406,7 @@ def main_worker(gpu, ngpus_per_node, args):
                     tb_logger.log_scalar(value, key, epoch + 1)
 
                 tb_logger.flush()
-                print(trajectory_success_rate_meter_reduced,acc_top1_reduced,MIoU2_meter_reduced, max_eva)
+                print(trajectory_success_rate_meter_reduced,acc_top1_reduced,MIoU2_meter_reduced,MIoU1_meter_reduced, max_eva)
 
             # Save checkpoint if the new trajectory success rate is better
             if trajectory_success_rate_meter_reduced > max_eva and acc_top1_reduced >= max_acc:

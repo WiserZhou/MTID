@@ -255,19 +255,26 @@ nohup python main_distributed.py --dataset=coin --name=coin4 --gpu=4 \
 nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor1 --gpu=0 \
       --base_model=predictor --horizon=4 --seed=3407 --ifMask=True > out/output_howpredictor1.log 2>&1 &
 nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor2 --gpu=1 \
-      --base_model=predictor --horizon=4 --ifMask=True > out/output_howpredictor2.log 2>&1 &
+      --base_model=predictor --horizon=4 --seed=3407 --ifMask=True > out/output_howpredictor2.log 2>&1 &
 nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor3 --gpu=2 \
-      --base_model=predictor --horizon=6 --seed=3407 --ifMask=True > out/output_howpredictor3.log 2>&1 &
+      --base_model=predictor --horizon=6 --seed=3402 --ifMask=True > out/output_howpredictor3.log 2>&1 &
 nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor4 --gpu=3 \
-      --base_model=predictor --horizon=6 --ifMask=True > out/output_howpredictor4.log 2>&1 &
+      --base_model=predictor --horizon=6 --seed=3402 --ifMask=True > out/output_howpredictor4.log 2>&1 &
 nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor5 --gpu=4 \
       --base_model=predictor --horizon=4 --seed=3405 --ifMask=True > out/output_howpredictor5.log 2>&1 &
 nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor6 --gpu=5 \
-      --base_model=predictor --horizon=4 --seed=3403 --ifMask=True > out/output_howpredictor6.log 2>&1 &
+      --base_model=predictor --horizon=4 --seed=3408 --ifMask=True > out/output_howpredictor6.log 2>&1 &
 nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor7 --gpu=6 \
       --base_model=predictor --horizon=6 --seed=3405 --ifMask=True > out/output_howpredictor7.log 2>&1 &
 nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor8 --gpu=7 \
-      --base_model=predictor --horizon=6 --seed=3403 --ifMask=True > out/output_howpredictor8.log 2>&1 &
+      --base_model=predictor --horizon=6 --seed=3408 --ifMask=True > out/output_howpredictor8.log 2>&1 &
+
+
+
+
+
+
+      
 
 nohup python main_distributed.py --dataset=coin --name=coin1 --gpu=0 \
       --base_model=predictor --horizon=4 --lr=1e-5 > out/coin1.log 2>&1 &
