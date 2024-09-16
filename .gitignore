@@ -19,3 +19,5 @@ dataset/crosstask/CrossTask_s3d.zip
 modelscope/
 out/
 wandb/
+whl.txt
+test.ipynb
