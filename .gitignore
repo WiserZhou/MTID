@@ -18,3 +18,4 @@ dataset/crosstask/crosstask_release.zip
 dataset/crosstask/CrossTask_s3d.zip
 modelscope/
 out/
+wandb/
