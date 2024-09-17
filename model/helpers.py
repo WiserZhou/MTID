@@ -7,7 +7,7 @@ from torch.optim.lr_scheduler import LambdaLR
 import os
 import numpy as np
 import logging
-from tensorboardX import SummaryWriter
+# from tensorboardX import SummaryWriter
 import itertools
 from collections import OrderedDict
 # from loss_function import compute_losses
@@ -279,11 +279,13 @@ def compute_mask(x,class_dim,action_dim,horizon):
     }
     task_ids = torch.argmax(x[:, :, : class_dim], axis=-1)  # (256*3)
     task_ids = task_ids[:, 0]
+    
+    current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    
     action_one_hot = np.load(
         os.path.join(
-            "/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask",
-            "crosstask_release",
-            "actions_one_hot.npy",
+            current_dir,
+            "dataset/crosstask/crosstask_release/actions_one_hot.npy",
         ),
         allow_pickle=True,
     ).item()
@@ -566,37 +568,37 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 
-class Logger:
-    def __init__(self, log_dir, n_logged_samples=10, summary_writer=SummaryWriter, if_exist=False):
-        self._log_dir = log_dir
-        print('logging outputs to ', log_dir)
-        self._n_logged_samples = n_logged_samples
-        self._summ_writer = summary_writer(
-            log_dir, flush_secs=120, max_queue=10)
-        if not if_exist:
-            log = logging.getLogger(log_dir)
-            if not log.handlers:
-                log.setLevel(logging.DEBUG)
-                if not os.path.exists(log_dir):
-                    os.mkdir(log_dir)
-                fh = logging.FileHandler(os.path.join(log_dir, 'log.txt'))
-                fh.setLevel(logging.INFO)
-                formatter = logging.Formatter(
-                    fmt='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S')
-                fh.setFormatter(formatter)
-                log.addHandler(fh)
-            self.log = log
+# class Logger:
+#     def __init__(self, log_dir, n_logged_samples=10, summary_writer=SummaryWriter, if_exist=False):
+#         self._log_dir = log_dir
+#         print('logging outputs to ', log_dir)
+#         self._n_logged_samples = n_logged_samples
+#         self._summ_writer = summary_writer(
+#             log_dir, flush_secs=120, max_queue=10)
+#         if not if_exist:
+#             log = logging.getLogger(log_dir)
+#             if not log.handlers:
+#                 log.setLevel(logging.DEBUG)
+#                 if not os.path.exists(log_dir):
+#                     os.mkdir(log_dir)
+#                 fh = logging.FileHandler(os.path.join(log_dir, 'log.txt'))
+#                 fh.setLevel(logging.INFO)
+#                 formatter = logging.Formatter(
+#                     fmt='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S')
+#                 fh.setFormatter(formatter)
+#                 log.addHandler(fh)
+#             self.log = log
 
-    def log_scalar(self, scalar, name, step_):
-        self._summ_writer.add_scalar('{}'.format(name), scalar, step_)
+#     def log_scalar(self, scalar, name, step_):
+#         self._summ_writer.add_scalar('{}'.format(name), scalar, step_)
 
-    def log_scalars(self, scalar_dict, group_name, step, phase):
-        """Will log all scalars in the same plot."""
-        self._summ_writer.add_scalars('{}_{}'.format(
-            group_name, phase), scalar_dict, step)
+#     def log_scalars(self, scalar_dict, group_name, step, phase):
+#         """Will log all scalars in the same plot."""
+#         self._summ_writer.add_scalars('{}_{}'.format(
+#             group_name, phase), scalar_dict, step)
 
-    def flush(self):
-        self._summ_writer.flush()
+#     def flush(self):
+#         self._summ_writer.flush()
 
-    def log_info(self, info):
-        self.log.info("{}".format(info))
+#     def log_info(self, info):
+#         self.log.info("{}".format(info))

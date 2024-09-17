@@ -1,5 +1,5 @@
 {
-    "base_path": "/data/zhaobo/zhouyufan/PDPP-Optimize/dataset",
+    "base_path": "/data/zhaobo/zhouyufan/MTID/dataset",
     "environments": [
         {
             "name": "crosstask_how_predictor",

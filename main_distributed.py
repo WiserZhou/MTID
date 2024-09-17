@@ -22,7 +22,7 @@ from utils import *
 # from logging import log
 from utils.args import get_args
 import numpy as np
-from model.helpers import Logger
+# from model.helpers import Logger
 from tqdm import tqdm
 from inference import test_inference
 from utils.accuracy import parse_fraction_or_float

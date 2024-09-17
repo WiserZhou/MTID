@@ -167,12 +167,31 @@ class PlanningDataset(Dataset):
             event_class = folder_id['event_class']
         else:
             task_class = folder_id['task_id']
-
+        
+        # Define dataset paths
+        self.dataset_paths = {
+            "crosstask_how": "crosstask/processed_data/",
+            "crosstask_base": "crosstask/crosstask_features/",
+            "coin": "coin/full_npy/",
+            "NIV": "NIV/processed_data/"
+        }
+        
+        # /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/processed_data/23521_DUhlrNEsKys.npy
+        # /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_features/GNJfDOoVORM.npy
+        # /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/full_npy/PutOnHairExtensions_122_xZecGPPhbHE.npy
+        # /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/processed_data/changing_tire_0001.npy
+        
+        self.current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # Determine the dataset path
+        dataset_path = self.dataset_paths.get(self.args.dataset, "")
+        full_path = os.path.join(self.current_dir, "dataset", dataset_path)
+        feature_filename = os.path.basename(folder_id['feature'])
+        feature_path = os.path.join(full_path, feature_filename)
         # Load video frames based on the dataset type
         if 'crosstask' in self.args.dataset:
             # If the video ID is different from the last one loaded, load new frames
             if folder_id['vid'] != self.last_vid:
-                images_ = np.load(folder_id['feature'], allow_pickle=True)
+                images_ = np.load(feature_path, allow_pickle=True)
 
                 if self.args.dataset == 'crosstask_base':
                     self.images = np.array(images_, dtype=np.float32)
@@ -182,7 +201,7 @@ class PlanningDataset(Dataset):
                 self.last_vid = folder_id['vid']
         else:
             # Load video frames for other datasets
-            images_ = np.load(folder_id['feature'], allow_pickle=True)
+            images_ = np.load(feature_path, allow_pickle=True)
             self.images = images_['frames_features']
 
         # Curate the dataset to get frames and labels within the legal range

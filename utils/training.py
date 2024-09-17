@@ -1,5 +1,5 @@
 import copy
-from model.helpers import AverageMeter, Logger
+from model.helpers import AverageMeter
 from .accuracy import *
 import torch.distributed as dist
 
