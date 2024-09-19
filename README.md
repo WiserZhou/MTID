@@ -107,10 +107,10 @@ CUDA_VISIBLE_DEVICES=0 python temp.py --num_thread_reader=1 --resume --batch_siz
 ```
 
 
-2. Train MTID: Modify the 'json_path_val' in `args.py` as the output file of `temp.py` and run:
+2. Train MTID: Modify the 'json_path_val**i**' in `dataset/environments_config.json` as the output file of `temp.py` and run:
 
 ```
-nohup python main_distributed.py --name=your_note --gpu=1 > out/output_note.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=how1 --gpu=0 --base_model=predictor --horizon=3 > out/how1.log 2>&1 &
 ```
 
 
@@ -118,12 +118,10 @@ nohup python main_distributed.py --name=your_note --gpu=1 > out/output_note.log 
 
 | Dataset            | n_diffusion_steps | n_train_steps | epochs | learning-rate |
 | ------------------ | ----------------- | ------------- | ------ | ------------- |
-| CrossTask$_{Base}$ | 200               | 200           | 60     | 8e-4          |
-| CrossTask$_{How}$  | 200               | 200           | 120    | 5e-4          |
-| COIN               | 200               | 200           | 800    | 1e-5          |
-| NIV                | 50                | 50            | 130    | 3e-4          |
-
-​	  Learning-rate schedule can be adjusted in `helpers.py`. Schedule details can be found in the [supplement](https://arxiv.org/abs/2303.14676). The trained models will be saved in `{root}/save_max`.
+| CrossTask$_{Base}$ | 200               | 200           | 80     | 8e-4          |
+| CrossTask$_{How}$  | 200               | 200           | 100    | 5e-4          |
+| COIN               | 200               | 200           | 100    | 1e-5          |
+| NIV                | 50                | 50            | 100    | 3e-4          |
 
 ​	  To train the $Deterministic$ and $Noise$ baselines, you need to modify `temporal.py` to remove 'time_mlp' modules and modify `diffusion.py` to change the initial noise, 'training' functions and `p_sample_loop` process.
 
@@ -133,25 +131,22 @@ nohup python main_distributed.py --name=your_note --gpu=1 > out/output_note.log 
 
 ------
 
-#### [Checkpoints](https://box.nju.edu.cn/d/bea511b00c984c0c8bd6/)
-
 **Note**: Numbers may vary from runs to runs for PDPP and $Noise$ baseline, due to probalistic sampling.
 
 ##### For Metrics
 
-​	  Modify the checkpoint path(L244) as the evaluated model in `inference.py` and run:
-
+All results have been printed to the `log` files in the `out` folder. If you want to perform inference separately, you can use the following command:
 ```
-python inference.py --resume --base_model=predictor --gpu=5 --ckpt_path=/path > output.txt
+python inference.py --resume --base_model=predictor --gpu=0 --ckpt_path=/path > output.txt
 ```
 
 ​	  **Results** of given checkpoints:
 
 |                         | SR    | mAcc  | MIoU  |
 | ----------------------- | ----- | ----- | ----- |
-| Crosstask_T=3_diffusion | 37.20 | 64.67 | 66.57 |
-| COIN_T=3_diffusion      | 21.33 | 45.62 | 51.82 |
-| NIV_T=3_diffusion       | 30.20 | 48.45 | 57.28 |
+| Crosstask_T=3_MTID      | 40.45 | 67.19 | 69.17 |
+| COIN_T=3_MIID           | 28.84 | 50.44 | 57.86 |
+| NIV_T=3_MTID            | 29.63 | 48.02 | 56.49 |
 
 
 
@@ -182,12 +177,7 @@ CUDA_VISIBLE_DEVICES=0 python uncertain.py --multiprocessing-distributed --num_t
 <!-- If this project helps you in your research or project, please cite our paper: -->
 
 ```
-<!-- @inproceedings{wang2023PDPPprojected,
-      title={PDPP:Projected Diffusion for Procedure Planning in Instructional Videos}, 
-      author={Hanlin Wang and Yilu Wu and Sheng Guo and Limin Wang},
-      booktitle={{CVPR}},
-      year={2023}
-} -->
+
 ```
 
 
@@ -196,4 +186,4 @@ CUDA_VISIBLE_DEVICES=0 python uncertain.py --multiprocessing-distributed --num_t
 
 ------
 
-<!-- We would like to thank [He Zhao](https://joehezhao.github.io/) for his help in extracting the s3d features and providing the evaluation code of probabilistic modeling in [P3IV](https://github.com/JoeHEZHAO/procedure-planing). The diffusion model implementation is based on [diffuser](https://github.com/jannerm/diffuser) and [improved-diffusion](https://github.com/openai/improved-diffusion). We also reference and use some code from [PlaTe](https://github.com/Jiankai-Sun/plate-pytorch). Very sincere thanks to the contributors to these excellent codebases. -->
+We would like to thank [PDPP](https://github.com/MCG-NJU/PDPP) and [diffusers](https://github.com/huggingface/diffusers) for their excellent code! 

@@ -44,8 +44,8 @@
             "json_path_val4": "coin/output4.json",
             "json_path_val5": "coin/output5.json",
             "json_path_val6": "coin/output6.json",
-            "n_diffusion_steps": 200,
-            "n_train_steps": 200,
+            "n_diffusion_steps": 300,
+            "n_train_steps": 300,
             "epochs": 100,
             "lr": 1e-5
         },

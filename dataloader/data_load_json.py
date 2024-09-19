@@ -111,9 +111,31 @@ class PlanningDataset(Dataset):
 
     def sample_single(self, index):
         folder_id = self.vid_names[index]
+        
+          # Define dataset paths
+        self.dataset_paths = {
+            "crosstask_how": "crosstask/processed_data/",
+            "crosstask_base": "crosstask/crosstask_features/",
+            "coin": "coin/full_npy/",
+            "NIV": "NIV/processed_data/"
+        }
+        
+        self.current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # Determine the dataset path
+        dataset_path = self.dataset_paths.get(self.args.dataset, "")
+        full_path = os.path.join(self.current_dir, "dataset", dataset_path)
+        
+        # print('---------------------------')
+        # print(folder_id['feature'])
+        
+        feature_filename = os.path.basename(folder_id['feature'])
+        
+        # print(feature_filename)
+        feature_path = os.path.join(full_path, feature_filename)
+        
         if 'crosstask' in self.args.dataset:
             if folder_id['vid'] != self.last_vid:
-                images_ = np.load(folder_id['feature'], allow_pickle=True)
+                images_ = np.load(feature_path, allow_pickle=True)
                 if self.args.dataset == 'crosstask_base':
                     self.images = images_
                 else:
@@ -121,7 +143,7 @@ class PlanningDataset(Dataset):
                 self.last_vid = folder_id['vid']
         else:
             # print(self.args.dataset)
-            images_ = np.load(folder_id['feature'], allow_pickle=True)
+            images_ = np.load(feature_path, allow_pickle=True)
             self.images = images_['frames_features']
         images, labels_matrix, idx_list = self.curate_dataset(
             self.images, folder_id['legal_range'], M=self.M)

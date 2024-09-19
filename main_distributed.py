@@ -81,10 +81,9 @@ def main_worker(gpu, ngpus_per_node, args):
     args.n_diffusion_steps = env_dict['n_diffusion_steps']
     args.n_train_steps = env_dict['n_train_steps']
     epoch_env = env_dict['epochs']
-    if args.dataset != 'coin':
-        args.lr = env_dict['lr']
+    args.lr = env_dict['lr']
         
-    current_time = time.strftime("%Y%m%d_%H%M%S")
+    current_time = time.strftime("%Y%m%d_%H%M%S", time.localtime())
     wandb_name = f"{args.base_model}_{args.name}_{current_time}"
 
     if args.verbose:
@@ -152,15 +151,15 @@ def main_worker(gpu, ngpus_per_node, args):
 
     # create model
     if args.base_model == 'base':
-        temporal_model = temporal.TemporalUnet(args,dim=256,dim_mults=(1, 2, 4), )
+        temporal_model = temporal.TemporalUnet(args,dim=args.model_dim,dim_mults=(1, 2, 4), )
     elif args.base_model == 'predictor':
-        temporal_model = temporalPredictor.TemporalUnet(args,dim=256,dim_mults=(1, 2, 4), )
+        temporal_model = temporalPredictor.TemporalUnet(args,dim=args.model_dim,dim_mults=(1, 2, 4), )
     elif args.base_model == 'preAll':
-        temporal_model = temporalPreAll.TemporalUnet(args,dim=256,dim_mults=(1, 2, 4), )
+        temporal_model = temporalPreAll.TemporalUnet(args,dim=args.model_dim,dim_mults=(1, 2, 4), )
     elif args.base_model == 'preStep':
-        temporal_model = temporalPreStep.TemporalUnet(args,dim=256,dim_mults=(1, 2, 4), )
+        temporal_model = temporalPreStep.TemporalUnet(args,dim=args.model_dim,dim_mults=(1, 2, 4), )
     elif args.base_model == 'preCas':
-        temporal_model = temporalPredictorCasual.TemporalUnet(args,dim=256,dim_mults=(1, 2, 4),)
+        temporal_model = temporalPredictorCasual.TemporalUnet(args,dim=args.model_dim,dim_mults=(1, 2, 4),)
     else:
         RuntimeError('unvalid base model!')
     
@@ -233,7 +232,8 @@ def main_worker(gpu, ngpus_per_node, args):
             scheduler.load_state_dict(checkpoint["scheduler"])
             
     if args.rank == 0:
-        wandb.init(project=f"MTID_{args.dataset}_T{args.horizon}", name=wandb_name, config=args)
+        project_name = f"MTID_{args.dataset}_T{args.horizon}"
+        wandb.init(project=project_name, name=wandb_name, config=args)
         wandb.watch(model.model)
 
 

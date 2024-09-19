@@ -82,8 +82,10 @@ class PlanningDataset(Dataset):
         self.last_vid = ''
 
         print(args.dataset)
+        
 
         if 'crosstask' in args.dataset:
+            # print('----------')
             self.crosstask_use_feature_how = True
             crosstask_use_feature_how = True
             if args.dataset == 'crosstask_base':
@@ -99,8 +101,8 @@ class PlanningDataset(Dataset):
                     └── videos_val.csv or json
             """
 
-            val_csv_path = '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/raw/test_list.json'
-            video_csv_path = '/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_release/raw/train_list.json'  # 'videos.csv')
+            val_csv_path = '/data/zhaobo/zhouyufan/MTID/dataset/crosstask/crosstask_release/raw/test_list.json'
+            video_csv_path = '/data/zhaobo/zhouyufan/MTID/dataset/crosstask/crosstask_release/raw/train_list.json'  # 'videos.csv')
 
             if crosstask_use_feature_how:
                 self.features_path = os.path.join(root, 'processed_data')
@@ -338,30 +340,8 @@ class PlanningDataset(Dataset):
                         niv_data = json.load(f)
                 for d in niv_data:
                     legal_range = []
-                    path = d['feature'] # "/data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/processed_data/changing_tire_0006.npy"
+                    path = d['feature']
                     info = np.load(path, allow_pickle=True)
-                    # {'name': 'changing_tire_0001.csv_changing_tire_0001.', 'duration': 0.0, 'start': array([-1.]), 
-                    # 'end': array([-1.]), 
-                    # 'frames_features': array([[-0.00483101, -0.00058195, -0.02285086, ...,  0.00349515,
-                    #      0.00721521,  0.01397078],
-                    #    ...,
-                    #    [-0.01316939,  0.00436195, -0.01162706, ...,  0.00957219,
-                    #     -0.00217685, -0.00224021]], dtype=float32), 
-                    # 'steps_features': array([[-3.7809582 ,  2.5330641 ,  2.7331033 , ...,  6.5107613 ,
-                    #     -1.6682445 ,  1.998441  ],
-                    #    ...,
-                    #    [-3.2700143 ,  1.5864558 ,  2.2025495 , ...,  6.8122425 ,
-                    #     -0.81877184,  1.9969207 ]], dtype=float32), 
-                    # 'subs_features': array([[0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-                    #     ....
-                    #     0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]]), 
-                    # 'subs_starts': array([-1.]), 'subs_ends': array([-1.]), 
-                    # 'num_subs': array([], dtype=float64), 'num_steps': 9, 
-                    # 'steps_ids': array([ 9,  0,  1,  2,  3,  4,  5,  6, 10]), 
-                    # 'steps_starts': array([  8.7     ,  32.033333,  44.7     ,  59.033333,  66.36667 ,
-                    #     94.03333 ,  96.7     , 106.46667 , 125.8     ], dtype=float32), 
-                    # 'steps_ends': array([ 25.333334,  40.      ,  47.333332,  66.      ,  67.666664,
-                    #     96.      , 106.1     , 110.96667 , 130.4     ], dtype=float32)}
                     num_steps = int(info['num_steps']) #
                     assert num_steps == len(info['steps_ids'])
                     assert info['num_steps'] == len(info['steps_starts'])
@@ -523,18 +503,40 @@ class PlanningDataset(Dataset):
             event_class = folder_id['task_id']
         else:
             task_class = folder_id['task_id']
+        
+        # Define dataset paths
+        self.dataset_paths = {
+            "crosstask_how": "crosstask/processed_data/",
+            "crosstask_base": "crosstask/crosstask_features/",
+            "coin": "coin/full_npy/",
+            "NIV": "NIV/processed_data/"
+        }
+        
+        self.current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # Determine the dataset path
+        dataset_path = self.dataset_paths.get(self.args.dataset, "")
+        full_path = os.path.join(self.current_dir, "dataset", dataset_path)
+        
+        # print('---------------------------')
+        # print(folder_id['feature'])
+        
+        feature_filename = os.path.basename(folder_id['feature'])
+        
+        # print(feature_filename)
+        feature_path = os.path.join(full_path, feature_filename)
 
         if 'crosstask' in self.args.dataset:
             if folder_id['vid'] != self.last_vid:
                 if self.crosstask_use_feature_how:
-                    images_ = np.load(folder_id['feature'], allow_pickle=True)
+                    images_ = np.load(feature_path, allow_pickle=True)
                     self.images = images_['frames_features']
                     self.last_vid = folder_id['vid']
                 else:
                     self.images = np.load(os.path.join(
                         self.features_path, folder_id['vid'] + '.npy'))
         else:
-            images_ = np.load(folder_id['feature'], allow_pickle=True)
+            # print(feature_path)
+            images_ = np.load(feature_path, allow_pickle=True)
             self.images = images_['frames_features']
 
         images, labels_matrix, idx_list = self.curate_dataset(
@@ -551,8 +553,10 @@ class PlanningDataset(Dataset):
 
     def __getitem__(self, index):
         if self.is_val:
+            # print(self.sample_single(index))
             frames, labels, event_class = self.sample_single(index)
         else:
+            # print(self.sample_single(index))
             frames, labels, task = self.sample_single(index)
         if self.is_val:
             batch = Batch(frames, labels, event_class)

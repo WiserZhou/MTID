@@ -2,12 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
-# import clip
-from PIL import Image
-import torchvision.transforms as transforms
-from transformers import AutoModel, AutoProcessor
-# Image Encoder
-
 
 class ImageEncoder(nn.Module):
     def __init__(self, input_channels, output_channels,ie_num=2):
@@ -38,40 +32,6 @@ class ImageEncoder(nn.Module):
         x = x.squeeze(2)
 
         return x
-
-
-class ImageEncoderByCLIP(nn.Module):
-    def __init__(self, input_dim, output_dim):
-        super(ImageEncoderByCLIP, self).__init__()
-
-        # Assuming input_dim is the flattened image size (e.g., 32x32x15 = 1536)
-        # and we need to reshape the input to a valid image size before passing to CLIP
-        # Simplified calculation for demonstration
-        self.input_height = int(input_dim ** 0.5)
-        self.input_width = self.input_height
-        self.input_channels = 3  # Assuming RGB images
-
-        # Load the CLIP model and processor directly
-        self.processor = AutoProcessor.from_pretrained(
-            "openai/clip-vit-base-patch32")
-        self.model = AutoModel.from_pretrained("openai/clip-vit-base-patch32")
-
-    # input shape (batch_size, observation_dim)
-    def forward(self, flat_images):
-        # Reshape the flat images to the correct image dimensions
-        images = flat_images.view(-1, self.input_channels,
-                                  self.input_height, self.input_width)
-
-        # Preprocess images
-        pixel_values = self.processor(
-            images=images, return_tensors="pt").pixel_values
-
-        # Encode images using CLIP
-        with torch.no_grad():
-            image_features = self.model(
-                pixel_values=pixel_values).pooler_output
-
-        return image_features
 
 
 # Semantic Space Interpolation
@@ -129,7 +89,6 @@ class MotionPredictor(nn.Module):
         super(MotionPredictor, self).__init__()
 
         self.encoder = ImageEncoder(input_dim, output_dim,args.ie_num)
-
 
         self.interpolator = SemanticSpaceInterpolation(
             output_dim, block_num)

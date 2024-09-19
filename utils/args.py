@@ -220,5 +220,6 @@ def get_args(description='whl'):
     parser.add_argument('--scale1',type=str,default='1/6')
     parser.add_argument('--scale2',type=str,default='1/4')
     parser.add_argument('--schedule',type=str,default='not')
+    parser.add_argument('--model_dim',type=int,default=256,help='model dimension')
     args = parser.parse_args()
     return args

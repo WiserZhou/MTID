@@ -238,14 +238,14 @@ nohup python main_distributed.py --dataset=coin --name=coin8 --gpu=3 \
       --dropout=0.7 --horizon=4 > out/coin8.log 2>&1 &
 
 
-nohup python main_distributed.py --dataset=coin --name=coin --gpu=5 \
-      --base_model=base --horizon=3 > out/output_coin.log 2>&1 &
-nohup python main_distributed.py --dataset=coin --name=coin2 --gpu=6 \
-      --base_model=base --horizon=3 --seed=3407 > out/output_coin2.log 2>&1 &
-nohup python main_distributed.py --dataset=coin --name=coin3 --gpu=7 \
-      --base_model=base --horizon=4 > out/output_coin3.log 2>&1 &
-nohup python main_distributed.py --dataset=coin --name=coin4 --gpu=4 \
-      --base_model=base --horizon=4 --seed=3407 > out/output_coin4.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=base1 --gpu=0 \
+      --base_model=base --horizon=3 --seed=3414 > out/base1.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=base2 --gpu=1 \
+      --base_model=base --horizon=4 --seed=3414 > out/base2.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=base3 --gpu=2 \
+      --base_model=base --horizon=5 --seed=3414 > out/base3.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=base4 --gpu=3 \
+      --base_model=base --horizon=6 --seed=3414 > out/base4.log 2>&1 &
 
 
 
@@ -283,8 +283,8 @@ nohup python main_distributed.py --dataset=coin --name=coin1 --gpu=0 \
 
 nohup python main_distributed.py --dataset=coin --name=coin7 --gpu=2 \
       --base_model=predictor --horizon=4 --seed=3407 > out/coin7.log 2>&1 &
-nohup python main_distributed.py --dataset=coin --name=coin8 --gpu=3 \
-      --base_model=predictor --horizon=4 > out/coin8.log 2>&1 &
+nohup python main_distributed.py --dataset=coin --name=coin8 --gpu=0 \
+      --base_model=predictor --horizon=4 --seed=3414 --model_dim=512 > out/coin.log 2>&1 &
 
 
 
@@ -297,3 +297,22 @@ nohup python main_distributed.py --dataset=crosstask_base --name=test3 --gpu=2 \
       --base_model=predictor --horizon=5  --ifMask=True > out/test3.log 2>&1 &
 nohup python main_distributed.py --dataset=crosstask_base --name=test4 --gpu=3 \
       --base_model=predictor --horizon=6 --ifMask=True > out/test4.log 2>&1 &     
+
+
+
+nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor1 --gpu=0 \
+      --base_model=predictor --horizon=3 --seed=3407 --ifMask=False > out/output_howpredictor1.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor2 --gpu=1 \
+      --base_model=predictor --horizon=4 --seed=3407 --ifMask=True > out/output_howpredictor2.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor3 --gpu=2 \
+      --base_model=predictor --horizon=6 --seed=3402 --ifMask=True > out/output_howpredictor3.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor4 --gpu=3 \
+      --base_model=predictor --horizon=6 --seed=3402 --ifMask=True > out/output_howpredictor4.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor5 --gpu=4 \
+      --base_model=predictor --horizon=4 --seed=3405 --ifMask=True > out/output_howpredictor5.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor6 --gpu=5 \
+      --base_model=predictor --horizon=4 --seed=3408 --ifMask=True > out/output_howpredictor6.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor7 --gpu=6 \
+      --base_model=predictor --horizon=6 --seed=3405 --ifMask=True > out/output_howpredictor7.log 2>&1 &
+nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor8 --gpu=7 \
+      --base_model=predictor --horizon=6 --seed=3408 --ifMask=True > out/output_howpredictor8.log 2>&1 &

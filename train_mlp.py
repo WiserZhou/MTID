@@ -3,7 +3,7 @@ import glob
 import os
 import random
 import time
-from collections import OrderedDict
+# from collections import OrderedDict
 
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
@@ -15,10 +15,10 @@ import torch.utils.data.distributed
 from torch.distributed import ReduceOp
 import torch.nn.functional as F
 from dataloader.data_load_mlp import PlanningDataset
-from model.helpers import get_lr_schedule_with_warmup, Logger
+from model.helpers import get_lr_schedule_with_warmup
 import torch.nn as nn
 from utils import *
-from logging import log
+# from logging import log
 from utils.args import get_args
 import numpy as np
 from tqdm import tqdm
@@ -29,50 +29,12 @@ import wandb
 def cycle(dl):
     while True:
         for data in dl:
+            # print(data)
             yield data
-# class TransformerHead(nn.Module):
-#     def __init__(self, input_dim, output_dim, num_heads=4, num_layers=3, dim_feedforward=1024, dropout=0.3):
-#         super(TransformerHead, self).__init__()
-        
-#         # Replace linear embedding with CNN
-#         self.embedding = nn.Sequential(
-#             nn.Conv1d(input_dim, dim_feedforward, kernel_size=3, padding=1),
-#             nn.ReLU(),
-#             nn.Conv1d(dim_feedforward, dim_feedforward, kernel_size=3, padding=1),
-#             nn.ReLU(),
-#         )
-        
-#         encoder_layer = nn.TransformerEncoderLayer(
-#             d_model=dim_feedforward,
-#             nhead=num_heads,
-#             dim_feedforward=dim_feedforward,
-#             dropout=dropout
-#         )
-#         self.transformer = nn.TransformerEncoder(
-#             encoder_layer, num_layers=num_layers)
-#         self.fc1 = nn.Linear(dim_feedforward, dim_feedforward//2)
-#         self.fc2 = nn.Linear(dim_feedforward//2, output_dim)
-#         self.dropout = nn.Dropout(dropout)
-#         self.relu = nn.ReLU()
 
-#     def forward(self, x):
-#         # Adjust input for CNN: [batch_size, input_dim, sequence_length]
-#         x = x.permute(0, 2, 1)
-#         x = self.embedding(x)
-#         # Adjust back for transformer: [sequence_length, batch_size, dim_feedforward]
-#         x = x.permute(2, 0, 1)
-#         x = self.transformer(x)
-#         x = torch.mean(x, dim=0)
-#         x = self.fc1(x)
-#         x = self.relu(x)
-#         x = self.dropout(x)
-#         x = self.fc2(x)
-#         return x
-
-# # ... rest of the code remains the same
-class TransformerHead(nn.Module):
+class TransformerHead2(nn.Module):
     def __init__(self,input_dim,output_dim,num_heads=4,num_layers=3,dim_feedforward=1024,dropout=0.3):
-        super(TransformerHead,self).__init__()
+        super(TransformerHead2,self).__init__()
         self.embedding=nn.Linear(input_dim,dim_feedforward)
         encoder_layer=nn.TransformerEncoderLayer(
             d_model=dim_feedforward,
@@ -97,6 +59,42 @@ class TransformerHead(nn.Module):
         x=self.relu(x)
         x=self.dropout(x)
         x=self.fc2(x)
+        return x
+    
+class TransformerHead(nn.Module):
+    def __init__(self, input_dim, output_dim, num_heads=8, num_layers=6, dim_feedforward=2048, dropout=0.3):
+        super(TransformerHead, self).__init__()
+        self.embedding = nn.Linear(input_dim, dim_feedforward)
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=dim_feedforward,
+            nhead=num_heads,
+            dim_feedforward=dim_feedforward * 4,  # 增加中间层的维度
+            dropout=dropout
+        )
+        self.transformer = nn.TransformerEncoder(
+            encoder_layer, num_layers=num_layers)
+        self.fc1 = nn.Linear(dim_feedforward, dim_feedforward)
+        self.fc2 = nn.Linear(dim_feedforward, dim_feedforward // 2)
+        self.fc3 = nn.Linear(dim_feedforward // 2, output_dim)
+        self.dropout = nn.Dropout(dropout)
+        self.relu = nn.ReLU()
+        self.layer_norm = nn.LayerNorm(dim_feedforward)
+
+    def forward(self, x):
+        x = self.embedding(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = x.permute(1, 0, 2)
+        x = self.transformer(x)
+        x = torch.mean(x, dim=0)
+        x = self.layer_norm(x)
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = self.fc2(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = self.fc3(x)
         return x
 
 class head(nn.Module):
@@ -209,23 +207,16 @@ def reduce_tensor(tensor):
 def main():
     args = get_args()
 
-    # deploy the specific dataset
-    if args.base_model != 'base':
-        base_model = 'predictor'
-    else:
-        base_model = 'base'
+    base_model = 'base'
     env_dict = get_environment_shape(args.dataset, args.horizon,base_model)
-    args.action_dim = env_dict['action_dim']
     args.observation_dim = env_dict['observation_dim']
     args.class_dim = env_dict['class_dim']
     args.root = env_dict['root']
-    args.json_path_train = env_dict['json_path_train']
     args.json_path_val = env_dict['json_path_val']
-    args.json_path_val2 = env_dict['json_path_val2']
-    args.n_diffusion_steps = env_dict['n_diffusion_steps']
+    args.json_path_train = env_dict['json_path_train']
     args.n_train_steps = env_dict['n_train_steps']
-    args.epochs = env_dict['epochs']
-    args.lr = env_dict['lr']
+    args.epochs = 200
+    args.lr = 1e-3
 
     os.environ['PYTHONHASHSEED'] = str(args.seed)
     torch.set_num_threads(20)
@@ -245,8 +236,6 @@ def main():
             is_val=True,
             model=None,
         )
-    args.log_root = '/data/zhaobo/zhouyufan/PDPP-Optimize/log_mlp/log'
-    args.log_root += '_mlp'
     if args.verbose:
         print(args)
     if args.seed is not None:
@@ -271,7 +260,7 @@ def main():
 def main_worker(gpu, ngpus_per_node, args):
     args.gpu = gpu
     
-    current_time = time.strftime("%Y%m%d_%H%M%S")
+    current_time = time.strftime("%Y%m%d_%H%M%S", time.localtime())
     wandb_name = f"{args.classfier_model}_{args.name}_{current_time}"
     if args.distributed:
         if args.multiprocessing_distributed:
@@ -340,12 +329,15 @@ def main_worker(gpu, ngpus_per_node, args):
         model = ResNet(depth=29, num_filters=None, output_dim=18, input_dim=1536, sequence_length=2)
         
     elif args.classfier_model == 'transformer':
-        # input_dim, output_dim, num_heads=4, num_layers=2, dim_feedforward=2048, dropout=0.5
+        # num_heads=8, num_layers=6, dim_feedforward=2048, dropout=0.3
+        # nohup python train_mlp.py --name=note7 --dataset=coin --gpu=4 --epochs=800 --num_heads=4 --num_layers=2 --dim_feedforward=2048 --dropout=0.7 > out/output_note7.log 2>&1 &
         model = TransformerHead(
             input_dim=args.observation_dim, output_dim=args.class_dim, num_heads=args.num_heads,
             num_layers=args.num_layers, dim_feedforward=args.dim_feedforward, dropout=args.dropout)
     elif args.classfier_model == 'linear':
         model = head(args.observation_dim, args.class_dim)
+    elif args.classfier_model == 'trans2':
+        model = TransformerHead2(input_dim=args.observation_dim, output_dim=args.class_dim)
     else:
         RuntimeError('unknown classfier model!')
 
@@ -385,7 +377,7 @@ def main_worker(gpu, ngpus_per_node, args):
     if args.resume:
         checkpoint_path = get_last_checkpoint(checkpoint_dir)
         if checkpoint_path:
-            log("=> loading checkpoint '{}'".format(checkpoint_path), args)
+            # log("=> loading checkpoint '{}'".format(checkpoint_path), args)
             checkpoint = torch.load(
                 checkpoint_path, map_location='cuda:{}'.format(args.gpu))
             args.start_epoch = checkpoint["epoch"]
@@ -395,18 +387,17 @@ def main_worker(gpu, ngpus_per_node, args):
             
     if args.rank == 0:
         # Initialize wandb
-        wandb.init(project="MTID_classifier_{args.dataset}_T{args.horizon}", name=wandb_name+"_resume", config=args)
-    log("=> loaded checkpoint '{}' (epoch {}){}".format(
-        checkpoint_path, checkpoint["epoch"], args.gpu), args)
+        wandb.init(project=f"MTID_classifier_{args.dataset}_T{args.horizon}", name=wandb_name, config=args)
+
 
     if args.cudnn_benchmark:
         cudnn.benchmark = True
-    total_batch_size = args.world_size * args.batch_size
-    log(
-        "Starting training loop for rank: {}, total batch size: {}".format(
-            args.rank, total_batch_size
-        ), args
-    )
+    # total_batch_size = args.world_size * args.batch_size
+    # log(
+    #     "Starting training loop for rank: {}, total batch size: {}".format(
+    #         args.rank, total_batch_size
+    #     ), args
+    # )
 
     max_eva = 0
     old_max_epoch = 0
@@ -475,6 +466,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
                 logs = {
                     'Train/EpochLoss': losses_reduced,
+                    'Train/lr': p['lr'],
                     'epoch': epoch + 1
                 }
                 wandb.log(logs)
@@ -514,10 +506,12 @@ def test(val_loader, model):
             observations[:, 1, :] = global_img_tensors[:, -1, :]
 
             task_s = model(observations.cuda())  # [bs, 18]
-            task_class_one_hot = task_class
+            # task_class_one_hot = task_class
+            
+            task_class_one_hot = F.one_hot(task_class, num_classes=180).float()
 
-            # loss = F.mse_loss(task_s, task_class_one_hot.cuda())
-            loss = F.cross_entropy(task_s, task_class_one_hot.cuda())
+            loss = F.mse_loss(task_s, task_class_one_hot)
+            # loss = F.cross_entropy(task_s, task_class_one_hot.cuda())
 
             task_pred = task_s.argmax(dim=-1)
             correct = task_pred.eq(task_class)
@@ -549,14 +543,14 @@ def train(train_loader, n_train_steps, model, scheduler, args, optimizer, if_cal
 
                 # [bs, 18] #[ 0.1, 0.3, , ,, , , ,,, , ....]
                 task_s = model(observations.cuda())
-                task_class_one_hot = task_class
-                # [1,0,0,0,0,0,0]
-                # [1,0,0,0,0,0,0]
-                # [1,0,0,0,0,0,0]
-                # [1,0,0,0,0,0,0]
+                # print(task_s.shape)
+                # print(task_s)
+                task_class_one_hot = F.one_hot(task_class, num_classes=180).float()
+                # print(task_class_one_hot.shape)
+                # print(task_class_one_hot)
 
-                # loss = F.mse_loss(task_s, task_class_one_hot.cuda())
-                loss = F.cross_entropy(task_s, task_class_one_hot.cuda())
+                loss = F.mse_loss(task_s, task_class_one_hot)
+                # loss = F.cross_entropy(task_s, task_class_one_hot.cuda())
 
                 loss = loss / args.gradient_accumulate_every
             loss.backward()
@@ -578,7 +572,6 @@ def train(train_loader, n_train_steps, model, scheduler, args, optimizer, if_cal
 
 
 def log(output, args):
-    # print(args.log_root)
     with open(os.path.join(os.path.dirname(__file__), args.checkpoint_dir + '.txt'), "a") as f:
         f.write(output + '\n')
 

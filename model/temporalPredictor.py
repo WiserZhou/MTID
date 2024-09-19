@@ -47,8 +47,7 @@ class CrossAttention(nn.Module):
         context = self.linear(context)
         # print(x.shape[2])
         # 1024
-# residual torch.Size([256, 1024, 1])
-
+        # residual torch.Size([256, 1024, 1])
         attn_output, _ = self.multihead_attn(x, context, context)
         x = x + attn_output
         x = self.layer_norm(x)
