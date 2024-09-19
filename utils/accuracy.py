@@ -52,8 +52,7 @@ def accuracy(output, target, topk=(1,), max_traj_len=0):
             pred_inst_set.add(tuple(pred_inst[i].tolist()))
             target_inst_set.add(tuple(target_inst[i].tolist()))
         # Calculate IoU for all actions
-        MIoU1 = 100.0 * len(pred_inst_set.intersection(target_inst_set)
-                            ) / len(pred_inst_set.union(target_inst_set))
+        MIoU1 = 100.0 * len(pred_inst_set.intersection(target_inst_set)) / len(pred_inst_set.union(target_inst_set))
 
         # Reshape to consider each trajectory separately
         batch_size = batch_size // max_traj_len

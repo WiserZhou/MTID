@@ -9,7 +9,7 @@ from .helpers import (
     Conv1dBlock,
 )
 from .actionPredictorPre import (
-    MotionPredictor,
+    ActionPredictor,
 )
 
 # Assuming Conv1dBlock, Rearrange, SinusoidalPosEmb, Downsample1d, Upsample1d are predefined
@@ -176,7 +176,7 @@ class TemporalUnet(nn.Module):
             Conv1dBlock(dim, dim, kernel_size=3, if_zero=True),
             nn.Conv1d(dim, transition_dim, 1),
         )
-        self.motionPredictor = MotionPredictor(self.args,
+        self.ActionPredictor = ActionPredictor(self.args,
                                                self.args.observation_dim,
                                                self.args.observation_dim//6,
                                                dim,
@@ -193,7 +193,7 @@ class TemporalUnet(nn.Module):
         #  args.action_dim + args.observation_dim + args.class_dim
 
         # shape (num_frames, batch_size, observation_dim)
-        cross_features = self.motionPredictor(x[:, 0, self.args.class_dim + self.args.action_dim:],
+        cross_features = self.ActionPredictor(x[:, 0, self.args.class_dim + self.args.action_dim:],
                                               x[:, -1, self.args.class_dim + self.args.action_dim:])
 
         # print(cross_features.shape) torch.Size([256, 3, 512])

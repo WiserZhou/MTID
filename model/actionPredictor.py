@@ -3,9 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
 
-class ImageEncoder(nn.Module):
+class ObservationEncoder(nn.Module):
     def __init__(self, input_channels, output_channels,ie_num=2):
-        super(ImageEncoder, self).__init__()
+        super(ObservationEncoder, self).__init__()
         self.ie_num = ie_num
         self.conv1 = nn.Conv1d(
             input_channels, output_channels, kernel_size=3, stride=1, padding=1)
@@ -36,9 +36,9 @@ class ImageEncoder(nn.Module):
 
 # Semantic Space Interpolation
 
-class SemanticSpaceInterpolation(nn.Module):
+class LatentSpaceInterpolator(nn.Module):
     def __init__(self, dimension_num, block_num):
-        super(SemanticSpaceInterpolation, self).__init__()
+        super(LatentSpaceInterpolator, self).__init__()
         self.block_num = block_num
         self.dimension_num = dimension_num
         # Introduce a linear layer to generate the alpha values dynamically for each frame
@@ -84,13 +84,13 @@ class TransformerBlock(nn.Module):
 # Motion Predictor with Transformer blocks
 
 
-class MotionPredictor(nn.Module):
+class ActionPredictor(nn.Module):
     def __init__(self, args, input_dim, output_dim, dimension_num, block_num, num_transformer_blocks=1):
-        super(MotionPredictor, self).__init__()
+        super(ActionPredictor, self).__init__()
 
-        self.encoder = ImageEncoder(input_dim, output_dim,args.ie_num)
+        self.encoder = ObservationEncoder(input_dim, output_dim,args.ie_num)
 
-        self.interpolator = SemanticSpaceInterpolation(
+        self.interpolator = LatentSpaceInterpolator(
             output_dim, block_num)
 
         self.transformer_blocks = nn.ModuleList([TransformerBlock(
