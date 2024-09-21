@@ -3,15 +3,24 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
 
-class ObservationEncoder(nn.Module):
+class ObservationConvEncoder(nn.Module):
     def __init__(self, input_channels, output_channels,ie_num=2):
-        super(ObservationEncoder, self).__init__()
+        super(ObservationConvEncoder, self).__init__()
         self.ie_num = ie_num
         self.conv1 = nn.Conv1d(
             input_channels, output_channels, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv1d(
             output_channels, output_channels, kernel_size=3, stride=1, padding=1)
 
+        # 初始化卷积核为近似恒等映射
+        with torch.no_grad():
+            self.conv1.weight.fill_(0)
+            self.conv1.bias.fill_(0)
+            self.conv2.weight.fill_(0)
+            self.conv2.bias.fill_(0)
+            self.conv1.weight[:, :, 1] = 1
+            self.conv2.weight[:, :, 1] = 1
+            
     # input shape (batch_size,observation_dim)
     def forward(self, x):
         
@@ -32,7 +41,21 @@ class ObservationEncoder(nn.Module):
         x = x.squeeze(2)
 
         return x
+    
+class ObservationEncoder(nn.Module):
+    def __init__(self, input_dim, output_dim,ie_num):
+        super(ObservationEncoder, self).__init__()
+        ie_num= 4
+        self.mlp = nn.Sequential(
+            nn.Linear(input_dim, input_dim*ie_num),
+            nn.ReLU(),
+            nn.Linear(input_dim*ie_num, input_dim*ie_num),
+            nn.ReLU(),
+            nn.Linear(input_dim*ie_num, output_dim)
+        )
 
+    def forward(self, x):
+        return self.mlp(x)
 
 # Semantic Space Interpolation
 
@@ -87,8 +110,15 @@ class TransformerBlock(nn.Module):
 class ActionPredictor(nn.Module):
     def __init__(self, args, input_dim, output_dim, dimension_num, block_num, num_transformer_blocks=1):
         super(ActionPredictor, self).__init__()
+        
+        self.module_kind = args.module_kind
+        self.encoder_kind = args.encoder_kind
 
-        self.encoder = ObservationEncoder(input_dim, output_dim,args.ie_num)
+        if self.encoder_kind == 'linear':
+            self.encoder = ObservationEncoder(input_dim, output_dim,args.ie_num)
+        else:
+            self.encoder = ObservationConvEncoder(input_dim,output_dim,args.ie_num)
+        
 
         self.interpolator = LatentSpaceInterpolator(
             output_dim, block_num)
@@ -99,35 +129,51 @@ class ActionPredictor(nn.Module):
     def forward(self, x1, x2):
 
         # print(x1.shape)torch.Size([256, 1536])
-
-        x1_encoded = self.encoder(x1)
-        x2_encoded = self.encoder(x2)
-
-        # x1_encoded = x1
-        # x2_encoded = x2
-        # print(x1_encoded.shape)
-
-        # print(x1_encoded.shape)torch.Size([256, 1536, 1])
-        interpolated_frames = self.interpolator(
-            x1_encoded, x2_encoded)
         
-        # print(interpolated_frames.shape)
+        if self.module_kind == 'i':
+            interpolated_frames = self.interpolator(x1,x2)
+            return interpolated_frames
+        elif self.module_kind == 'e+i':
+            x1_encoded = self.encoder(x1)
+            x2_encoded = self.encoder(x2)
+            interpolated_frames = self.interpolator(x1_encoded, x2_encoded)
+            return interpolated_frames
+        elif self.module_kind == 'i+t':
+            interpolated_frames = self.interpolator(x1, x2)
+            transformer_input = interpolated_frames
+            for transformer_block in self.transformer_blocks:
+                transformer_input = transformer_block(transformer_input)
+            output = transformer_input + interpolated_frames
+            return output
+        else:
+            x1_encoded = self.encoder(x1)
+            x2_encoded = self.encoder(x2)
 
-        # print(interpolated_frames.shape)  # torch.Size([256, 12, 1536])
+            # x1_encoded = x1
+            # x2_encoded = x2
+            # print(x1_encoded.shape)
 
-        # shape (num_frames, batch_size, observation_dim)
-        # num_frames, batch_size, observation_dim = interpolated_frames.shape
-        transformer_input = interpolated_frames
-        # print(transformer_input.shape)torch.Size([256, 12, 1536])
+            # print(x1_encoded.shape)torch.Size([256, 1536, 1])
+            interpolated_frames = self.interpolator(
+                x1_encoded, x2_encoded)
+            
+            # print(interpolated_frames.shape)
 
-        for transformer_block in self.transformer_blocks:
-            transformer_input = transformer_block(transformer_input)
+            # print(interpolated_frames.shape)  # torch.Size([256, 12, 1536])
 
-        output = transformer_input + interpolated_frames
-        # print(output.shape)torch.Size([256, 12, 1536])
+            # shape (num_frames, batch_size, observation_dim)
+            # num_frames, batch_size, observation_dim = interpolated_frames.shape
+            transformer_input = interpolated_frames
+            # print(transformer_input.shape)torch.Size([256, 12, 1536])
 
-        # output = self.ffn(output)
-        # print(output.shape)torch.Size([256, 12, 256])
+            for transformer_block in self.transformer_blocks:
+                transformer_input = transformer_block(transformer_input)
 
-        # resnet connect
-        return output
+            output = transformer_input + interpolated_frames
+            # print(output.shape)torch.Size([256, 12, 1536])
+
+            # output = self.ffn(output)
+            # print(output.shape)torch.Size([256, 12, 256])
+
+            # resnet connect
+            return output

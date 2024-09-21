@@ -1,35 +1,29 @@
 #!/bin/bash
 # conda activate MTID
-# Base command
-BASE_CMD="python main_distributed.py --dataset=coin --base_model=predictor"
 
-# Array of seeds (2 seeds)
-SEEDS=(3407 3414)
+# Configuration
+BASE_CMD="python main_distributed.py --dataset=crosstask_how --base_model=predictor --horizon=3"
+SEEDS=(3407 3414 3411 3412)
+MODEL_DIM=256
+NUM_GPUS=8
+OUTPUT_DIR="out"
 
-# Array of model dimensions
-MODEL_DIMS=(128 256 512)
-
-# Array of horizons
-HORIZONS=(3 4)
+# Ensure output directory exists
+# mkdir -p "$OUTPUT_DIR"
 
 # Run experiments
-experiment_count=0
-for SEED in "${SEEDS[@]}"
-do
-    for MODEL_DIM in "${MODEL_DIMS[@]}"
-    do
-        for HORIZON in "${HORIZONS[@]}"
-        do
-            experiment_count=$((experiment_count + 1))
-            GPU=$((experiment_count % 8))  # Use GPUs 0-7 in a round-robin fashion
-
-            nohup $BASE_CMD --name=coinpredictor_s${SEED}_d${MODEL_DIM}_h${HORIZON} --gpu=$GPU \
-                 --horizon=$HORIZON --seed=$SEED --model_dim=$MODEL_DIM \
-                 > out/output_coinpredictor_s${SEED}_d${MODEL_DIM}_h${HORIZON}.log 2>&1 &
-
-            echo "Started experiment $experiment_count on GPU $GPU with horizon $HORIZON, seed $SEED, and model_dim $MODEL_DIM"
-        done
-    done
+for ((i=0; i<${#SEEDS[@]}; i++)); do
+    SEED=${SEEDS[i]}
+    GPU=$((i % NUM_GPUS))
+    
+    EXPERIMENT_NAME="coinpredictor_s${SEED}_d${MODEL_DIM}_h3"
+    LOG_FILE="$OUTPUT_DIR/output_${EXPERIMENT_NAME}.log"
+    
+    nohup $BASE_CMD --name=$EXPERIMENT_NAME --gpu=$GPU \
+            --seed=$SEED --model_dim=$MODEL_DIM \
+            > "$LOG_FILE" 2>&1 &
+    
+    echo "Started experiment $((i + 1)) on GPU $GPU with seed $SEED and model_dim $MODEL_DIM"
 done
 
-echo "All $experiment_count experiments started. Check individual log files for progress."
+echo "All ${#SEEDS[@]} experiments started. Check individual log files in $OUTPUT_DIR for progress."

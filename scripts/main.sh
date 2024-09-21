@@ -316,3 +316,20 @@ nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor7 --
       --base_model=predictor --horizon=6 --seed=3405 --ifMask=True > out/output_howpredictor7.log 2>&1 &
 nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor8 --gpu=7 \
       --base_model=predictor --horizon=6 --seed=3408 --ifMask=True > out/output_howpredictor8.log 2>&1 &
+
+
+nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor1 --gpu=5 \
+      --base_model=predictor --horizon=3 --seed=3407 --ifMask=True --module_kind=e+i > out/output_howpredictor1.log 2>&1 &
+
+
+nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor1 --gpu=0 \
+      --base_model=predictor --horizon=3 --seed=3407 --ifMask=True \
+      --encoder_kind=conv > out/output_howpredictor1.log 2>&1 &
+
+
+nohup python main_distributed.py --dataset=crosstask_how --name=howpredictorconv --gpu=5 \
+      --base_model=predictor --horizon=3 --seed=3407 --ifMask=True --module_kind=e+i \
+      --encoder_kind=conv > out/howpredictorconv.log 2>&1 &
+
+# nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor1 --gpu=0 \
+#       --base_model=predictor --horizon=3 --seed=3407 --ifMask=True --module_kind=i > out/output_howpredictor1.log 2>&1 &
