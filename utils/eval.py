@@ -12,8 +12,7 @@ def validate(val_loader, model, args):
     MIoU1_meter = AverageMeter()
     MIoU2_meter = AverageMeter()
 
-    A0_acc = AverageMeter()
-    AT_acc = AverageMeter()
+    CorrectAll = [AverageMeter() for _ in range(args.horizon)]
 
     for i_batch, sample_batch in enumerate(val_loader):
         # compute output
@@ -68,7 +67,7 @@ def validate(val_loader, model, args):
             # [bs*T, action_dim]
             actions_pred = actions_pred.view(-1, args.action_dim)
 
-            (acc1, acc5), trajectory_success_rate, MIoU1, MIoU2, a0_acc, aT_acc = \
+            (acc1, acc5), trajectory_success_rate, MIoU1, MIoU2,  correct_all = \
                 accuracy(actions_pred.cpu(), video_label_reshaped.cpu(),
                          topk=(1,5), max_traj_len=args.horizon)
 
@@ -79,10 +78,13 @@ def validate(val_loader, model, args):
             trajectory_success_rate.item(), batch_size_current)
         MIoU1_meter.update(MIoU1, batch_size_current)
         MIoU2_meter.update(MIoU2, batch_size_current)
-        A0_acc.update(a0_acc, batch_size_current)
-        AT_acc.update(aT_acc, batch_size_current)
-
+        # A0_acc.update(a0_acc, batch_size_current)
+        # AT_acc.update(aT_acc, batch_size_current)
+        
+        for i in range(len(correct_all)):
+            CorrectAll[i].update(correct_all[i], batch_size_current)
+            
+    CorrectAll = [torch.tensor(meter.avg) for meter in CorrectAll]
     return torch.tensor(losses.avg), torch.tensor(acc_top1.avg), torch.tensor(acc_top5.avg), \
         torch.tensor(trajectory_success_rate_meter.avg), \
-        torch.tensor(MIoU1_meter.avg), torch.tensor(MIoU2_meter.avg), \
-        torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+        torch.tensor(MIoU1_meter.avg), torch.tensor(MIoU2_meter.avg),  CorrectAll

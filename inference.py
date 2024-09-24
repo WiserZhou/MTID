@@ -65,13 +65,16 @@ def accuracy2(output, target, topk=(1,), max_traj_len=0):
         correct_a = correct[:1].view(-1, max_traj_len)
 
         # print_and_size(correct_a)  # torch.Size([256, 3])
+        correct_all = []
+        for i in range(len(correct_a.shape[1])):
+            correct_all.append(correct_a[:,i].reshape(-1).float().mean().mul_(100.0))
 
         # 计算第一个时间步的平均准确率
-        correct_a0 = correct_a[:, 0].reshape(-1).float().mean().mul_(100.0)
-        # print_and_size(correct_a0)  # torch.Size([])
-        # 计算最后一个时间步的平均准确率
-        correct_aT = correct_a[:, -1].reshape(-1).float().mean().mul_(100.0)
-        # print_and_size(correct_aT)  # torch.Size([])
+        # correct_a0 = correct_a[:, 0].reshape(-1).float().mean().mul_(100.0)
+        # # print_and_size(correct_a0)  # torch.Size([])
+        # # 计算最后一个时间步的平均准确率
+        # correct_aT = correct_a[:, -1].reshape(-1).float().mean().mul_(100.0)
+        # # print_and_size(correct_aT)  # torch.Size([])
         # 初始化结果列表
         res = []
 
@@ -143,7 +146,7 @@ def accuracy2(output, target, topk=(1,), max_traj_len=0):
         MIoU2 = MIoU_sum / batch_size
 
         # 返回计算结果
-        return res[0], trajectory_success_rate, MIoU1, MIoU2, correct_a0, correct_aT
+        return res[0], trajectory_success_rate, MIoU1, MIoU2,correct_all
 
 
 def test_inference(val_loader, model, args):
@@ -153,9 +156,11 @@ def test_inference(val_loader, model, args):
     MIoU1_meter = AverageMeter()
     MIoU2_meter = AverageMeter()
 
-    A0_acc = AverageMeter()
-    AT_acc = AverageMeter()
-
+    # A0_acc = AverageMeter()
+    # AT_acc = AverageMeter()
+    CorrectAll = []
+    for i in range(args.horizon):
+        CorrectAll.append(AverageMeter())
     for i_batch, sample_batch in enumerate(val_loader):
         # compute output
         global_img_tensors = sample_batch[0].cuda().contiguous()
@@ -231,7 +236,7 @@ def test_inference(val_loader, model, args):
             # print(video_label_reshaped.size())  # torch.Size([768])
             # print(video_label_reshaped)
 
-            acc1, trajectory_success_rate, MIoU1, MIoU2, a0_acc, aT_acc = \
+            acc1, trajectory_success_rate, MIoU1, MIoU2, correct_all = \
                 accuracy2(actions_pred.cpu(), video_label_reshaped.cpu(),
                           topk=(1,), max_traj_len=args.horizon)
 
@@ -240,13 +245,16 @@ def test_inference(val_loader, model, args):
             trajectory_success_rate.item(), batch_size_current)
         MIoU1_meter.update(MIoU1, batch_size_current)
         MIoU2_meter.update(MIoU2, batch_size_current)
-        A0_acc.update(a0_acc, batch_size_current)
-        AT_acc.update(aT_acc, batch_size_current)
+        
+        for i in range(len(correct_all)):
+            CorrectAll[i].update(correct_all[i], batch_size_current)
+            
+        for i in range(len(CorrectAll)):
+            CorrectAll[i] = torch.tensor(CorrectAll[i].avg)
 
     return torch.tensor(acc_top1.avg), \
         torch.tensor(trajectory_success_rate_meter.avg), \
-        torch.tensor(MIoU1_meter.avg), torch.tensor(MIoU2_meter.avg), \
-        torch.tensor(A0_acc.avg), torch.tensor(AT_acc.avg)
+        torch.tensor(MIoU1_meter.avg), torch.tensor(MIoU2_meter.avg), CorrectAll
 
 
 def reduce_tensor(tensor):
@@ -405,8 +413,8 @@ def main_worker(gpu, ngpus_per_node, args):
     trajectory_success_rate_meter_reduced_sum = []
     MIoU1_meter_reduced_sum = []
     MIoU2_meter_reduced_sum = []
-    acc_a0_reduced_sum = []
-    acc_aT_reduced_sum = []
+    # acc_a0_reduced_sum = []
+    # acc_aT_reduced_sum = []
     test_times = 1
 
     for epoch in range(0, test_times):
@@ -416,7 +424,7 @@ def main_worker(gpu, ngpus_per_node, args):
         torch.manual_seed(tmp)
         torch.cuda.manual_seed_all(tmp)
 
-        acc_top1, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, acc_a0, acc_aT = test_inference(
+        acc_top1, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, correct_all = test_inference(
             test_loader, model.ema_model, args)
 
         acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
@@ -424,16 +432,21 @@ def main_worker(gpu, ngpus_per_node, args):
             trajectory_success_rate_meter.cuda()).item()
         MIoU1_meter_reduced = reduce_tensor(MIoU1_meter.cuda()).item()
         MIoU2_meter_reduced = reduce_tensor(MIoU2_meter.cuda()).item()
-        acc_a0_reduced = reduce_tensor(acc_a0.cuda()).item()
-        acc_aT_reduced = reduce_tensor(acc_aT.cuda()).item()
+        # for i in range(len(correct_all)):
+        #     correct_all[i] = reduce_tensor(correct_all[i].cuda()).item()
+        # acc_a0_reduced = reduce_tensor(acc_a0.cuda()).item()
+        # acc_aT_reduced = reduce_tensor(acc_aT.cuda()).item()
 
         acc_top1_reduced_sum.append(acc_top1_reduced)
         trajectory_success_rate_meter_reduced_sum.append(
             trajectory_success_rate_meter_reduced)
         MIoU1_meter_reduced_sum.append(MIoU1_meter_reduced)
         MIoU2_meter_reduced_sum.append(MIoU2_meter_reduced)
-        acc_a0_reduced_sum.append(acc_a0_reduced)
-        acc_aT_reduced_sum.append(acc_aT_reduced)
+        CorrectAll = []
+        for i in range(len(correct_all)):
+            CorrectAll.append(reduce_tensor(correct_all[i].cuda()).item())
+        # acc_a0_reduced_sum.append(acc_a0_reduced)
+        # acc_aT_reduced_sum.append(acc_aT_reduced)
 
     if args.rank == 0:
         time_end = time.time()
@@ -447,10 +460,13 @@ def main_worker(gpu, ngpus_per_node, args):
               test_times, np.var(MIoU1_meter_reduced_sum))
         print('Val/MIoU2', sum(MIoU2_meter_reduced_sum) /
               test_times, np.var(MIoU2_meter_reduced_sum))
-        print('Val/acc_a0', sum(acc_a0_reduced_sum) /
-              test_times, np.var(acc_a0_reduced_sum))
-        print('Val/acc_aT', sum(acc_aT_reduced_sum) /
-              test_times, np.var(acc_aT_reduced_sum))
+        # print('Val/acc_a0', sum(acc_a0_reduced_sum) /
+        #       test_times, np.var(acc_a0_reduced_sum))
+        # print('Val/acc_aT', sum(acc_aT_reduced_sum) /
+        #       test_times, np.var(acc_aT_reduced_sum))
+        for i in range(len(CorrectAll)):
+            print(f'Val/CorrectAll_{i}', sum(CorrectAll[i]) /
+              test_times, np.var(CorrectAll[i]))
 
 
 if __name__ == "__main__":

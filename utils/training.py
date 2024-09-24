@@ -270,19 +270,19 @@ class Trainer(object):
                     actions_pred = output[:, :, args.class_dim:args.class_dim+self.model.module.action_dim]\
                         .contiguous().view(-1, self.model.module.action_dim)  # Shape: [batch_size*T, action_dim]
 
-                    (acc1, acc5), trajectory_success_rate, MIoU1, MIoU2, a0_acc, aT_acc = \
+                    (acc1, acc5), trajectory_success_rate, MIoU1, MIoU2, correct_all = \
                         accuracy(actions_pred.cpu(), video_label.cpu(), topk=(1, 5),
                                  max_traj_len=self.model.module.horizon)
                 else:
                     actions_pred = output[:, :, args.class_dim:args.class_dim+self.model.action_dim]\
                         .contiguous().view(-1, self.model.action_dim)  # Shape: [batch_size*T, action_dim]
 
-                    (acc1, acc5), trajectory_success_rate, MIoU1, MIoU2, a0_acc, aT_acc = \
+                    (acc1, acc5), trajectory_success_rate, MIoU1, MIoU2, correct_all = \
                         accuracy(actions_pred.cpu(), video_label.cpu(), topk=(1, 5),
                                  max_traj_len=self.model.horizon)
 
                 return torch.tensor(losses.avg), acc1, acc5, torch.tensor(trajectory_success_rate), \
-                    torch.tensor(MIoU1), torch.tensor(MIoU2), a0_acc, aT_acc
+                    torch.tensor(MIoU1), torch.tensor(MIoU2), correct_all
 
         else:
             return torch.tensor(losses.avg)

@@ -13,13 +13,13 @@ class ObservationConvEncoder(nn.Module):
             output_channels, output_channels, kernel_size=3, stride=1, padding=1)
 
         # 初始化卷积核为近似恒等映射
-        with torch.no_grad():
-            self.conv1.weight.fill_(0)
-            self.conv1.bias.fill_(0)
-            self.conv2.weight.fill_(0)
-            self.conv2.bias.fill_(0)
-            self.conv1.weight[:, :, 1] = 1
-            self.conv2.weight[:, :, 1] = 1
+        # with torch.no_grad():
+        #     self.conv1.weight.fill_(0)
+        #     self.conv1.bias.fill_(0)
+        #     self.conv2.weight.fill_(0)
+        #     self.conv2.bias.fill_(0)
+        #     self.conv1.weight[:, :, 1] = 1
+        #     self.conv2.weight[:, :, 1] = 1
             
     # input shape (batch_size,observation_dim)
     def forward(self, x):

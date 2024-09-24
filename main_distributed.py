@@ -85,6 +85,8 @@ def main_worker(gpu, ngpus_per_node, args):
         
     current_time = time.strftime("%Y%m%d_%H%M%S", time.localtime())
     wandb_name = f"{args.base_model}_{args.name}_{current_time}"
+    
+    args.ifMask = False
 
     if args.verbose:
         print(args)
@@ -270,7 +272,7 @@ def main_worker(gpu, ngpus_per_node, args):
         # train for one epoch
         if (epoch + 1) % 5 == 0:  # calculate on training set
             losses, acc_top1, acc_top5, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
-                acc_a0, acc_aT = model.train(
+                correct_all = model.train(
                     args.n_train_steps, True, args, scheduler)
 
             # max_train_acc = max(max_train_acc, trajectory_success_rate_meter)
@@ -285,8 +287,11 @@ def main_worker(gpu, ngpus_per_node, args):
                 trajectory_success_rate_meter.cuda()).item()
             MIoU1_meter_reduced = reduce_tensor(MIoU1_meter.cuda()).item()
             MIoU2_meter_reduced = reduce_tensor(MIoU2_meter.cuda()).item()
-            acc_a0_reduced = reduce_tensor(acc_a0.cuda()).item()
-            acc_aT_reduced = reduce_tensor(acc_aT.cuda()).item()
+            
+            
+            correct_all_reduced = []
+            for i in range(len(correct_all)):
+                correct_all_reduced.append(reduce_tensor(correct_all[i].cuda()).item())
 
             if args.rank == 0:
                 logs = OrderedDict()
@@ -296,21 +301,23 @@ def main_worker(gpu, ngpus_per_node, args):
                 logs['Train/Traj_Success_Rate'] = trajectory_success_rate_meter_reduced
                 logs['Train/MIoU1'] = MIoU1_meter_reduced
                 logs['Train/MIoU2'] = MIoU2_meter_reduced
-                logs['Train/acc_a0'] = acc_a0_reduced
-                logs['Train/acc_aT'] = acc_aT_reduced
+              
+                for i in range(len(correct_all_reduced)):
+                    logs['Train/acc_all_' + str(i)] = correct_all_reduced[i]
                 wandb.log(logs, step=epoch + 1)
         else:
             losses = model.train(args.n_train_steps, False,
                                  args, scheduler).cuda()
             losses_reduced = reduce_tensor(losses).item()
             if args.rank == 0:
-                print()
+                # print()
+                # Log learning rate and loss
                 for p in model.optimizer.param_groups:
-                    print('lrs:' + str(p['lr']))
-                print('---------------------------------')
+                    current_lr = p['lr']
+                    break  # We only need the first group's learning rate
 
                 logs = OrderedDict()
-                logs['Train/lrs'] = p['lr']
+                logs['Train/lr'] = current_lr
                 logs['Train/EpochLoss'] = losses_reduced
                 wandb.log(logs, step=epoch + 1)
 
@@ -318,7 +325,9 @@ def main_worker(gpu, ngpus_per_node, args):
         if args.evaluate:
             losses, acc_top1, acc_top5, \
                 trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, \
-                acc_a0, acc_aT = validate(test_loader, model.ema_model, args)
+                correct_all = validate(test_loader, model.ema_model, args)
+            
+
 
             # max_test_acc = max(max_test_acc, trajectory_success_rate_meter)
             if trajectory_success_rate_meter > max_test_acc:
@@ -332,8 +341,10 @@ def main_worker(gpu, ngpus_per_node, args):
                 trajectory_success_rate_meter.cuda()).item()
             MIoU1_meter_reduced = reduce_tensor(MIoU1_meter.cuda()).item()
             MIoU2_meter_reduced = reduce_tensor(MIoU2_meter.cuda()).item()
-            acc_a0_reduced = reduce_tensor(acc_a0.cuda()).item()
-            acc_aT_reduced = reduce_tensor(acc_aT.cuda()).item()
+           
+            correct_all_reduced = []
+            for i in range(len(correct_all)):
+                correct_all_reduced.append(reduce_tensor(correct_all[i].cuda()).item())
 
             # If the current process is the main process (rank 0), log the validation metrics
             if args.rank == 0:
@@ -344,8 +355,8 @@ def main_worker(gpu, ngpus_per_node, args):
                 logs['Val/Traj_Success_Rate'] = trajectory_success_rate_meter_reduced
                 logs['Val/MIoU1'] = MIoU1_meter_reduced
                 logs['Val/MIoU2'] = MIoU2_meter_reduced
-                logs['Val/acc_a0'] = acc_a0_reduced
-                logs['Val/acc_aT'] = acc_aT_reduced
+                for i in range(len(correct_all_reduced)):
+                    logs['Val/acc_all_' + str(i)] = correct_all_reduced[i]
                 wandb.log(logs, step=epoch + 1)
                 
                 print(trajectory_success_rate_meter_reduced,acc_top1_reduced,MIoU2_meter_reduced,MIoU1_meter_reduced, max_eva)
@@ -415,7 +426,7 @@ def main_worker(gpu, ngpus_per_node, args):
         # torch.manual_seed(tmp)
         # torch.cuda.manual_seed_all(tmp)
 
-        acc_top1, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, acc_a0, acc_aT = test_inference(
+        acc_top1, trajectory_success_rate_meter, MIoU1_meter, MIoU2_meter, correct_all = test_inference(
             test_loader, model.ema_model, args)
 
         acc_top1_reduced = reduce_tensor(acc_top1.cuda()).item()
@@ -423,16 +434,19 @@ def main_worker(gpu, ngpus_per_node, args):
             trajectory_success_rate_meter.cuda()).item()
         MIoU1_meter_reduced = reduce_tensor(MIoU1_meter.cuda()).item()
         MIoU2_meter_reduced = reduce_tensor(MIoU2_meter.cuda()).item()
-        acc_a0_reduced = reduce_tensor(acc_a0.cuda()).item()
-        acc_aT_reduced = reduce_tensor(acc_aT.cuda()).item()
+        # acc_a0_reduced = reduce_tensor(acc_a0.cuda()).item()
+        # acc_aT_reduced = reduce_tensor(acc_aT.cuda()).item()
 
         acc_top1_reduced_sum.append(acc_top1_reduced)
         trajectory_success_rate_meter_reduced_sum.append(
             trajectory_success_rate_meter_reduced)
         MIoU1_meter_reduced_sum.append(MIoU1_meter_reduced)
         MIoU2_meter_reduced_sum.append(MIoU2_meter_reduced)
-        acc_a0_reduced_sum.append(acc_a0_reduced)
-        acc_aT_reduced_sum.append(acc_aT_reduced)
+        # acc_a0_reduced_sum.append(acc_a0_reduced)
+        # acc_aT_reduced_sum.append(acc_aT_reduced)
+        correct_all_reduced = []
+        for i in range(len(correct_all)):
+            correct_all_reduced.append(reduce_tensor(correct_all[i].cuda()).item())
 
     if args.rank == 0:
         time_end = time.time()
@@ -450,19 +464,26 @@ def main_worker(gpu, ngpus_per_node, args):
         print('Val/MIoU1', sum(MIoU1_meter_reduced_sum) /
               test_times, np.var(MIoU1_meter_reduced_sum))
         print('Val/MIoU2', MIoU2)
-        print('Val/acc_a0', sum(acc_a0_reduced_sum) /
-              test_times, np.var(acc_a0_reduced_sum))
-        print('Val/acc_aT', sum(acc_aT_reduced_sum) /
-              test_times, np.var(acc_aT_reduced_sum))
+        # print('Val/acc_a0', sum(acc_a0_reduced_sum) /
+        #       test_times, np.var(acc_a0_reduced_sum))
+        # print('Val/acc_aT', sum(acc_aT_reduced_sum) /
+        #       test_times, np.var(acc_aT_reduced_sum))
         
-        wandb.log({
-            'Final/EpochAcc@1': EpochAcc1,
-            'Final/Traj_Success_Rate': Traj_Success_Rate,
-            'Final/MIoU1': sum(MIoU1_meter_reduced_sum) / test_times,
-            'Final/MIoU2': MIoU2,
-            'Final/acc_a0': sum(acc_a0_reduced_sum) / test_times,
-            'Final/acc_aT': sum(acc_aT_reduced_sum) / test_times,
-        })
+        for i in range(len(correct_all_reduced)):
+            print(f'Val/CorrectAll_{i}', sum(correct_all_reduced[i]) /
+              test_times, np.var(correct_all_reduced[i]))
+        
+        final_logs = {
+                'Final/EpochAcc@1': EpochAcc1,
+                'Final/Traj_Success_Rate': Traj_Success_Rate,
+                'Final/MIoU1': sum(MIoU1_meter_reduced_sum) / test_times,
+                'Final/MIoU2': MIoU2,
+            }
+            
+        for i, acc in enumerate(correct_all_reduced):
+            final_logs[f'Final/CorrectAll_{i}'] = acc
+        
+        wandb.log(final_logs)
         wandb.finish()
 
         # print experiment results

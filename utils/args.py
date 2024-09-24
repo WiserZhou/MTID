@@ -151,8 +151,6 @@ def get_args(description='whl'):
     # parameters that need to be modified
     parser.add_argument('--seed', default=217, type=int,
                         help='seed for initializing training. ')
-    parser.add_argument('--weight', default=6, type=float,
-                        help='weight of the loss function')
     parser.add_argument('--clip_denoised', default=True,
                         action='store_true', help='')
     parser.add_argument('--ddim_discr_method',
@@ -223,6 +221,16 @@ def get_args(description='whl'):
     parser.add_argument('--model_dim',type=int,default=256,help='model dimension')
     parser.add_argument('--module_kind',type=str,default='all',help='ablation for module design')
     parser.add_argument('--encoder_kind',type=str,default='conv')
-    parser.add_argument('--mask_kind',type=str,default='')
+    parser.add_argument('--mask_loss',type=str,default='1')
+    parser.add_argument('--weight', default=6, type=float,
+                        help='weight of the loss function')
+    parser.add_argument('--mask_iteration', type=str, default='add', help='')
     args = parser.parse_args()
     return args
+
+# --loss_type=Weighted_MSE --mask_loss=2 --weight=1
+# --loss_type=Weighted_MSE --mask_loss=2 --weight=6
+# --loss_type=Weighted_Gradient_MSE --mask_loss=2 --weight=6
+# --loss_type=Weighted_MSE --mask_loss=1 --weight=1
+# --loss_type=Weighted_MSE --mask_loss=1 --weight=6
+# --loss_type=Weighted_Gradient_MSE --mask_loss=1 --weight=6

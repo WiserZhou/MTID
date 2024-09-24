@@ -420,6 +420,45 @@ class Weighted_Gradient_MSE(nn.Module):
         # print(loss_action)
         return loss_action
     
+class Weighted_MSE(nn.Module):
+
+    def __init__(self,  action_dim, class_dim, weight):
+        super().__init__()
+        # self.register_buffer('weights', weights)
+        self.action_dim = action_dim
+        self.class_dim = class_dim
+        self.weight = weight
+
+    def forward(self, pred, targ, mask=None):
+        """
+        :param pred: [B, T, task_dim+action_dim+observation_dim]
+        :param targ: [B, T, task_dim+action_dim+observation_dim]
+        :return:
+        """
+        batch_size, time_steps, _ = pred.size()
+        loss_action = F.mse_loss(pred, targ, reduction='none')
+        loss_action[:, 0, self.class_dim:self.class_dim +
+                    self.action_dim] *= self.weight
+        loss_action[:, -1, self.class_dim:self.class_dim +
+                    self.action_dim] *= self.weight
+        if mask is not None:
+            # Scale tensor
+            scale = torch.full((time_steps,), 1.1, device=pred.device)
+            # Apply weights to the action part of the loss
+            loss_action = loss_action[
+                :, :, self.class_dim: self.class_dim + self.action_dim
+            ]
+            mask = mask[:, :, self.class_dim: self.class_dim + self.action_dim]
+            for t in range(time_steps):
+                loss_action[:, t, :] = torch.where(
+                    mask[:, t, :] == 1,
+                    loss_action[:, t, :] * scale[t],
+                    loss_action[:, t, :],
+                )
+                
+        loss_action = loss_action.sum()
+        return loss_action
+    
 def variance_loss(predictions):
     mean = torch.mean(predictions)
     variance = torch.mean((predictions - mean) ** 2)
@@ -476,7 +515,8 @@ class Variance_Weighted_MSE(nn.Module):
 Losses = {
     'Sequence_CE': Sequence_CE,
     'Weighted_Gradient_MSE': Weighted_Gradient_MSE,
-    'Variance_Weighted_MSE':Variance_Weighted_MSE
+    'Variance_Weighted_MSE':Variance_Weighted_MSE,
+    'Weighted_MSE':Weighted_MSE
 }
 
 # -----------------------------------------------------------------------------#

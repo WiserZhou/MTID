@@ -23,6 +23,8 @@ class GaussianDiffusion(nn.Module):
         self.weight = args.weight  # Set the weight for the loss function
         self.ifMask = args.ifMask
         self.kind = args.kind
+        self.mask_loss = args.mask_loss
+        self.mask_iteration = args.mask_iteration
 
         # Set the number of timesteps for diffusion
         self.n_timesteps = args.n_diffusion_steps # default=200
@@ -188,9 +190,8 @@ class GaussianDiffusion(nn.Module):
         x = torch.randn(shape, device=device) * \
             self.random_ratio  # Initialize xt for Noise and diffusion
         # x = torch.zeros(shape, device=device)   # for Deterministic
-        mask = None
+        mask = compute_mask(x,self.class_dim,self.action_dim,self.horizon)
         if self.ifMask:
-            mask = compute_mask(x,self.class_dim,self.action_dim,self.horizon)
             x = condition_projection(x, cond, self.action_dim, self.class_dim)
             x = x * mask
         else:
@@ -223,6 +224,9 @@ class GaussianDiffusion(nn.Module):
                     x = self.p_sample_ddim(x, cond, timesteps, timesteps_prev)
                 x = condition_projection(
                     x, cond, self.action_dim, self.class_dim)
+                if self.mask_iteration == "add":
+                    x = x * mask
+                    
 
         '''
         The two lines below are for Noise and Deterministic
@@ -275,7 +279,7 @@ class GaussianDiffusion(nn.Module):
         
         if self.loss_type == 'Sequence_CE':        
              loss = self.loss_fn(x_recon, x_start, self.l_order,self.l_pos,self.l_perm,self.kind)  # Compute the loss
-        elif self.ifMask:
+        elif self.mask_loss == '1':
             loss = self.loss_fn(x_recon, x_start, mask)  # Compute the loss
         else:
             loss = self.loss_fn(x_recon, x_start)

@@ -18,10 +18,16 @@ def accuracy(output, target, topk=(1,), max_traj_len=0):
 
         # Reshape to consider each trajectory separately
         correct_a = correct[:1].view(-1, max_traj_len)  # [bs, T]
+        
+        correct_all = []
+        
+        for i in range(correct_a.shape[1]):
+            correct_all.append(correct_a[:, i].reshape(-1).float().mean().mul_(100.0))
+            
         # Calculate the accuracy at the first time step
-        correct_a0 = correct_a[:, 0].reshape(-1).float().mean().mul_(100.0)
-        # Calculate the accuracy at the last time step
-        correct_aT = correct_a[:, -1].reshape(-1).float().mean().mul_(100.0)
+        # correct_a0 = correct_a[:, 0].reshape(-1).float().mean().mul_(100.0)
+        # # Calculate the accuracy at the last time step
+        # correct_aT = correct_a[:, -1].reshape(-1).float().mean().mul_(100.0)
 
         # Initialize a list to store results for each k in topk
         res = []
@@ -77,7 +83,7 @@ def accuracy(output, target, topk=(1,), max_traj_len=0):
         MIoU2 = MIoU_sum / batch_size
 
         # Return results including accuracy at top-k, success rate, and MIoU
-        return res, trajectory_success_rate, MIoU1, MIoU2, correct_a0, correct_aT
+        return res, trajectory_success_rate, MIoU1, MIoU2, correct_all
 
 
 def parse_fraction_or_float(value):

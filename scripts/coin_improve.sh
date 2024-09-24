@@ -2,9 +2,9 @@
 # conda activate MTID
 
 # Configuration
-BASE_CMD="python main_distributed.py --dataset=crosstask_how --base_model=predictor --horizon=3"
-SEEDS=(3407 3414 3411 3412)
-MODEL_DIM=256
+BASE_CMD="python main_distributed.py --dataset=coin --base_model=predictor --horizon=3 --ifMask=False"
+SEEDS=(3407 3414 3411 3412 3413 3415 3416 3417)
+MODEL_DIM=512
 NUM_GPUS=8
 OUTPUT_DIR="out"
 
