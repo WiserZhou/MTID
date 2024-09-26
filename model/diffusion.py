@@ -87,8 +87,9 @@ class GaussianDiffusion(nn.Module):
 
         # Set the loss type and corresponding loss function
         self.loss_type = args.loss_type
+        self.mask_scale = args.mask_scale
         self.loss_fn = Losses[self.loss_type](
-            self.action_dim, self.class_dim, self.weight)
+            self.action_dim, self.class_dim, self.weight,self.mask_scale)
 
     # ------------------------------------------ sampling ------------------------------------------#
 

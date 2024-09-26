@@ -76,7 +76,7 @@ class ObservationEncoder(nn.Module):
 # Semantic Space Interpolation
 
 class LatentSpaceInterpolator(nn.Module):
-    def __init__(self, dimension_num, block_num):
+    def __init__(self, dimension_num, block_num, interpolation_init, interpolation_usage):
         super(LatentSpaceInterpolator, self).__init__()
         self.block_num = block_num
         self.dimension_num = dimension_num
@@ -84,8 +84,11 @@ class LatentSpaceInterpolator(nn.Module):
         self.alpha_generator = nn.Linear(dimension_num, block_num)
         # Use Sigmoid activation function to constrain the alpha values between 0 and 1
         self.sigmoid = nn.Sigmoid()
-
+        self.interpolation_init = interpolation_init
+        self.interpolation_usage = interpolation_usage
+        
     def forward(self, x1, x2):
+
         batch_size, *_ = x1.shape
         
         # print(x1.shape)# torch.Size([256, 1536])
@@ -93,21 +96,68 @@ class LatentSpaceInterpolator(nn.Module):
 
         x_combined = torch.stack([x1, x2], dim=0)
         # print(x_combined.shape)# torch.Size([2, 256, 1536])
-
-        alphas = self.sigmoid(self.alpha_generator(
-            torch.ones(batch_size, self.dimension_num).to(x1.device)))
+        if self.interpolation_init == 0:
+            alphas = self.sigmoid(self.alpha_generator(
+                torch.ones(batch_size, self.dimension_num).to(x1.device)))
+        elif self.interpolation_init == 1:
+            alphas = self.sigmoid(self.alpha_generator(
+                torch.full((batch_size, self.dimension_num), 0.5).to(x1.device)))
+        elif self.interpolation_init == 2:
+            alphas = self.sigmoid(self.alpha_generator(
+                torch.full((batch_size, self.dimension_num), 2).to(x1.device)))
+        elif self.interpolation_init == 3:
+            alphas = self.sigmoid(self.alpha_generator(
+                torch.zeros(batch_size, self.dimension_num).to(x1.device)))
+        elif self.interpolation_init == 4:
+            alphas = self.sigmoid(self.alpha_generator(
+                torch.rand((batch_size, self.dimension_num)).to(x1.device)))
+        elif self.interpolation_init == 5:
+            return x1.unsqueeze(1).repeat(1,self.block_num,1)
+        elif self.interpolation_init == 6:
+            return x2.unsqueeze(1).repeat(1,self.block_num,1)
+        elif self.interpolation_init == 7:
+            alphas = torch.linspace(1, 6, self.block_num).repeat(batch_size, 1).to(x1.device)
+        elif self.interpolation_init == 8:
+            alphas = torch.linspace(6, 1, self.block_num).repeat(batch_size, 1).to(x1.device)
+        elif self.interpolation_init == 9:
+            alphas = torch.linspace(1, 6, self.block_num).repeat(batch_size, 1).to(x1.device)
+            alphas = alphas ** 2
+        elif self.interpolation_init == 10:
+            alphas = torch.linspace(6, 1, self.block_num).repeat(batch_size, 1).to(x1.device)
+            alphas = alphas ** 2
         # print(alphas.shape)# torch.Size([256, 12])
-
+        elif self.interpolation_init == 11:
+            # 创建一个先减小后增大的插值序列
+            half_block = self.block_num // 2
+            alphas_first_half = torch.linspace(6, 1, half_block)
+            alphas_second_half = torch.linspace(1, 6, self.block_num - half_block)
+            alphas = torch.cat([alphas_first_half, alphas_second_half]).repeat(batch_size, 1).to(x1.device)
+        elif self.interpolation_init == 12:
+            half_block = self.block_num // 2
+            x1_half = x1.unsqueeze(1).repeat(1, half_block, 1)
+            x2_half = x2.unsqueeze(1).repeat(1, self.block_num - half_block, 1)
+            alphas = torch.cat([x1_half, x2_half], dim=1)
+        else:
+            RuntimeError('unvalid interpolation_init!')
+        
         alphas = alphas.unsqueeze(-1)
         # print(alphas.shape)# torch.Size([256, 12, 1])
-     
+    
         # print(x_combined[0].unsqueeze(1).shape)# torch.Size([256, 1, 1536])
         # print(x_combined[1].unsqueeze(1).shape)# torch.Size([256, 1, 1536])
-        interpolated_frames = (
-            1 - alphas) * x_combined[0].unsqueeze(1) + alphas * x_combined[1].unsqueeze(1)
+        if self.interpolation_usage == 0:
+            interpolated_frames = (
+                1 - alphas) * x_combined[0].unsqueeze(1) + alphas * x_combined[1].unsqueeze(1)
+        elif self.interpolation_usage == 1:
+            interpolated_frames = (
+                1 - alphas) * x_combined[0].unsqueeze(1) + alphas * x_combined[1].unsqueeze(1)
+            
+        else:
+            RuntimeError('unvalid interpolation_usage!')
         # print(interpolated_frames.shape)# torch.Size([256, 12, 1536])
 
         return interpolated_frames
+
 
 # Transformer Block
 
@@ -137,7 +187,7 @@ class ActionPredictor(nn.Module):
         
 
         self.interpolator = LatentSpaceInterpolator(
-            output_dim, block_num)
+            output_dim, block_num, args.interpolation_init, args.interpolation_usage)
 
         self.transformer_blocks = nn.ModuleList([TransformerBlock(
             output_dim, num_heads=8, num_layers=args.transformer_num) for _ in range(num_transformer_blocks)])

@@ -227,6 +227,9 @@ def get_args(description='whl'):
                         default=5, help='layer nums for transformer blocks,NIV:2,coin:7')
     parser.add_argument('--ie_num', type=int, default=1,
                         help='image encoder convolution layer num,NIV:2')
+    parser.add_argument('--interpolation_init',type=int,default=0,help='interpolation init schema')
+    parser.add_argument('--interpolation_usage',type=int,default=0,help='interpolation usage schema')
+    parser.add_argument('--mask_scale',type=float,default=1.1,help='scale of mask loss')
     args = parser.parse_args()
     return args
 

@@ -252,6 +252,8 @@ def main_worker(gpu, ngpus_per_node, args):
     )
 
     max_eva = 0
+    max_mAcc = 0
+    max_mIoU = 0
     max_acc = 0
     old_max_epoch = 0
     save_max = os.path.join(os.path.dirname(__file__), 'save_max')
@@ -362,7 +364,7 @@ def main_worker(gpu, ngpus_per_node, args):
                     logs['Val/acc_all_' + str(i)] = correct_all_reduced[i]
                 wandb.log(logs, step=epoch + 1)
                 
-                print(trajectory_success_rate_meter_reduced,acc_top1_reduced,MIoU2_meter_reduced,MIoU1_meter_reduced, max_eva)
+                print(trajectory_success_rate_meter_reduced,acc_top1_reduced,MIoU2_meter_reduced,MIoU1_meter_reduced, max_eva, max_mAcc, max_mIoU)
 
             # Save checkpoint if the new trajectory success rate is better
             if trajectory_success_rate_meter_reduced > max_eva and acc_top1_reduced >= max_acc:
@@ -378,6 +380,8 @@ def main_worker(gpu, ngpus_per_node, args):
                 #                                     }, save_max, old_max_epoch, epoch + 1, args.rank
                 #                                     )
                 max_eva = trajectory_success_rate_meter_reduced
+                max_mAcc = MIoU2_meter_reduced
+                max_mIoU = MIoU1_meter_reduced
                 max_acc = acc_top1_reduced
                 old_max_epoch = epoch + 1
 

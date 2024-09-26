@@ -363,13 +363,13 @@ class Sequence_CE(nn.Module):
 
 class Weighted_Gradient_MSE(nn.Module):
 
-    def __init__(self,  action_dim, class_dim, weight):
+    def __init__(self,  action_dim, class_dim, weight, mask_scale):
         super().__init__()
         # self.register_buffer('weights', weights)
         self.action_dim = action_dim
         self.class_dim = class_dim
         self.weight = weight
-
+        self.mask_scale = mask_scale
     def forward(self, pred, targ, mask=None):
         """
         :param pred: [B, T, task_dim+action_dim+observation_dim]
@@ -396,7 +396,7 @@ class Weighted_Gradient_MSE(nn.Module):
         # mask = None
         if mask is not None:
             # Scale tensor
-            scale = torch.full((time_steps,), 1.1, device=pred.device)
+            scale = torch.full((time_steps,), self.mask_scale, device=pred.device)
             # Apply weights to the action part of the loss
             loss_action = loss_action[
                 :, :, self.class_dim: self.class_dim + self.action_dim
@@ -422,13 +422,13 @@ class Weighted_Gradient_MSE(nn.Module):
     
 class Weighted_MSE(nn.Module):
 
-    def __init__(self,  action_dim, class_dim, weight):
+    def __init__(self,  action_dim, class_dim, weight,mask_scale):
         super().__init__()
         # self.register_buffer('weights', weights)
         self.action_dim = action_dim
         self.class_dim = class_dim
         self.weight = weight
-
+        self.mask_scale = mask_scale
     def forward(self, pred, targ, mask=None):
         """
         :param pred: [B, T, task_dim+action_dim+observation_dim]
@@ -443,7 +443,7 @@ class Weighted_MSE(nn.Module):
                     self.action_dim] *= self.weight
         if mask is not None:
             # Scale tensor
-            scale = torch.full((time_steps,), 1.1, device=pred.device)
+            scale = torch.full((time_steps,), self.mask_scale, device=pred.device)
             # Apply weights to the action part of the loss
             loss_action = loss_action[
                 :, :, self.class_dim: self.class_dim + self.action_dim

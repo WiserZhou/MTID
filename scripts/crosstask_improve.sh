@@ -4,22 +4,52 @@ GPUS=(0 1 2 3 4 5 6 7)  # 使用8张GPU
 OUTPUT_DIR="out"
 SEEDS=(3407 3414)  # 使用两个种子：3407和3414
 HORIZON=3  # 固定HORIZON为3
+MASK_SCALES=(0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5)  # mask_scale参数值
 
 # Run experiments
+GPU_INDEX=0
 for SEED in "${SEEDS[@]}"; do
-    for TRANSFORMER_NUM in {1..8}; do
-        GPU=${GPUS[TRANSFORMER_NUM-1]}
+    for MASK_SCALE in "${MASK_SCALES[@]}"; do
+        GPU=${GPUS[$GPU_INDEX]}
         
-        EXPERIMENT_NAME="howscorepredictor_s${SEED}_h${HORIZON}_t${TRANSFORMER_NUM}"
+        EXPERIMENT_NAME="howscorepredictor_s${SEED}_h${HORIZON}_ms${MASK_SCALE}"
         LOG_FILE="$OUTPUT_DIR/output_${EXPERIMENT_NAME}.log"
         
         nohup $BASE_CMD --name=$EXPERIMENT_NAME --gpu=$GPU \
-                --seed=$SEED --horizon=$HORIZON --transformer_num=$TRANSFORMER_NUM \
+                --seed=$SEED --horizon=$HORIZON --mask_scale=$MASK_SCALE \
                 > "$LOG_FILE" 2>&1 &
         
-        echo "Started experiment for GPU $GPU with horizon $HORIZON, seed $SEED, transformer_num $TRANSFORMER_NUM"
+        echo "Started experiment for GPU $GPU with horizon $HORIZON, seed $SEED, mask_scale $MASK_SCALE"
+        
+        # 更新GPU索引，如果达到最后一个GPU，则重新从0开始
+        GPU_INDEX=$((($GPU_INDEX + 1) % 8))
     done
 done
+
+# ... 其余注释掉的代码保持不变 ...
+
+# # Configuration
+# BASE_CMD="python main_distributed.py --dataset=crosstask_how --base_model=predictor"
+# GPUS=(0 1 2 3 4 5 6 7)  # 使用8张GPU
+# OUTPUT_DIR="out"
+# SEEDS=(3407 3414)  # 使用两个种子：3407和3414
+# HORIZON=3  # 固定HORIZON为3
+
+# # Run experiments
+# for SEED in "${SEEDS[@]}"; do
+#     for TRANSFORMER_NUM in {1..8}; do
+#         GPU=${GPUS[TRANSFORMER_NUM-1]}
+        
+#         EXPERIMENT_NAME="howscorepredictor_s${SEED}_h${HORIZON}_t${TRANSFORMER_NUM}"
+#         LOG_FILE="$OUTPUT_DIR/output_${EXPERIMENT_NAME}.log"
+        
+#         nohup $BASE_CMD --name=$EXPERIMENT_NAME --gpu=$GPU \
+#                 --seed=$SEED --horizon=$HORIZON --transformer_num=$TRANSFORMER_NUM \
+#                 > "$LOG_FILE" 2>&1 &
+        
+#         echo "Started experiment for GPU $GPU with horizon $HORIZON, seed $SEED, transformer_num $TRANSFORMER_NUM"
+#     done
+# done
 
 # // ... 其余注释掉的代码保持不变 ...
 
