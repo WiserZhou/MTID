@@ -2,9 +2,25 @@
 MTID: Masked Temporal Interpolation Diffusion For Procedure Planning
 
 <!-- This repository gives the official PyTorch implementation of [MTID: Masked Temporal Interpolation Diffusion For Procedure Planning](https://arxiv.org/abs/2303.14676v2) (CVPR 2023) -->
+<details>
+<summary>Overall Architecture Diagram (click to expand)</summary>
+
 ![architecture1](figure/architecture1.png)
+</details>
+
+<details>
+<summary>Latent Space Temporal Logical Interpolation Module (click to expand)</summary>
+
 ![architecture2](figure/architecture2.png)
+</details>
+
+<details>
+<summary>Residal Temporal Blocks (click to expand)</summary>
+
 ![architecture3](figure/architecture3.png)
+</details>
+
+
 ## Overview
 
 Our masked temporal interpolation diffusion (prediction horizon $T=3$) works as follows:
