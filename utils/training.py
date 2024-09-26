@@ -160,7 +160,7 @@ class Trainer(object):
 
                 # set the start and end observation feature
                 img_tensors = torch.zeros(
-                    (bs, T, args.class_dim + args.action_dim + args.observation_dim))
+                    (bs, T, args.class_dim + args.action_dim + args.observation_dim)).cuda()
 
                 img_tensors[:, 0, args.class_dim +
                             args.action_dim:] = global_img_tensors[:, 0, :]  # Os
@@ -179,10 +179,10 @@ class Trainer(object):
 
                 # Initialize an empty tensor for one-hot encoded action labels.
                 # If distributed training is initialized, use model.module.action_dim, else use model.action_dim.
-                action_label_onehot = torch.zeros((video_label.size(0), self.action_dim))
+                action_label_onehot = torch.zeros((video_label.size(0), self.action_dim)).cuda()
 
                 # Create an index tensor with values ranging from 0 to the length of video_label.
-                ind = torch.arange(0, len(video_label))
+                ind = torch.arange(0, len(video_label)).cuda()
                 # Set the appropriate positions in the one-hot tensor to 1.
                 # This creates one-hot encoded vectors for the action labels.
                 # Fancy Indexing
@@ -198,10 +198,10 @@ class Trainer(object):
                             args.action_dim] = action_label_onehot
 
                 # Initialize an empty tensor for one-hot encoded task labels. Shape: [batch_size, class_dim]
-                task_onehot = torch.zeros((task_class.size(0), args.class_dim))
+                task_onehot = torch.zeros((task_class.size(0), args.class_dim)).cuda()
 
                 # Create an index tensor with values ranging from 0 to the length of task_class.
-                ind = torch.arange(0, len(task_class))
+                ind = torch.arange(0, len(task_class)).cuda()
 
                 # Set the appropriate positions in the one-hot tensor to 1.
                 # This creates one-hot encoded vectors for the task labels.
@@ -233,7 +233,6 @@ class Trainer(object):
 
                 # Compute the loss
                 if dist.is_initialized():
-
                     loss = self.model.module.loss(x, cond)
                 else:
                     loss = self.model.loss(x, cond)

@@ -297,4 +297,4 @@ class GaussianDiffusion(nn.Module):
 
     # Forward pass of the model
     def forward(self, cond, if_jump=True):
-        return self.p_sample_loop(cond, if_jump)
+        return self.p_sample_loop(cond, True)

@@ -235,7 +235,10 @@ def main_worker(gpu, ngpus_per_node, args):
             
     if args.rank == 0:
         project_name = f"MTID_{args.dataset}_T{args.horizon}"
-        wandb.init(project=project_name, name=wandb_name, config=args)
+        # https://github.com/wandb/wandb/issues/8359
+        # wandb.init(settings=wandb.Settings(_disable_stats=True))
+        wandb.init(project=project_name, name=wandb_name, config=args,
+                   settings=wandb.Settings(_disable_stats=True))  # Add this line)
         wandb.watch(model.model)
 
 
@@ -307,8 +310,8 @@ def main_worker(gpu, ngpus_per_node, args):
                 wandb.log(logs, step=epoch + 1)
         else:
             losses = model.train(args.n_train_steps, False,
-                                 args, scheduler).cuda()
-            losses_reduced = reduce_tensor(losses).item()
+                                 args, scheduler)
+            losses_reduced = reduce_tensor(losses.cuda()).item()
             if args.rank == 0:
                 # print()
                 # Log learning rate and loss
@@ -364,33 +367,33 @@ def main_worker(gpu, ngpus_per_node, args):
             # Save checkpoint if the new trajectory success rate is better
             if trajectory_success_rate_meter_reduced > max_eva and acc_top1_reduced >= max_acc:
                 # if not (trajectory_success_rate_meter_reduced == max_eva and acc_top1_reduced < max_acc):
-                ckpt_max_path = save_checkpoint_max(args.name,
-                                                    {
-                                                        "epoch": epoch + 1,
-                                                        "model": model.model.state_dict(),
-                                                        "ema": model.ema_model.state_dict(),
-                                                        "optimizer": model.optimizer.state_dict(),
-                                                        "step": model.step,
-                                                        "scheduler": scheduler.state_dict(),
-                                                    }, save_max, old_max_epoch, epoch + 1, args.rank
-                                                    )
+                # ckpt_max_path = save_checkpoint_max(args.name,
+                #                                     {
+                #                                         "epoch": epoch + 1,
+                #                                         "model": model.model.state_dict(),
+                #                                         "ema": model.ema_model.state_dict(),
+                #                                         "optimizer": model.optimizer.state_dict(),
+                #                                         "step": model.step,
+                #                                         "scheduler": scheduler.state_dict(),
+                #                                     }, save_max, old_max_epoch, epoch + 1, args.rank
+                #                                     )
                 max_eva = trajectory_success_rate_meter_reduced
                 max_acc = acc_top1_reduced
                 old_max_epoch = epoch + 1
 
         # Save checkpoint periodically based on the save frequency
-        if (epoch + 1) % args.save_freq == 0:
-            if args.rank == 0:
-                save_checkpoint(args.name,
-                                {
-                                    "epoch": epoch + 1,
-                                    "model": model.model.state_dict(),
-                                    "ema": model.ema_model.state_dict(),
-                                    "optimizer": model.optimizer.state_dict(),
-                                    "step": model.step,
-                                    "scheduler": scheduler.state_dict(),
-                                }, checkpoint_dir, epoch + 1
-                                )
+        # if (epoch + 1) % args.save_freq == 0:
+        #     if args.rank == 0:
+        #         save_checkpoint(args.name,
+        #                         {
+        #                             "epoch": epoch + 1,
+        #                             "model": model.model.state_dict(),
+        #                             "ema": model.ema_model.state_dict(),
+        #                             "optimizer": model.optimizer.state_dict(),
+        #                             "step": model.step,
+        #                             "scheduler": scheduler.state_dict(),
+        #                         }, checkpoint_dir, epoch + 1
+        #                         )
                 
     print(f'max_train_acc:{max_train_acc} max_train_epoch:{max_train_epoch}')
     print(f'max_test_acc:{max_test_acc} max_test_epoch:{max_test_epoch}')

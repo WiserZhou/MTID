@@ -2,6 +2,9 @@ import torch
 import fractions
 
 def accuracy(output, target, topk=(1,), max_traj_len=0):
+    
+    output = output.cuda()
+    target = target.cuda()
     # Ensure gradients are not calculated for this section
     with torch.no_grad():
         # Determine the maximum value of topk

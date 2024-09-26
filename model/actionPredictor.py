@@ -11,6 +11,8 @@ class ObservationConvEncoder(nn.Module):
             input_channels, output_channels, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv1d(
             output_channels, output_channels, kernel_size=3, stride=1, padding=1)
+        self.conv3 = nn.Conv1d(
+            output_channels, output_channels, kernel_size=3, stride=1, padding=1)
 
         # 初始化卷积核为近似恒等映射
         # with torch.no_grad():
@@ -29,12 +31,26 @@ class ObservationConvEncoder(nn.Module):
         x = x.unsqueeze(2)
         
         # print(x.shape)
-        
-        if self.ie_num == 2:
+        if self.ie_num == 0:
+            x = F.relu(self.conv1(x))
+        elif self.ie_num == 1:
+            x = F.relu(self.conv1(x))
+            x = F.relu(self.conv2(x))
+        elif self.ie_num == 2:
             x = F.relu(self.conv1(x))
             # print(x.shape)
             x = F.relu(self.conv2(x))
             # print(x.shape)
+            x = F.relu(self.conv3(x))
+        elif self.ie_num == 3:
+            x = self.conv1(x)
+        elif self.ie_num == 4:
+            x = self.conv1(x)
+            x = self.conv2(x)
+        elif self.ie_num == 5:
+            x = self.conv1(x)
+            x = self.conv2(x)
+            x = self.conv3(x)
         else:
             RuntimeError('unvalid ie_num!')
 
@@ -71,29 +87,29 @@ class LatentSpaceInterpolator(nn.Module):
 
     def forward(self, x1, x2):
         batch_size, *_ = x1.shape
+        
+        # print(x1.shape)# torch.Size([256, 1536])
+        # print(x2.shape)# torch.Size([256, 1536])
 
-        # Stack x1 and x2 along a new dimension
-        # Shape: (2, batch_size, dimension_num)
         x_combined = torch.stack([x1, x2], dim=0)
+        # print(x_combined.shape)# torch.Size([2, 256, 1536])
 
-        # Generate unique alpha values for each block
-        # Shape: (batch_size, block_num)
         alphas = self.sigmoid(self.alpha_generator(
             torch.ones(batch_size, self.dimension_num).to(x1.device)))
+        # print(alphas.shape)# torch.Size([256, 12])
 
-        # Expand alphas to match the dimensionality of the input
-        # Shape: (batch_size, block_num, 1)
         alphas = alphas.unsqueeze(-1)
-
-        # Compute the interpolated frames using broadcasting
-        # Shape: (batch_size, block_num, dimension_num)
+        # print(alphas.shape)# torch.Size([256, 12, 1])
+     
+        # print(x_combined[0].unsqueeze(1).shape)# torch.Size([256, 1, 1536])
+        # print(x_combined[1].unsqueeze(1).shape)# torch.Size([256, 1, 1536])
         interpolated_frames = (
             1 - alphas) * x_combined[0].unsqueeze(1) + alphas * x_combined[1].unsqueeze(1)
+        # print(interpolated_frames.shape)# torch.Size([256, 12, 1536])
 
         return interpolated_frames
 
 # Transformer Block
-
 
 class TransformerBlock(nn.Module):
     def __init__(self, dim, num_heads, num_layers):
@@ -106,7 +122,7 @@ class TransformerBlock(nn.Module):
         return x
 # Motion Predictor with Transformer blocks
 
-
+# self.args, self.args.observation_dim, self.args.observation_dim, dim, self.block_num
 class ActionPredictor(nn.Module):
     def __init__(self, args, input_dim, output_dim, dimension_num, block_num, num_transformer_blocks=1):
         super(ActionPredictor, self).__init__()

@@ -66,7 +66,7 @@ def accuracy2(output, target, topk=(1,), max_traj_len=0):
 
         # print_and_size(correct_a)  # torch.Size([256, 3])
         correct_all = []
-        for i in range(len(correct_a.shape[1])):
+        for i in range(correct_a.shape[1]):
             correct_all.append(correct_a[:,i].reshape(-1).float().mean().mul_(100.0))
 
         # 计算第一个时间步的平均准确率

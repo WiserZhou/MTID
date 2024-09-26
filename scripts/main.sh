@@ -66,7 +66,7 @@ nohup python main_distributed.py --dataset=NIV --name=NIV6 --gpu=0 \
       --base_model=predictor --transformer_num=2 --ie_num=2 > out/NIVtransformer_num2ie_num2_6.log 2>&1 &
 
 
-nohup python main_distributed.py --dataset=crosstask_how --name=how1 --gpu=4 \
+nohup python main_distributed.py --dataset=crosstask_how --name=how1 --gpu=0 \
       --base_model=predictor --horizon=3 --ifMask=True > out/output_how1.log 2>&1 &
 nohup python main_distributed.py --dataset=crosstask_how --name=how2 --gpu=5 \
       --base_model=predictor --horizon=4 > out/output_how2.log 2>&1 &

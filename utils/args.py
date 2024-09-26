@@ -173,10 +173,8 @@ def get_args(description='whl'):
                         type=int,
                         default=10,
                         help='')
-    parser.add_argument('--ie_num', type=int, default=2,
-                        help='image encoder convolution layer num,NIV:2')
-    parser.add_argument('--transformer_num', type=int,
-                        default=5, help='layer nums for transformer blocks,NIV:2,coin:7')
+
+
     parser.add_argument('--base_model', type=str,
                         default='base', help='predictor')
     parser.add_argument('--classfier_model',default='transformer',
@@ -221,10 +219,14 @@ def get_args(description='whl'):
     parser.add_argument('--model_dim',type=int,default=256,help='model dimension')
     parser.add_argument('--module_kind',type=str,default='all',help='ablation for module design')
     parser.add_argument('--encoder_kind',type=str,default='conv')
-    parser.add_argument('--mask_loss',type=str,default='1')
+    parser.add_argument('--mask_loss',type=str,default='none',help='1')
     parser.add_argument('--weight', default=6, type=float,
                         help='weight of the loss function')
-    parser.add_argument('--mask_iteration', type=str, default='add', help='')
+    parser.add_argument('--mask_iteration', type=str, default='none', help='add')
+    parser.add_argument('--transformer_num', type=int,
+                        default=5, help='layer nums for transformer blocks,NIV:2,coin:7')
+    parser.add_argument('--ie_num', type=int, default=1,
+                        help='image encoder convolution layer num,NIV:2')
     args = parser.parse_args()
     return args
 
