@@ -5,15 +5,15 @@ def get_args(description='whl'):
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--checkpoint_root',
                         type=str,
-                        default='/data/zhaobo/zhouyufan/MTID/checkpoint',
+                        default='/home/MTID/checkpoint',
                         help='checkpoint dir root')
     parser.add_argument('--checkpoint_max_root',
                         type=str,
-                        default='/data/zhaobo/zhouyufan/MTID/save_max',
+                        default='/home/MTID/save_max',
                         help='checkpoint max dir root')
     parser.add_argument('--log_root',
                         type=str,
-                        default='/data/zhaobo/zhouyufan/MTID/log/log',
+                        default='/home/MTID/log/log',
                         help='log dir root')
     parser.add_argument('--checkpoint_dir',
                         type=str,
@@ -87,19 +87,19 @@ def get_args(description='whl'):
                         help='')
     parser.add_argument('--root',
                         type=str,
-                        default='/data/zhaobo/zhouyufan/MTID/dataset/crosstask',
+                        default='/home/MTID/dataset/crosstask',
                         help='root path of dataset crosstask')
     parser.add_argument('--json_path_train',
                         type=str,
-                        default='/data/zhaobo/zhouyufan/MTID/dataset/crosstask/crosstask_release/train_list.json',
+                        default='/home/MTID/dataset/crosstask/crosstask_release/train_list.json',
                         help='path of the generated json file for train')
     parser.add_argument('--json_path_val',
                         type=str,
-                        default='/data/zhaobo/zhouyufan/MTID/dataset/crosstask/crosstask_release/test_list.json',
+                        default='/home/MTID/dataset/crosstask/crosstask_release/test_list.json',
                         help='path of the generated json file for val train mlp')
     parser.add_argument('--json_path_val2',
                         type=str,
-                        default='/data/zhaobo/zhouyufan/MTID/dataset/crosstask/crosstask_release/output.json',
+                        default='/home/MTID/dataset/crosstask/crosstask_release/output.json',
                         help='path of the generated json file for val train model')
     ########################################################################################
 
@@ -232,10 +232,3 @@ def get_args(description='whl'):
     parser.add_argument('--mask_scale',type=float,default=1.1,help='scale of mask loss')
     args = parser.parse_args()
     return args
-
-# --loss_type=Weighted_MSE --mask_loss=2 --weight=1
-# --loss_type=Weighted_MSE --mask_loss=2 --weight=6
-# --loss_type=Weighted_Gradient_MSE --mask_loss=2 --weight=6
-# --loss_type=Weighted_MSE --mask_loss=1 --weight=1
-# --loss_type=Weighted_MSE --mask_loss=1 --weight=6
-# --loss_type=Weighted_Gradient_MSE --mask_loss=1 --weight=6

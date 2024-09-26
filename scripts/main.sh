@@ -83,7 +83,7 @@ nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor111 
 
 
 
-python inference.py --base_model=predictor --dataset=NIV --name=NIV2 --horizon=3 --ckpt_path=/data/zhaobo/zhouyufan/PDPP-Optimize/save_max/epoch_NIV2_0066_0.pth.tar --gpu=0
+python inference.py --base_model=predictor --dataset=NIV --name=NIV2 --horizon=3 --ckpt_path=/home/PDPP-Optimize/save_max/epoch_NIV2_0066_0.pth.tar --gpu=0
 
 nohup python main_distributed.py --dataset=crosstask_how --name=howpredictor1 --gpu=0 \
       --base_model=predictor --horizon=3 --seed=3407 --ifMask=True > out/output_howpredictor1.log 2>&1 &
@@ -141,7 +141,7 @@ nohup python main_distributed.py --dataset=crosstask_how --name=test_loss --gpu=
 
 
 python inference.py --base_model=base --dataset=coin --name=howpredictor2 --horizon=3 --seed=3407 \
-       --ckpt_path=/data/zhaobo/zhouyufan/PDPP-Optimize/COIN_T=3_diffusion.pth.tar --gpu=5 --resume
+       --ckpt_path=/home/PDPP-Optimize/COIN_T=3_diffusion.pth.tar --gpu=5 --resume
 
 
 nohup python main_distributed.py --dataset=crosstask_how --name=test_loss1 --gpu=0 \

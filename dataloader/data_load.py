@@ -176,10 +176,6 @@ class PlanningDataset(Dataset):
             "NIV": "NIV/processed_data/"
         }
         
-        # /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/processed_data/23521_DUhlrNEsKys.npy
-        # /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/crosstask/crosstask_features/GNJfDOoVORM.npy
-        # /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/coin/full_npy/PutOnHairExtensions_122_xZecGPPhbHE.npy
-        # /data/zhaobo/zhouyufan/PDPP-Optimize/dataset/NIV/processed_data/changing_tire_0001.npy
         
         self.current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         # Determine the dataset path

@@ -101,8 +101,8 @@ class PlanningDataset(Dataset):
                     └── videos_val.csv or json
             """
 
-            val_csv_path = '/data/zhaobo/zhouyufan/MTID/dataset/crosstask/crosstask_release/raw/test_list.json'
-            video_csv_path = '/data/zhaobo/zhouyufan/MTID/dataset/crosstask/crosstask_release/raw/train_list.json'  # 'videos.csv')
+            val_csv_path = '/home/MTID/dataset/crosstask/crosstask_release/raw/test_list.json'
+            video_csv_path = '/home/MTID/dataset/crosstask/crosstask_release/raw/train_list.json'  # 'videos.csv')
 
             if crosstask_use_feature_how:
                 self.features_path = os.path.join(root, 'processed_data')

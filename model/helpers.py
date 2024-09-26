@@ -127,9 +127,6 @@ class FourierPosEmb(nn.Module):
 
         return emb
 
-# RuntimeError: mat1 and mat2 shapes cannot be multiplied (256x512 and 256x1024)
-# nohup python main_distributed.py --layer_num=5 --name=5layer --gpu=1 > out/output_5layer.log 2>&1
-
 
 class Downsample1d(nn.Module):
     def __init__(self, dim):

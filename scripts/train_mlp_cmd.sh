@@ -25,7 +25,7 @@ nohup python train_mlp.py --name=note5 --dataset=crosstask_how --horizon=3 \
 python temp.py --num_thread_reader=1 --resume --dataset=coin \
        --batch_size=32 --batch_size_val=32 --horizon=3 \
        --num_heads=8 --num_layers=6 --dim_feedforward=2048 --dropout=0.3 \
-       --ckpt_path=/data/zhaobo/zhouyufan/MTID/save_max_mlp/epoch_note7_0030.pth.tar --gpu=7
+       --ckpt_path=/home/MTID/save_max_mlp/epoch_note7_0030.pth.tar --gpu=7
 
 
 

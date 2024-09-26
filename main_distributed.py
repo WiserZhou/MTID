@@ -235,8 +235,6 @@ def main_worker(gpu, ngpus_per_node, args):
             
     if args.rank == 0:
         project_name = f"MTID_{args.dataset}_T{args.horizon}"
-        # https://github.com/wandb/wandb/issues/8359
-        # wandb.init(settings=wandb.Settings(_disable_stats=True))
         wandb.init(project=project_name, name=wandb_name, config=args,
                    settings=wandb.Settings(_disable_stats=True))  # Add this line)
         wandb.watch(model.model)
@@ -363,8 +361,6 @@ def main_worker(gpu, ngpus_per_node, args):
                 for i in range(len(correct_all_reduced)):
                     logs['Val/acc_all_' + str(i)] = correct_all_reduced[i]
                 wandb.log(logs, step=epoch + 1)
-                
-                print(trajectory_success_rate_meter_reduced,acc_top1_reduced,MIoU2_meter_reduced,MIoU1_meter_reduced, max_eva, max_mAcc, max_mIoU)
 
             # Save checkpoint if the new trajectory success rate is better
             if trajectory_success_rate_meter_reduced > max_eva and acc_top1_reduced >= max_acc:

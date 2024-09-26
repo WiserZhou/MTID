@@ -196,11 +196,3 @@ CUDA_VISIBLE_DEVICES=0 python uncertain.py --multiprocessing-distributed --num_t
 ```
 
 ```
-
-
-
-### Acknowledgements
-
-------
-
-We would like to thank [PDPP](https://github.com/MCG-NJU/PDPP) and [diffusers](https://github.com/huggingface/diffusers) for their excellent code! 
