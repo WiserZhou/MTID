@@ -111,7 +111,7 @@ nohup python train_mlp.py --name=how1 --dataset=crosstask_how --gpu=0 --epochs=1
 
 | Dataset   | observation_dim      | action_dim | class_dim |
 | --------- | -------------------- | ---------- | --------- |
-| CrossTask | 1536(how) 9600(base) | 105        | 18        |
+| CrossTask | 1536(how)            | 105        | 18        |
 | COIN      | 1536                 | 778        | 180       |
 | NIV       | 1536                 | 48         | 5         |
 
@@ -130,16 +130,6 @@ CUDA_VISIBLE_DEVICES=0 python temp.py --num_thread_reader=1 --resume --batch_siz
 nohup python main_distributed.py --dataset=crosstask_how --name=how1 --gpu=0 --base_model=predictor --horizon=3 > out/how1.log 2>&1 &
 ```
 
-
-​	  Training settings for different datasets are listed below:
-
-| Dataset            | n_diffusion_steps | n_train_steps | epochs | learning-rate |
-| ------------------ | ----------------- | ------------- | ------ | ------------- |
-| CrossTask$_{Base}$ | 200               | 200           | 80     | 8e-4          |
-| CrossTask$_{How}$  | 200               | 200           | 100    | 5e-4          |
-| COIN               | 200               | 200           | 100    | 1e-5          |
-| NIV                | 50                | 50            | 100    | 3e-4          |
-
 ​	  To train the $Deterministic$ and $Noise$ baselines, you need to modify `temporal.py` to remove 'time_mlp' modules and modify `diffusion.py` to change the initial noise, 'training' functions and `p_sample_loop` process.
 
 
@@ -157,15 +147,6 @@ All results have been printed to the `log` files in the `out` folder. If you wan
 python inference.py --resume --base_model=predictor --gpu=0 --ckpt_path=/path > output.txt
 ```
 
-​	  **Results** of given checkpoints:
-
-|                         | SR    | mAcc  | MIoU  |
-| ----------------------- | ----- | ----- | ----- |
-| Crosstask_T=3_MTID      | 40.45 | 67.19 | 69.17 |
-| COIN_T=3_MIID           | 28.84 | 50.44 | 57.86 |
-| NIV_T=3_MTID            | 29.63 | 48.02 | 56.49 |
-
-
 
 ##### For probabilistic modeling
 
@@ -176,14 +157,6 @@ python inference.py --resume --base_model=predictor --gpu=0 --ckpt_path=/path > 
 ```
 CUDA_VISIBLE_DEVICES=0 python uncertain.py --multiprocessing-distributed --num_thread_reader=1 --cudnn_benchmark=1 --pin_memory --checkpoint_dir=whl --resume --batch_size=32 --batch_size_val=32 --evaluate > output.txt
 ```
-
-​	  **Results** of given checkpoints:
-
-|                         | NLL  | KL-Div | ModePrec | ModeRec |
-| ----------------------- | ---- | ------ | -------- | ------- |
-| Crosstask_T=6_diffusion | 4.06 | 2.76   | 25.61    | 22.68   |
-| Crosstask_T=6_noise     | 4.79 | 3.49   | 24.51    | 11.04   |
-| Crosstask_T=6_zero      | 5.12 | 3.82   | 25.24    | 6.75    |
 
 
 
