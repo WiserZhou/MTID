@@ -2,7 +2,9 @@
 
 <div align="center">
 
-[![openreview](https://img.shields.io/badge/openreview-poster-blue)](https://openreview.net/forum?id=HnpDHiItd2&referrer=%5BAuthor%20Console%5D(%2Fgroup%3Fid%3DICLR.cc%2F2025%2FConference%2FAuthors%23your-submissions))
+[![OpenReview](https://img.shields.io/badge/OpenReview-Paper-blue)](https://openreview.net/forum?id=HnpDHiItd2)
+[![Project Page](https://img.shields.io/badge/Project-Page-38A7A7)](https://yuankjing.github.io/MTID-Project-Page/)
+
 </div>
 
 > #### [**MTID**: Masked Temporal Interpolation Diffusion For Procedure Planning]()
